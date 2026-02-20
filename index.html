@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>企优咨·商标申请下单系统 (移动/桌面版)</title>
+    <title>企优咨·商标申请下单系统 (折叠树版)</title>
     <style>
         * {
             box-sizing: border-box;
@@ -45,7 +45,7 @@
         }
         .main-layout {
             display: grid;
-            grid-template-columns: 1fr 1fr 1.2fr;  /* 三列桌面 */
+            grid-template-columns: 1fr 1fr 1.2fr;
             gap: 20px;
             padding: 24px;
             background: #f9fafc;
@@ -93,15 +93,39 @@
             padding: 8px 4px;
             background: #ffffff;
         }
+        /* 折叠展开样式 */
         .tree-ul {
             list-style: none;
             padding-left: 0;
         }
-        .tree-li {
-            margin: 2px 0;
+        .tree-ul ul {
+            display: none;  /* 默认隐藏子列表 */
+            margin-left: 16px;
+            padding-left: 8px;
+            border-left: 1px dashed #ccc;
         }
-        .tree-ul .tree-ul {
-            padding-left: 20px;
+        .tree-ul li.expanded > ul {
+            display: block; /* 展开时显示子列表 */
+        }
+        .folder-label {
+            cursor: pointer;
+            user-select: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 0;
+            width: 100%;
+        }
+        .folder-label::before {
+            content: "▶";   /* 折叠状态图标 */
+            font-size: 0.8rem;
+            color: #003d7c;
+            transition: transform 0.1s;
+            display: inline-block;
+            width: 16px;
+        }
+        li.expanded > .folder-label::before {
+            content: "▼";   /* 展开状态图标 */
         }
         .cat-major {
             font-weight: 600;
@@ -339,39 +363,18 @@
             text-align: right;
         }
 
-        /* ----- 移动端适配 (宽度 ≤ 900px) ----- */
+        /* 移动端适配 */
         @media (max-width: 900px) {
             body { padding: 10px; }
             .main-layout {
-                grid-template-columns: 1fr;  /* 单列 */
+                grid-template-columns: 1fr;
                 gap: 16px;
                 padding: 16px;
             }
-            .card-title {
-                font-size: 1.2rem;
-            }
-            .tree-container {
-                max-height: 400px;
-            }
-            .selected-list {
-                max-height: 200px;
-            }
-            .fee-box {
-                max-height: 300px;
-            }
-            .btn-primary, .btn-secondary {
-                padding: 12px 20px;
-                font-size: 0.95rem;
-            }
-            .scheme-option {
-                flex-wrap: wrap;
-                gap: 6px;
-            }
-            .scheme-name {
-                min-width: auto;
-            }
+            .tree-container { max-height: 400px; }
+            .selected-list { max-height: 200px; }
+            .fee-box { max-height: 300px; }
         }
-        /* 小屏手机 */
         @media (max-width: 480px) {
             .header h1 { font-size: 1.5rem; }
             .card { padding: 16px; }
@@ -383,7 +386,7 @@
 <div class="app-container">
     <div class="header">
         <h1>📋 企优咨 · 商标申请</h1>
-        <p>移动/桌面自适应 | 数据加载同目录下 JSON</p>
+        <p>移动/桌面自适应 | 折叠树版 | 数据加载同目录下 JSON</p>
     </div>
 
     <div class="main-layout">
@@ -653,69 +656,7 @@
             refreshUI();
         }
 
-        // 渲染树
-        function renderTree(filterText = '') {
-            const treeElem = document.getElementById('categoryTree');
-            treeElem.innerHTML = '';
-            if (!rawData || rawData.length === 0) {
-                treeElem.innerHTML = '<li style="padding:20px; color:red;">⚠️ 未加载分类数据，请确保JSON文件存在</li>';
-                return;
-            }
-
-            let matchCount = 0;
-            const lowerFilter = filterText.toLowerCase().trim();
-
-            rawData.forEach(majorNode => {
-                const majorName = majorNode.大类 || majorNode.name || '';
-                let groupHTML = '';
-
-                (majorNode.children || []).forEach(groupNode => {
-                    const groupName = groupNode.name || groupNode.类似群组 || '';
-                    const groupNumber = groupNode.类似群组 || '';
-                    const groupText = `${groupNumber} ${groupName}`.toLowerCase();
-                    let groupHasMatch = false;
-                    let subItemsHTML = '';
-
-                    (groupNode.children || []).forEach(subNode => {
-                        const subName = subNode.小类 || subNode.name || '';
-                        const subText = subName.toLowerCase();
-                        const match = !lowerFilter || 
-                                      majorName.toLowerCase().includes(lowerFilter) ||
-                                      groupText.includes(lowerFilter) ||
-                                      subText.includes(lowerFilter);
-                        if (match || !lowerFilter) {
-                            groupHasMatch = true;
-                            matchCount++;
-                            const checked = (selectedSubclasses[majorName] && selectedSubclasses[majorName].includes(subName)) ? 'checked' : '';
-                            subItemsHTML += `<li class="subclass-item">
-                                <input type="checkbox" class="subclass-checkbox" data-major="${escapeAttr(majorName)}" data-sub="${escapeAttr(subName)}" ${checked}>
-                                <span class="subclass-name">${escapeHtml(subName)}</span>
-                            </li>`;
-                        }
-                    });
-
-                    if (groupHasMatch || !lowerFilter) {
-                        groupHTML += `<li class="tree-li"><div class="cat-group">📁 ${escapeHtml(groupNumber)} - ${escapeHtml(groupName)}</div>`;
-                        groupHTML += `<ul class="tree-ul">${subItemsHTML}</ul></li>`;
-                    }
-                });
-
-                if (groupHTML || !lowerFilter) {
-                    const majorDisplay = `<div class="cat-major">📌 大类 ${escapeHtml(majorName)}</div>`;
-                    const ul = `<ul class="tree-ul">${groupHTML}</ul>`;
-                    treeElem.innerHTML += `<li class="tree-li">${majorDisplay}${ul}</li>`;
-                }
-            });
-
-            document.getElementById('searchCount').innerText = lowerFilter ? `🔍 匹配 ${matchCount} 项` : `共 ${getTotalSubCount()} 小类`;
-
-            document.querySelectorAll('.subclass-checkbox').forEach(cb => {
-                cb.removeEventListener('change', handleCheckboxChange);
-                cb.addEventListener('change', handleCheckboxChange);
-            });
-            syncCheckboxesFromSelected();
-        }
-
+        // 转义函数
         function escapeHtml(unsafe) {
             return unsafe.replace(/[&<>"]/g, function(m) {
                 if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; if(m === '"') return '&quot;';
@@ -730,6 +671,106 @@
             let c = 0;
             rawData.forEach(m => (m.children || []).forEach(g => (g.children || []).forEach(() => c++)));
             return c;
+        }
+
+        // 渲染树（带折叠展开功能）
+        function renderTree(filterText = '') {
+            const treeElem = document.getElementById('categoryTree');
+            treeElem.innerHTML = '';
+            if (!rawData || rawData.length === 0) {
+                treeElem.innerHTML = '<li style="padding:20px; color:red;">⚠️ 未加载分类数据</li>';
+                return;
+            }
+
+            let matchCount = 0;
+            const lowerFilter = filterText.toLowerCase().trim();
+            const hasFilter = lowerFilter !== '';
+
+            rawData.forEach(majorNode => {
+                const majorName = majorNode.大类 || majorNode.name || '';
+                let majorHasMatch = false;
+                let groupsHTML = '';
+
+                (majorNode.children || []).forEach(groupNode => {
+                    const groupName = groupNode.name || groupNode.类似群组 || '';
+                    const groupNumber = groupNode.类似群组 || '';
+                    const groupText = `${groupNumber} ${groupName}`.toLowerCase();
+                    let groupHasMatch = false;
+                    let subItemsHTML = '';
+
+                    (groupNode.children || []).forEach(subNode => {
+                        const subName = subNode.小类 || subNode.name || '';
+                        const subText = subName.toLowerCase();
+                        const match = !hasFilter || 
+                                      majorName.toLowerCase().includes(lowerFilter) ||
+                                      groupText.includes(lowerFilter) ||
+                                      subText.includes(lowerFilter);
+                        if (match || !hasFilter) {
+                            groupHasMatch = true;
+                            majorHasMatch = true;
+                            matchCount++;
+                            const checked = (selectedSubclasses[majorName] && selectedSubclasses[majorName].includes(subName)) ? 'checked' : '';
+                            subItemsHTML += `<li class="subclass-item">
+                                <input type="checkbox" class="subclass-checkbox" data-major="${escapeAttr(majorName)}" data-sub="${escapeAttr(subName)}" ${checked}>
+                                <span class="subclass-name">${escapeHtml(subName)}</span>
+                            </li>`;
+                        }
+                    });
+
+                    if (groupHasMatch || !hasFilter) {
+                        // 如果群组下有匹配项（或没有过滤），则生成群组HTML，并根据是否有过滤决定是否自动展开
+                        let groupLiClass = 'tree-li group-li';
+                        if (hasFilter && groupHasMatch) groupLiClass += ' expanded'; // 搜索时展开匹配的群组
+                        groupsHTML += `<li class="${groupLiClass}">
+                            <div class="folder-label cat-group" data-group="${escapeAttr(groupNumber)}">📁 ${escapeHtml(groupNumber)} - ${escapeHtml(groupName)}</div>
+                            <ul class="group-subs">${subItemsHTML}</ul>
+                        </li>`;
+                    }
+                });
+
+                if (majorHasMatch || !hasFilter) {
+                    // 生成大类HTML，并根据是否有过滤决定是否自动展开
+                    let majorLiClass = 'tree-li major-li';
+                    if (hasFilter && majorHasMatch) majorLiClass += ' expanded'; // 搜索时展开匹配的大类
+                    const majorLi = document.createElement('li');
+                    majorLi.className = majorLiClass;
+                    majorLi.innerHTML = `
+                        <div class="folder-label cat-major" data-major="${escapeAttr(majorName)}">📌 大类 ${escapeHtml(majorName)}</div>
+                        <ul class="major-groups">${groupsHTML}</ul>
+                    `;
+                    treeElem.appendChild(majorLi);
+                }
+            });
+
+            document.getElementById('searchCount').innerText = hasFilter ? `🔍 匹配 ${matchCount} 项` : `共 ${getTotalSubCount()} 小类`;
+
+            // 重新绑定复选框事件
+            document.querySelectorAll('.subclass-checkbox').forEach(cb => {
+                cb.removeEventListener('change', handleCheckboxChange);
+                cb.addEventListener('change', handleCheckboxChange);
+            });
+            syncCheckboxesFromSelected();
+
+            // 为所有可折叠的标题添加点击事件（大类、群组）
+            attachFolderListeners();
+        }
+
+        // 折叠/展开事件监听
+        function attachFolderListeners() {
+            document.querySelectorAll('.major-li > .folder-label').forEach(label => {
+                label.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const li = this.parentElement;
+                    li.classList.toggle('expanded');
+                });
+            });
+            document.querySelectorAll('.group-li > .folder-label').forEach(label => {
+                label.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const li = this.parentElement;
+                    li.classList.toggle('expanded');
+                });
+            });
         }
 
         // 加载JSON
