@@ -51,6 +51,9 @@
                         <div style="padding: 16px; font-weight: bold; border-bottom: 1px solid #eee;">选择小类</div>
                         <div style="flex:1; overflow-y: auto; padding: 12px;">
                             <van-search v-model="searchText" placeholder="搜索小类名称" />
+                            <div v-if="categories.length === 0" style="text-align: center; color: #999; padding: 20px;">
+                                正在加载分类数据...
+                            </div>
                             <div v-for="cat in filteredCategories" :key="cat.id" style="margin-bottom: 16px;">
                                 <div style="font-weight: bold; background: #f0f0f0; padding: 8px;">{{ cat.name }}</div>
                                 <div v-for="group in cat.children" :key="group.id" style="margin-left: 12px;">
@@ -90,13 +93,13 @@
                 <van-cell-group inset>
                     <van-radio-group v-model="plan">
                         <van-cell-group>
-                            <van-cell title="A方案·流程跟进" clickable @click="plan='A'">
+                            <van-cell title="A方案·流程跟进 (380元/大类，含10小类)" clickable @click="plan='A'">
                                 <template #right-icon><van-radio name="A" /></template>
                             </van-cell>
-                            <van-cell title="B方案·专业辅导" clickable @click="plan='B'">
+                            <van-cell title="B方案·专业辅导 (580元/大类，含10小类)" clickable @click="plan='B'">
                                 <template #right-icon><van-radio name="B" /></template>
                             </van-cell>
-                            <van-cell title="C方案·后置付费" clickable @click="plan='C'">
+                            <van-cell title="C方案·后置付费 (1100元/大类，含10小类)" clickable @click="plan='C'">
                                 <template #right-icon><van-radio name="C" /></template>
                             </van-cell>
                         </van-cell-group>
@@ -161,26 +164,59 @@
                 const plan = ref('A');
                 const needInvoice = ref(false);
 
+                // 备选示例数据（当data.json加载失败时使用）
+                const fallbackCategories = [
+                    {
+                        "id": "category_01化学原料",
+                        "name": "大类 01化学原料",
+                        "children": [
+                            {
+                                "id": "group_01化学原料_0101",
+                                "name": "类似群组 0101",
+                                "children": [
+                                    { "id": "subclass_01化学原料_0101_氦", "name": "氦" },
+                                    { "id": "subclass_01化学原料_0101_氢", "name": "氢" }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "id": "category_02颜料油漆",
+                        "name": "大类 02颜料油漆",
+                        "children": [
+                            {
+                                "id": "group_02颜料油漆_0201",
+                                "name": "类似群组 0201",
+                                "children": [
+                                    { "id": "subclass_02颜料油漆_0201_染料", "name": "染料" },
+                                    { "id": "subclass_02颜料油漆_0201_媒染剂", "name": "媒染剂" }
+                                ]
+                            }
+                        ]
+                    }
+                ];
+
                 // 加载分类数据
                 const loadCategories = async () => {
                     try {
                         const resp = await fetch('data.json');
+                        if (!resp.ok) throw new Error('网络响应错误');
                         const data = await resp.json();
                         categories.value = data;
-                        // 构建idMap
-                        const map = new Map();
-                        data.forEach(cat => {
-                            cat.children.forEach(group => {
-                                group.children.forEach(sub => {
-                                    map.set(sub.id, { category: cat.name, name: sub.name });
-                                });
+                    } catch (e) {
+                        console.warn('加载 data.json 失败，使用备选示例数据', e);
+                        categories.value = fallbackCategories; // 使用备选数据
+                    }
+                    // 构建idMap
+                    const map = new Map();
+                    categories.value.forEach(cat => {
+                        cat.children.forEach(group => {
+                            group.children.forEach(sub => {
+                                map.set(sub.id, { category: cat.name, name: sub.name });
                             });
                         });
-                        idMap.value = map;
-                    } catch (e) {
-                        console.error('加载分类数据失败', e);
-                        vant.Toast.fail('加载分类数据失败');
-                    }
+                    });
+                    idMap.value = map;
                 };
 
                 // 搜索过滤
@@ -276,10 +312,21 @@
                     };
                 });
 
-                // 费用明细HTML文本
+                // 费用明细HTML文本（改进：未选小类时显示默认方案说明）
                 const feeText = computed(() => {
                     const d = feeDetails.value;
-                    if (d.catCountArr.length === 0) return '请先选择小类';
+                    if (d.catCountArr.length === 0) {
+                        // 未选择小类时显示默认方案说明
+                        return `
+                            <b>⚠️ 尚未选择任何小类</b><br>
+                            请在分类中选择需要的商标小类，费用将自动计算。<br><br>
+                            <b>=== 服务方案说明 ===</b><br>
+                            A方案·流程跟进: 380元/大类（含10小类）<br>
+                            B方案·专业辅导: 580元/大类（含10小类）<br>
+                            C方案·后置付费: 1100元/大类（含10小类）<br>
+                            <span style="color:gray;">*超出部分按38/58/110元/小类加收</span>
+                        `;
+                    }
                     let html = '';
                     html += `<b>=== 服务方案: ${plan.value}方案 ===</b><br>`;
                     html += `基础价格：每大类${plan.value==='A'?380:plan.value==='B'?580:1100}元（含10小类），超出${plan.value==='A'?38:plan.value==='B'?58:110}元/小类。<br>`;
@@ -303,7 +350,10 @@
                         html += `🔹 首付款: ${(d.totalWithInvoice * d.downPaymentRatio).toFixed(2)}元<br>`;
                         html += '🔹 尾款（每大类下证后）:<br>';
                         d.catCountArr.forEach(item => {
-                            const catFee = item.cnt <= 10 ? (plan.value==='C'?1100:0) : (plan.value==='C'?1100 + (item.cnt-10)*110:0);
+                            // 计算该大类的基础费用
+                            const catBase = plan.value === 'C' ? 1100 : 0;
+                            const catExtra = plan.value === 'C' ? 110 : 0;
+                            const catFee = item.cnt <= 10 ? catBase : catBase + (item.cnt - 10) * catExtra;
                             const catFeeWithInvoice = catFee * (needInvoice.value ? 1.05 : 1);
                             const tail = catFeeWithInvoice * d.tailPaymentRatio;
                             html += `   ${item.cat}：${tail.toFixed(2)}元<br>`;
