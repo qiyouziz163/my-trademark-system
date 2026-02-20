@@ -2,564 +2,865 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>企优咨·商标申请</title>
-    <!-- 引入 Vant 样式 -->
-    <link rel="stylesheet" href="https://unpkg.com/vant@4/lib/index.css">
-    <!-- 引入 Vue 3 -->
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <!-- 引入 Vant 组件库 -->
-    <script src="https://unpkg.com/vant@4/lib/vant.min.js"></script>
-    <!-- 引入 docx 和 FileSaver 用于生成 Word -->
-    <script src="https://unpkg.com/docx@8.0.0/build/index.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>企优咨·商标申请下单系统 (移动/桌面版)</title>
     <style>
-        body { margin: 0; background-color: #f5f5f5; font-family: 'Microsoft YaHei', sans-serif; }
-        .app { padding: 12px; }
-        .section-title { font-size: 16px; font-weight: bold; color: #0078D7; margin: 12px 0 8px; }
-        .van-cell-group { margin-bottom: 12px; }
-        .selected-item { display: inline-block; background: #e6f7ff; border: 1px solid #91d5ff; border-radius: 16px; padding: 4px 12px; margin: 4px; font-size: 13px; }
-        .fee-detail { background: white; padding: 12px; border-radius: 8px; white-space: pre-wrap; font-size: 14px; line-height: 1.6; max-height: 200px; overflow-y: auto; border: 1px solid #eee; }
-        .red { color: #c00000; font-weight: bold; }
-        .invoice-checkbox .van-checkbox__label { color: black; }
-        .invoice-checkbox.is-checked .van-checkbox__label { color: #c00000; }
-        .button-row { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
-        .button-row .van-button { flex: 1; }
-        .image-preview { width: 100%; max-height: 150px; object-fit: contain; margin-top: 8px; border: 1px dashed #ccc; border-radius: 8px; padding: 4px; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, '微软雅黑', system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 16px;
+        }
+        .app-container {
+            max-width: 1200px;
+            width: 100%;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(0,20,60,0.08);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #002856 0%, #003d7c 100%);
+            color: white;
+            padding: 24px 22px;
+        }
+        .header h1 {
+            font-size: 1.9rem;
+            font-weight: 500;
+            margin: 0;
+            letter-spacing: 0.5px;
+            line-height: 1.2;
+        }
+        .header p {
+            margin: 8px 0 0;
+            opacity: 0.8;
+            font-size: 0.95rem;
+        }
+        .main-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.2fr;  /* 三列桌面 */
+            gap: 20px;
+            padding: 24px;
+            background: #f9fafc;
+        }
+        .card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.02);
+            padding: 20px;
+            border: 1px solid rgba(0,40,86,0.06);
+        }
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #003d7c;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 2px solid #eef2f6;
+            padding-bottom: 10px;
+        }
+        .search-box {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+        .search-box input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #d9e1ec;
+            border-radius: 40px;
+            font-size: 1rem;
+            outline: none;
+        }
+        .search-box input:focus {
+            border-color: #003d7c;
+            box-shadow: 0 0 0 3px rgba(0,61,124,0.1);
+        }
+        .tree-container {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #eaeef4;
+            border-radius: 20px;
+            padding: 8px 4px;
+            background: #ffffff;
+        }
+        .tree-ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .tree-li {
+            margin: 2px 0;
+        }
+        .tree-ul .tree-ul {
+            padding-left: 20px;
+        }
+        .cat-major {
+            font-weight: 600;
+            color: #1e2f4e;
+            background: #f2f6fc;
+            padding: 8px 16px;
+            border-radius: 30px;
+            margin: 12px 0 6px;
+            font-size: 1rem;
+        }
+        .cat-group {
+            font-weight: 500;
+            color: #2a4b7c;
+            padding: 6px 0 4px 12px;
+            background: #f8faff;
+            border-radius: 20px 0 0 20px;
+            margin: 4px 0;
+        }
+        .subclass-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 8px 6px 20px;
+            border-radius: 30px;
+        }
+        .subclass-item:hover {
+            background: #edf3ff;
+        }
+        .subclass-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: #003d7c;
+            flex-shrink: 0;
+        }
+        .subclass-name {
+            font-size: 0.95rem;
+            word-break: break-word;
+        }
+        .selected-list {
+            min-height: 150px;
+            max-height: 250px;
+            overflow-y: auto;
+            background: #f8fafd;
+            border-radius: 18px;
+            padding: 12px;
+            border: 1px solid #dee7f0;
+            margin: 15px 0;
+        }
+        .selected-list ul {
+            padding-left: 20px;
+        }
+        .selected-list li {
+            margin: 5px 0;
+            color: #1f3a5f;
+        }
+        .badge {
+            background: #d3e5ff;
+            color: #003d7c;
+            border-radius: 30px;
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .btn-clear {
+            background: white;
+            border: 1px solid #ccdae9;
+            border-radius: 40px;
+            padding: 8px 18px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: 0.1s;
+        }
+        .btn-clear:hover {
+            background: #f0f4fe;
+        }
+        .form-row {
+            margin-bottom: 18px;
+        }
+        .form-row label {
+            display: block;
+            font-weight: 500;
+            color: #1f3a5f;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+        .form-row input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d0ddee;
+            border-radius: 40px;
+            font-size: 1rem;
+            outline: none;
+        }
+        .form-row input:focus {
+            border-color: #003d7c;
+            box-shadow: 0 0 0 3px rgba(0,61,124,0.1);
+        }
+        .upload-area {
+            border: 2px dashed #b6cae0;
+            border-radius: 24px;
+            padding: 24px;
+            text-align: center;
+            background: #fcfdff;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        .upload-area:hover {
+            background: #f2f8ff;
+            border-color: #003d7c;
+        }
+        .preview-box {
+            margin-top: 12px;
+            display: flex;
+            justify-content: center;
+            background: #f4f8ff;
+            border-radius: 18px;
+            padding: 16px;
+            min-height: 120px;
+            align-items: center;
+        }
+        .preview-box img {
+            max-width: 100%;
+            max-height: 160px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .scheme-panel {
+            background: #f6faff;
+            border-radius: 20px;
+            padding: 12px;
+        }
+        .scheme-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 14px;
+            background: white;
+            border-radius: 40px;
+            margin-bottom: 8px;
+            border: 1px solid #e0eaf7;
+            cursor: pointer;
+        }
+        .scheme-option.selected {
+            border: 2px solid #003d7c;
+            background: #eaf3ff;
+        }
+        .scheme-option input[type="radio"] {
+            accent-color: #003d7c;
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+        .scheme-name {
+            font-weight: 600;
+            min-width: 120px;
+            font-size: 0.95rem;
+        }
+        .scheme-desc {
+            font-size: 0.85rem;
+            color: #2f4b74;
+        }
+        .invoice-check {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+            padding: 14px 18px;
+            border-radius: 40px;
+            border: 1px solid #dae3f0;
+            margin: 18px 0;
+        }
+        .invoice-check input {
+            width: 20px;
+            height: 20px;
+            accent-color: #003d7c;
+        }
+        .invoice-check label {
+            font-weight: 500;
+            font-size: 1rem;
+        }
+        .fee-box {
+            background: #f2f6fd;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 0;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            max-height: 350px;
+            overflow-y: auto;
+            border: 1px solid #c9d8ec;
+        }
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .btn-primary {
+            background: #003d7c;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 8px 16px rgba(0,61,124,0.2);
+            transition: 0.1s;
+            flex: 1 1 auto;
+        }
+        .btn-primary:hover {
+            background: #002856;
+            transform: scale(0.98);
+        }
+        .btn-secondary {
+            background: white;
+            border: 1px solid #b6cae0;
+            padding: 14px 24px;
+            border-radius: 40px;
+            font-weight: 500;
+            cursor: pointer;
+            flex: 1 1 auto;
+        }
+        .btn-secondary:hover {
+            background: #f2f8ff;
+        }
+        .footer-info {
+            color: #6f7d95;
+            padding: 14px 24px;
+            border-top: 1px solid #e0e8f2;
+            font-size: 0.85rem;
+            text-align: right;
+        }
+
+        /* ----- 移动端适配 (宽度 ≤ 900px) ----- */
+        @media (max-width: 900px) {
+            body { padding: 10px; }
+            .main-layout {
+                grid-template-columns: 1fr;  /* 单列 */
+                gap: 16px;
+                padding: 16px;
+            }
+            .card-title {
+                font-size: 1.2rem;
+            }
+            .tree-container {
+                max-height: 400px;
+            }
+            .selected-list {
+                max-height: 200px;
+            }
+            .fee-box {
+                max-height: 300px;
+            }
+            .btn-primary, .btn-secondary {
+                padding: 12px 20px;
+                font-size: 0.95rem;
+            }
+            .scheme-option {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            .scheme-name {
+                min-width: auto;
+            }
+        }
+        /* 小屏手机 */
+        @media (max-width: 480px) {
+            .header h1 { font-size: 1.5rem; }
+            .card { padding: 16px; }
+            .subclass-item { padding-left: 10px; }
+        }
     </style>
 </head>
 <body>
-    <div id="app">
-        <van-config-provider :theme-vars="themeVars">
-            <div class="app">
-                <!-- 分类选择区域 -->
-                <div class="section-title">📌 一、选择商标小类</div>
-                <van-cell-group inset>
-                    <van-cell title="已选小类" :value="selectedCount + '个'" is-link @click="showCategoryPopup = true" />
-                </van-cell-group>
-                <!-- 已选小类标签列表 -->
-                <div style="margin: 8px 0;">
-                    <span v-for="item in selectedSubDetails" :key="item.id" class="selected-item">
-                        {{ item.category }} - {{ item.name }}
-                        <van-icon name="cross" @click="removeSub(item.id)" style="margin-left: 4px;" />
-                    </span>
-                </div>
-
-                <!-- 分类选择弹出层 -->
-                <van-popup v-model:show="showCategoryPopup" position="bottom" round :style="{ height: '80%' }">
-                    <div style="height: 100%; display: flex; flex-direction: column;">
-                        <div style="padding: 16px; font-weight: bold; border-bottom: 1px solid #eee;">选择小类</div>
-                        <div style="flex:1; overflow-y: auto; padding: 12px;">
-                            <van-search v-model="searchText" placeholder="搜索小类名称" />
-                            <div v-if="categories.length === 0" style="text-align: center; color: #999; padding: 20px;">
-                                正在加载分类数据...
-                            </div>
-                            <div v-for="cat in filteredCategories" :key="cat.id" style="margin-bottom: 16px;">
-                                <div style="font-weight: bold; background: #f0f0f0; padding: 8px;">{{ cat.name }}</div>
-                                <div v-for="group in cat.children" :key="group.id" style="margin-left: 12px;">
-                                    <div style="font-size: 14px; color: #666; margin: 8px 0 4px;">{{ group.name }}</div>
-                                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                                        <van-checkbox v-for="sub in group.children" :key="sub.id" v-model="selectedSet" :name="sub.id" shape="square" style="width: 45%; margin-bottom: 4px;">
-                                            {{ sub.name }}
-                                        </van-checkbox>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div style="padding: 12px;">
-                            <van-button type="primary" block @click="showCategoryPopup = false">完成</van-button>
-                        </div>
-                    </div>
-                </van-popup>
-
-                <!-- 申请人信息 -->
-                <div class="section-title">👤 二、申请人信息</div>
-                <van-cell-group inset>
-                    <van-field v-model="form.applicant" label="申请人全称" placeholder="请输入" />
-                    <van-field v-model="form.trademark" label="商标名称" placeholder="请输入" />
-                    <van-field v-model="form.phone" label="联系电话" placeholder="请输入" />
-                    <van-field v-model="form.contact" label="联系人姓名" placeholder="请输入" />
-                </van-cell-group>
-
-                <!-- 商标图样 -->
-                <div class="section-title">🖼️ 三、商标图样</div>
-                <van-cell-group inset>
-                    <van-uploader v-model="imageList" :max-count="1" :after-read="afterImageRead" />
-                </van-cell-group>
-                <img v-if="imagePreview" :src="imagePreview" class="image-preview" alt="预览" />
-
-                <!-- 服务方案 -->
-                <div class="section-title">🎯 四、服务方案</div>
-                <van-cell-group inset>
-                    <van-radio-group v-model="plan">
-                        <van-cell-group>
-                            <van-cell title="A方案·流程跟进 (380元/大类，含10小类)" clickable @click="plan='A'">
-                                <template #right-icon><van-radio name="A" /></template>
-                            </van-cell>
-                            <van-cell title="B方案·专业辅导 (580元/大类，含10小类)" clickable @click="plan='B'">
-                                <template #right-icon><van-radio name="B" /></template>
-                            </van-cell>
-                            <van-cell title="C方案·后置付费 (1100元/大类，含10小类)" clickable @click="plan='C'">
-                                <template #right-icon><van-radio name="C" /></template>
-                            </van-cell>
-                        </van-cell-group>
-                    </van-radio-group>
-                </van-cell-group>
-
-                <!-- 专票选项 -->
-                <van-cell-group inset>
-                    <van-cell title="开具专票（加收5%）">
-                        <template #right-icon>
-                            <van-checkbox v-model="needInvoice" :class="{ 'is-checked': needInvoice }" />
-                        </template>
-                    </van-cell>
-                </van-cell-group>
-
-                <!-- 费用明细 -->
-                <div class="section-title">💰 五、费用明细</div>
-                <div class="fee-detail" v-html="feeText"></div>
-
-                <!-- 操作按钮 -->
-                <div class="button-row">
-                    <van-button type="primary" @click="exportOrder">📄 导出Word订单</van-button>
-                    <van-button type="success" @click="copySummary">📋 复制摘要</van-button>
-                </div>
-                <div class="button-row">
-                    <van-button plain @click="clearAll">🧹 清空</van-button>
-                    <van-button plain @click="loadLastRecord">🔄 加载最近记录</van-button>
-                </div>
-                <div style="height: 20px;"></div>
-            </div>
-        </van-config-provider>
+<div class="app-container">
+    <div class="header">
+        <h1>📋 企优咨 · 商标申请</h1>
+        <p>移动/桌面自适应 | 数据加载同目录下 JSON</p>
     </div>
 
-    <script>
-        const { createApp, ref, reactive, computed, onMounted } = Vue;
-        const app = createApp({
-            setup() {
-                // 主题变量
-                const themeVars = { primaryColor: '#0078D7' };
+    <div class="main-layout">
+        <!-- 左侧：分类树 + 搜索 -->
+        <div class="card">
+            <div class="card-title">🔍 一、商标分类选择</div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="输入关键词搜索...">
+                <span class="badge" id="searchCount">0 项</span>
+            </div>
+            <div class="tree-container" id="treeContainer">
+                <ul class="tree-ul" id="categoryTree"></ul>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+                <button class="btn-clear" id="clearSelectedBtn">🧹 清空已选</button>
+                <span class="badge" id="selectedCountBadge">已选 0 个小类</span>
+            </div>
+        </div>
 
-                // 数据
-                const categories = ref([]);                // 原始分类树
-                const idMap = ref(new Map());               // id -> { category, name } 用于快速查找
-                const selectedSet = ref(new Set());         // 已选小类id集合
-                const showCategoryPopup = ref(false);
-                const searchText = ref('');
+        <!-- 中间：已选小类 & 申请人信息 & 图样 -->
+        <div class="card">
+            <div class="card-title">📋 二、已选小类 & 申请人</div>
+            <div><strong>📌 已选小类列表</strong></div>
+            <div class="selected-list" id="selectedListContainer">
+                <ul id="selectedListUl" style="padding-left: 16px;"></ul>
+            </div>
 
-                // 表单
-                const form = reactive({
-                    applicant: '',
-                    trademark: '',
-                    phone: '',
-                    contact: ''
-                });
+            <div class="form-row">
+                <label>申请人全称 <span style="color:#a00;">*</span></label>
+                <input type="text" id="applicantName" placeholder="如：企优咨有限公司">
+            </div>
+            <div class="form-row">
+                <label>商标名称 <span style="color:#a00;">*</span></label>
+                <input type="text" id="trademarkName" placeholder="如：企优咨">
+            </div>
+            <div class="form-row">
+                <label>联系电话</label>
+                <input type="text" id="contactPhone" placeholder="手机/固话">
+            </div>
+            <div class="form-row">
+                <label>联系人姓名</label>
+                <input type="text" id="contactPerson" placeholder="姓名">
+            </div>
 
-                // 图片
-                const imageList = ref([]);
-                const imageFile = ref(null);                // 原始文件对象
-                const imagePreview = ref('');                // 预览URL
+            <div><strong>🖼️ 商标图样</strong></div>
+            <div class="upload-area" id="uploadArea">
+                📎 点击上传图片 (PNG/JPG等)
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+            </div>
+            <div class="preview-box" id="imagePreview">
+                <span style="color:#99aec6;">暂无预览</span>
+            </div>
+        </div>
 
-                // 方案和专票
-                const plan = ref('A');
-                const needInvoice = ref(false);
+        <!-- 右侧：服务方案 + 费用 + 操作 -->
+        <div class="card">
+            <div class="card-title">🎯 三、服务方案 & 费用</div>
+            <div class="scheme-panel">
+                <div class="scheme-option" id="schemeA">
+                    <input type="radio" name="scheme" value="A" id="radioA" checked> 
+                    <span class="scheme-name">A方案·流程跟进</span>
+                    <span class="scheme-desc">380元/大类(含10小类)，超出38/小类</span>
+                </div>
+                <div class="scheme-option" id="schemeB">
+                    <input type="radio" name="scheme" value="B" id="radioB"> 
+                    <span class="scheme-name">B方案·专业辅导</span>
+                    <span class="scheme-desc">580元/大类，超出58/小类 大类＞6立减15%</span>
+                </div>
+                <div class="scheme-option" id="schemeC">
+                    <input type="radio" name="scheme" value="C" id="radioC"> 
+                    <span class="scheme-name">C方案·后置付费</span>
+                    <span class="scheme-desc">1100元/大类，超出110/小类 首付300官费</span>
+                </div>
 
-                // 备选示例数据（当data.json加载失败时使用）
-                const fallbackCategories = [
-                    {
-                        "id": "category_01化学原料",
-                        "name": "大类 01化学原料",
-                        "children": [
-                            {
-                                "id": "group_01化学原料_0101",
-                                "name": "类似群组 0101",
-                                "children": [
-                                    { "id": "subclass_01化学原料_0101_氦", "name": "氦" },
-                                    { "id": "subclass_01化学原料_0101_氢", "name": "氢" }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "id": "category_02颜料油漆",
-                        "name": "大类 02颜料油漆",
-                        "children": [
-                            {
-                                "id": "group_02颜料油漆_0201",
-                                "name": "类似群组 0201",
-                                "children": [
-                                    { "id": "subclass_02颜料油漆_0201_染料", "name": "染料" },
-                                    { "id": "subclass_02颜料油漆_0201_媒染剂", "name": "媒染剂" }
-                                ]
-                            }
-                        ]
-                    }
-                ];
+                <div class="invoice-check">
+                    <input type="checkbox" id="invoiceCheckbox">
+                    <label for="invoiceCheckbox" id="invoiceLabel">📄 开专票（加收5%）</label>
+                </div>
+            </div>
 
-                // 加载分类数据
-                const loadCategories = async () => {
-                    try {
-                        const resp = await fetch('data.json');
-                        if (!resp.ok) throw new Error('网络响应错误');
-                        const data = await resp.json();
-                        categories.value = data;
-                    } catch (e) {
-                        console.warn('加载 data.json 失败，使用备选示例数据', e);
-                        categories.value = fallbackCategories; // 使用备选数据
-                    }
-                    // 构建idMap
-                    const map = new Map();
-                    categories.value.forEach(cat => {
-                        cat.children.forEach(group => {
-                            group.children.forEach(sub => {
-                                map.set(sub.id, { category: cat.name, name: sub.name });
-                            });
-                        });
-                    });
-                    idMap.value = map;
-                };
+            <div class="fee-box" id="feeDisplay">
+                ⚠️ 请先选择小类
+            </div>
 
-                // 搜索过滤
-                const filteredCategories = computed(() => {
-                    if (!searchText.value) return categories.value;
-                    const kw = searchText.value.toLowerCase();
-                    const result = [];
-                    categories.value.forEach(cat => {
-                        const newCat = { ...cat, children: [] };
-                        cat.children.forEach(group => {
-                            const newGroup = { ...group, children: [] };
-                            group.children.forEach(sub => {
-                                if (sub.name.includes(kw)) {
-                                    newGroup.children.push(sub);
-                                }
-                            });
-                            if (newGroup.children.length > 0) newCat.children.push(newGroup);
-                        });
-                        if (newCat.children.length > 0) result.push(newCat);
-                    });
-                    return result;
-                });
+            <div class="button-group">
+                <button class="btn-secondary" id="previewOrderBtn">📋 预览</button>
+                <button class="btn-primary" id="exportWordBtn">📝 导出Word订单</button>
+            </div>
+            <p style="font-size:0.75rem; color:#7f8fa4; margin-top: 8px;">*导出时浏览器会提示下载，文件可保存至手机。</p>
+        </div>
+    </div>
+    <div class="footer-info">
+        数据来源: 尼斯分类表_树状结构.json | 实时计算
+    </div>
+</div>
 
-                // 已选小类详情
-                const selectedSubDetails = computed(() => {
-                    return Array.from(selectedSet.value).map(id => {
-                        const info = idMap.value.get(id);
-                        return { id, category: info?.category || '', name: info?.name || '' };
-                    }).filter(item => item.category);
-                });
+<script>
+    (function() {
+        // ---------- 全局变量 ----------
+        let rawData = [];
+        let selectedSubclasses = {};          // 大类 -> 小类名称数组
+        let trademarkImageData = null;         // base64
+        let imageFileName = '';
 
-                const selectedCount = computed(() => selectedSet.value.size);
+        const schemeParams = {
+            A: { base: 380, extra: 38, name: '流程跟进' },
+            B: { base: 580, extra: 58, name: '专业辅导' },
+            C: { base: 1100, extra: 110, name: '后置付费' }
+        };
 
-                // 移除小类
-                const removeSub = (id) => {
-                    selectedSet.value.delete(id);
-                    selectedSet.value = new Set(selectedSet.value);
-                };
+        // ---------- 工具函数 ----------
+        function cleanInput(str) {
+            return str.replace(/\s+/g, '');
+        }
 
-                // 图片上传后处理
-                const afterImageRead = (file) => {
-                    imageFile.value = file.file;
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        imagePreview.value = e.target.result;
-                    };
-                    reader.readAsDataURL(file.file);
-                };
-
-                // 费用计算
-                const feeDetails = computed(() => {
-                    // 按大类统计小类数量
-                    const catCount = {};
-                    selectedSubDetails.value.forEach(item => {
-                        catCount[item.category] = (catCount[item.category] || 0) + 1;
-                    });
-
-                    const planParams = {
-                        A: { base: 380, extra: 38 },
-                        B: { base: 580, extra: 58 },
-                        C: { base: 1100, extra: 110 }
-                    };
-                    const param = planParams[plan.value];
-                    const catCountArr = Object.entries(catCount).map(([cat, cnt]) => ({ cat, cnt }));
-                    const totalOriginal = catCountArr.reduce((sum, { cnt }) => sum + (cnt <= 10 ? param.base : param.base + (cnt - 10) * param.extra), 0);
-                    
-                    // 大类数量
-                    const N = catCountArr.length;
-                    let discount = 1;
-                    let tailDiscount = 1;
-                    if (plan.value === 'B' && N > 6) discount = 0.85;
-                    if (plan.value === 'C' && N > 6) tailDiscount = 0.85;
-                    
-                    const totalAfterDiscount = totalOriginal * discount;
-                    const invoiceFee = needInvoice.value ? totalAfterDiscount * 0.05 : 0;
-                    const totalWithInvoice = totalAfterDiscount + invoiceFee;
-
-                    // 尾款比例 (C方案)
-                    const downPaymentRatio = 300 / 1100; // 27.27%
-                    const tailPaymentRatio = (800 / 1100) * tailDiscount; // 72.73% * tailDiscount
-
-                    return {
-                        catCountArr,
-                        totalOriginal,
-                        totalAfterDiscount,
-                        invoiceFee,
-                        totalWithInvoice,
-                        N,
-                        discount,
-                        tailDiscount,
-                        downPaymentRatio,
-                        tailPaymentRatio
-                    };
-                });
-
-                // 费用明细HTML文本（改进：未选小类时显示默认方案说明）
-                const feeText = computed(() => {
-                    const d = feeDetails.value;
-                    if (d.catCountArr.length === 0) {
-                        // 未选择小类时显示默认方案说明
-                        return `
-                            <b>⚠️ 尚未选择任何小类</b><br>
-                            请在分类中选择需要的商标小类，费用将自动计算。<br><br>
-                            <b>=== 服务方案说明 ===</b><br>
-                            A方案·流程跟进: 380元/大类（含10小类）<br>
-                            B方案·专业辅导: 580元/大类（含10小类）<br>
-                            C方案·后置付费: 1100元/大类（含10小类）<br>
-                            <span style="color:gray;">*超出部分按38/58/110元/小类加收</span>
-                        `;
-                    }
-                    let html = '';
-                    html += `<b>=== 服务方案: ${plan.value}方案 ===</b><br>`;
-                    html += `基础价格：每大类${plan.value==='A'?380:plan.value==='B'?580:1100}元（含10小类），超出${plan.value==='A'?38:plan.value==='B'?58:110}元/小类。<br>`;
-                    if (plan.value === 'B' && d.N > 6) html += `<span style="color:red;">🎁 B方案大客户优惠：总金额立减15%</span><br>`;
-                    if (plan.value === 'C' && d.N > 6) html += `<span style="color:red;">🎁 C方案大客户优惠：尾款减免15%</span><br>`;
-                    html += '<br><b>=== 💰 费用明细 ===</b><br>';
-                    d.catCountArr.forEach(item => {
-                        html += `📌 ${item.cat}（${item.cnt}个小类）<br>`;
-                    });
-                    html += `📊 小计（原价）: ${d.totalOriginal.toFixed(2)}元<br>`;
-                    if (d.discount < 1) html += `📊 小计（优惠后）: ${d.totalAfterDiscount.toFixed(2)}元<br>`;
-                    if (needInvoice.value) {
-                        html += `🧾 专票费用（加收5%）: ${d.invoiceFee.toFixed(2)}元<br>`;
-                        html += `<span class="red">💎 总合计（含专票）: ${d.totalWithInvoice.toFixed(2)}元</span><br>`;
-                    } else {
-                        html += `🧾 专票费用: 0元（未选择）<br>`;
-                        html += `<span class="red">💎 总合计: ${d.totalAfterDiscount.toFixed(2)}元</span><br>`;
-                    }
-                    if (plan.value === 'C') {
-                        html += '<br><b>【C方案·付款计划】</b><br>';
-                        html += `🔹 首付款: ${(d.totalWithInvoice * d.downPaymentRatio).toFixed(2)}元<br>`;
-                        html += '🔹 尾款（每大类下证后）:<br>';
-                        d.catCountArr.forEach(item => {
-                            // 计算该大类的基础费用
-                            const catBase = plan.value === 'C' ? 1100 : 0;
-                            const catExtra = plan.value === 'C' ? 110 : 0;
-                            const catFee = item.cnt <= 10 ? catBase : catBase + (item.cnt - 10) * catExtra;
-                            const catFeeWithInvoice = catFee * (needInvoice.value ? 1.05 : 1);
-                            const tail = catFeeWithInvoice * d.tailPaymentRatio;
-                            html += `   ${item.cat}：${tail.toFixed(2)}元<br>`;
-                        });
-                    } else {
-                        html += '<br><b>【A/B方案·付款计划】</b><br>';
-                        html += `📅 签合同后一次性付清: ${(needInvoice.value ? d.totalWithInvoice : d.totalAfterDiscount).toFixed(2)}元<br>`;
-                    }
-                    return html;
-                });
-
-                // 导出Word订单
-                const exportOrder = async () => {
-                    if (!form.applicant || !form.trademark) {
-                        vant.Toast.fail('请填写申请人全称和商标名称');
-                        return;
-                    }
-                    if (selectedSet.value.size === 0) {
-                        vant.Toast.fail('请至少选择一个小类');
-                        return;
-                    }
-
-                    const d = feeDetails.value;
-                    const doc = new docx.Document({
-                        sections: [{
-                            children: [
-                                new docx.Paragraph({ children: [new docx.TextRun({ text: '📄 商标申请订单', bold: true, size: 36 })] }),
-                                new docx.Paragraph({ text: '' }),
-                                new docx.Paragraph({ children: [new docx.TextRun({ text: '一、基本信息', bold: true })] }),
-                                ...createInfoTable(),
-                                new docx.Paragraph({ text: '' }),
-                                new docx.Paragraph({ children: [new docx.TextRun({ text: '二、已选类别明细', bold: true })] }),
-                                ...createSelectedTable(),
-                                new docx.Paragraph({ text: '' }),
-                                new docx.Paragraph({ children: [new docx.TextRun({ text: '三、费用明细', bold: true })] }),
-                                new docx.Paragraph({ text: feeText.value.replace(/<[^>]*>/g, '') }), // 简单去HTML
-                                new docx.Paragraph({ text: '' }),
-                                new docx.Paragraph({ children: [new docx.TextRun({ text: '四、商标图样', bold: true })] }),
-                                ...(imageFile.value ? await createImageParagraph() : [new docx.Paragraph('未上传商标图样')]),
-                            ]
-                        }]
-                    });
-
-                    const blob = await docx.Packer.toBlob(doc);
-                    saveAs(blob, `商标订单_${form.applicant}.docx`);
-                    vant.Toast.success('订单已生成');
-                };
-
-                // 辅助函数：创建信息表格
-                function createInfoTable() {
-                    const rows = [
-                        ['申请人全称', form.applicant],
-                        ['商标名称', form.trademark],
-                        ['联系电话', form.phone],
-                        ['联系人', form.contact],
-                        ['下订单日期', new Date().toLocaleDateString('zh-CN')],
-                        ['服务方案', plan.value + '方案'],
-                        ['专票选项', needInvoice.value ? '是（+5%）' : '否']
-                    ];
-                    const table = new docx.Table({
-                        rows: rows.map(([label, val]) => new docx.TableRow({
-                            children: [
-                                new docx.TableCell({ children: [new docx.Paragraph({ children: [new docx.TextRun({ text: label, bold: true })] })] }),
-                                new docx.TableCell({ children: [new docx.Paragraph(val)] })
-                            ]
-                        }))
-                    });
-                    return [table];
+        function getSelectedStats() {
+            let majorCount = 0, totalSubCount = 0;
+            for (let major in selectedSubclasses) {
+                if (selectedSubclasses[major].length > 0) {
+                    majorCount++;
+                    totalSubCount += selectedSubclasses[major].length;
                 }
+            }
+            return { majorCount, totalSubCount };
+        }
 
-                function createSelectedTable() {
-                    const details = selectedSubDetails.value;
-                    // 按大类分组
-                    const groups = {};
-                    details.forEach(item => {
-                        if (!groups[item.category]) groups[item.category] = [];
-                        groups[item.category].push(item.name);
-                    });
-                    const rows = Object.entries(groups).map(([cat, subs]) => [cat, subs.join('；')]);
-                    const table = new docx.Table({
-                        rows: [
-                            new docx.TableRow({
-                                children: [
-                                    new docx.TableCell({ children: [new docx.Paragraph('大类')] }),
-                                    new docx.TableCell({ children: [new docx.Paragraph('小类')] })
-                                ]
-                            }),
-                            ...rows.map(([cat, subs]) => new docx.TableRow({
-                                children: [
-                                    new docx.TableCell({ children: [new docx.Paragraph(cat)] }),
-                                    new docx.TableCell({ children: [new docx.Paragraph(subs)] })
-                                ]
-                            }))
-                        ]
-                    });
-                    return [table];
+        // 核心费用计算
+        function computeFeeText() {
+            const scheme = document.querySelector('input[name="scheme"]:checked')?.value || 'A';
+            const params = schemeParams[scheme];
+            const withInvoice = document.getElementById('invoiceCheckbox').checked;
+
+            let totalOriginal = 0;
+            const majorDetails = {};
+            for (let major in selectedSubclasses) {
+                let subList = selectedSubclasses[major];
+                if (subList.length === 0) continue;
+                let count = subList.length;
+                let cost = (count <= 10) ? params.base : (params.base + (count - 10) * params.extra);
+                majorDetails[major] = { count, cost };
+                totalOriginal += cost;
+            }
+
+            const majorCount = Object.keys(selectedSubclasses).length;
+            let discountNote = '';
+            let finalTotal = totalOriginal;
+            if (scheme === 'B' && majorCount > 6) {
+                finalTotal = totalOriginal * 0.85;
+                discountNote = '🎁 B方案大客户优惠: 总金额立减15%';
+            }
+            let invoiceAmount = withInvoice ? finalTotal * 0.05 : 0;
+            let totalWithInvoice = finalTotal + invoiceAmount;
+
+            let lines = [];
+            lines.push(`=== 服务方案: ${scheme}方案·${params.name} ===`);
+            lines.push(`💰 基础价格：每大类${params.base}元（含10小类），超出部分${params.extra}元/小类。`);
+            if (scheme === 'B' && majorCount > 6) lines.push(discountNote);
+            if (scheme === 'C') lines.push('🎁 C方案大客户优惠：大类＞6个尾款减免15%');
+            lines.push('');
+
+            lines.push('=== 💰 费用明细 ===');
+            if (majorCount === 0) {
+                lines.push('⚠️ 尚未选择任何小类');
+            } else {
+                for (let major in majorDetails) {
+                    let d = majorDetails[major];
+                    lines.push(`📌 ${major}大类（${d.count}个小类） = ${d.cost}元`);
                 }
-
-                async function createImageParagraph() {
-                    if (!imageFile.value) return [new docx.Paragraph('未上传商标图样')];
-                    const buffer = await imageFile.value.arrayBuffer();
-                    const image = new docx.ImageRun({
-                        data: buffer,
-                        transformation: { width: 100, height: 100 }
-                    });
-                    return [new docx.Paragraph({ children: [image] })];
+                lines.push(`📊 小计（原价）: ${totalOriginal.toFixed(2)}元`);
+                if (scheme === 'B' && majorCount > 6) {
+                    lines.push(`📊 小计（优惠后）: ${finalTotal.toFixed(2)}元`);
                 }
+                if (withInvoice) {
+                    lines.push(`🧾 专票费用（加收5%）: ${invoiceAmount.toFixed(2)}元`);
+                    lines.push(`💎 总合计（含专票）: ${totalWithInvoice.toFixed(2)}元`);
+                } else {
+                    lines.push(`🧾 专票费用: 0元（未选择）`);
+                    lines.push(`💎 总合计: ${finalTotal.toFixed(2)}元`);
+                }
+                lines.push('');
 
-                // 复制摘要
-                const copySummary = () => {
-                    const text = `申请人：${form.applicant}\n商标：${form.trademark}\n电话：${form.phone}\n联系人：${form.contact}\n已选小类：${selectedSubDetails.value.map(i=>i.name).join('、')}\n费用：${feeText.value.replace(/<[^>]*>/g, '')}`;
-                    navigator.clipboard.writeText(text).then(() => {
-                        vant.Toast.success('已复制到剪贴板');
-                    }).catch(() => {
-                        vant.Toast.fail('复制失败');
-                    });
-                };
+                if (scheme === 'A' || scheme === 'B') {
+                    lines.push(`【${scheme}方案·付款计划】`);
+                    let payAmount = withInvoice ? totalWithInvoice : finalTotal;
+                    lines.push(`📅 签合同后一次性付清: ${payAmount.toFixed(2)}元`);
+                } else if (scheme === 'C') {
+                    lines.push('【C方案·后置付费计划】');
+                    let baseForFirst = withInvoice ? totalWithInvoice : finalTotal;
+                    let firstPayment = baseForFirst * (300/1100);
+                    lines.push(`🔹 首付款（签合同后）: ${baseForFirst.toFixed(2)}×27.27% = ${firstPayment.toFixed(2)}元`);
+                    if (majorCount > 6) lines.push('🎁 【C方案尾款减免15%】');
+                    lines.push('🔹 尾款支付（每大类下发注册证后）:');
+                    let idx = 1;
+                    for (let major in majorDetails) {
+                        let cost = majorDetails[major].cost;
+                        let withInvoiceCost = withInvoice ? cost * 1.05 : cost;
+                        let tailPercent = 0.7273;
+                        if (majorCount > 6) tailPercent *= 0.85;
+                        let tail = withInvoiceCost * tailPercent;
+                        lines.push(`   ${idx}. ${major}大类尾款：${withInvoiceCost.toFixed(2)}×${(tailPercent*100).toFixed(2)}% = ${tail.toFixed(2)}元`);
+                        idx++;
+                    }
+                }
+                lines.push('');
+                lines.push('=== 💳 付款信息 ===');
+                lines.push('账户名称：企优咨（广州）咨询有限公司');
+                lines.push('账户号码：4405 0158 0107 0000 4275');
+                lines.push('开户银行：中国建设银行股份有限公司广州花城支行');
+                lines.push('【📌 重要提示】1. 付款水单发给陈工；2. 启动服务后不支持退款');
+            }
+            return lines.join('\n');
+        }
 
-                // 清空
-                const clearAll = () => {
-                    selectedSet.value.clear();
-                    selectedSet.value = new Set();
-                    form.applicant = '';
-                    form.trademark = '';
-                    form.phone = '';
-                    form.contact = '';
-                    imageList.value = [];
-                    imageFile.value = null;
-                    imagePreview.value = '';
-                    plan.value = 'A';
-                    needInvoice.value = false;
-                    vant.Toast.success('已清空');
-                };
+        function refreshUI() {
+            // 更新已选列表显示
+            const ul = document.getElementById('selectedListUl');
+            ul.innerHTML = '';
+            for (let major in selectedSubclasses) {
+                if (selectedSubclasses[major].length === 0) continue;
+                let li = document.createElement('li');
+                li.innerHTML = `<strong>【${escapeHtml(major)}】</strong>`;
+                ul.appendChild(li);
+                let subUl = document.createElement('ul');
+                selectedSubclasses[major].forEach(sub => {
+                    let subLi = document.createElement('li');
+                    subLi.textContent = sub;
+                    subUl.appendChild(subLi);
+                });
+                ul.appendChild(subUl);
+            }
+            if (ul.children.length === 0) {
+                ul.innerHTML = '<span style="color:#aaa;">暂无已选小类</span>';
+            }
 
-                // 本地存储
-                const saveLastRecord = () => {
-                    const record = {
-                        applicant: form.applicant,
-                        phone: form.phone,
-                        contact: form.contact,
-                        selected: Array.from(selectedSet.value),
-                        plan: plan.value,
-                        needInvoice: needInvoice.value
-                    };
-                    localStorage.setItem('lastTrademarkRecord', JSON.stringify(record));
-                };
+            let stats = getSelectedStats();
+            document.getElementById('selectedCountBadge').innerText = `已选 ${stats.totalSubCount} 个小类`;
+            document.getElementById('feeDisplay').innerText = computeFeeText();
+            syncCheckboxesFromSelected();
+        }
 
-                const loadLastRecord = () => {
-                    const saved = localStorage.getItem('lastTrademarkRecord');
-                    if (saved) {
-                        try {
-                            const record = JSON.parse(saved);
-                            form.applicant = record.applicant || '';
-                            form.phone = record.phone || '';
-                            form.contact = record.contact || '';
-                            if (record.selected) {
-                                selectedSet.value = new Set(record.selected);
-                            }
-                            plan.value = record.plan || 'A';
-                            needInvoice.value = record.needInvoice || false;
-                            vant.Toast.success('已加载最近记录');
-                        } catch (e) {
-                            vant.Toast.fail('加载失败');
+        function syncCheckboxesFromSelected() {
+            const checkboxes = document.querySelectorAll('.subclass-checkbox');
+            checkboxes.forEach(cb => {
+                const major = cb.dataset.major;
+                const sub = cb.dataset.sub;
+                cb.checked = !!(selectedSubclasses[major] && selectedSubclasses[major].includes(sub));
+            });
+        }
+
+        function handleCheckboxChange(e) {
+            const cb = e.target;
+            const major = cb.dataset.major;
+            const sub = cb.dataset.sub;
+            if (!major || !sub) return;
+            if (cb.checked) {
+                if (!selectedSubclasses[major]) selectedSubclasses[major] = [];
+                if (!selectedSubclasses[major].includes(sub)) {
+                    selectedSubclasses[major].push(sub);
+                }
+            } else {
+                if (selectedSubclasses[major]) {
+                    const idx = selectedSubclasses[major].indexOf(sub);
+                    if (idx > -1) selectedSubclasses[major].splice(idx, 1);
+                    if (selectedSubclasses[major].length === 0) delete selectedSubclasses[major];
+                }
+            }
+            refreshUI();
+        }
+
+        // 渲染树
+        function renderTree(filterText = '') {
+            const treeElem = document.getElementById('categoryTree');
+            treeElem.innerHTML = '';
+            if (!rawData || rawData.length === 0) {
+                treeElem.innerHTML = '<li style="padding:20px; color:red;">⚠️ 未加载分类数据，请确保JSON文件存在</li>';
+                return;
+            }
+
+            let matchCount = 0;
+            const lowerFilter = filterText.toLowerCase().trim();
+
+            rawData.forEach(majorNode => {
+                const majorName = majorNode.大类 || majorNode.name || '';
+                let groupHTML = '';
+
+                (majorNode.children || []).forEach(groupNode => {
+                    const groupName = groupNode.name || groupNode.类似群组 || '';
+                    const groupNumber = groupNode.类似群组 || '';
+                    const groupText = `${groupNumber} ${groupName}`.toLowerCase();
+                    let groupHasMatch = false;
+                    let subItemsHTML = '';
+
+                    (groupNode.children || []).forEach(subNode => {
+                        const subName = subNode.小类 || subNode.name || '';
+                        const subText = subName.toLowerCase();
+                        const match = !lowerFilter || 
+                                      majorName.toLowerCase().includes(lowerFilter) ||
+                                      groupText.includes(lowerFilter) ||
+                                      subText.includes(lowerFilter);
+                        if (match || !lowerFilter) {
+                            groupHasMatch = true;
+                            matchCount++;
+                            const checked = (selectedSubclasses[majorName] && selectedSubclasses[majorName].includes(subName)) ? 'checked' : '';
+                            subItemsHTML += `<li class="subclass-item">
+                                <input type="checkbox" class="subclass-checkbox" data-major="${escapeAttr(majorName)}" data-sub="${escapeAttr(subName)}" ${checked}>
+                                <span class="subclass-name">${escapeHtml(subName)}</span>
+                            </li>`;
                         }
-                    } else {
-                        vant.Toast.info('暂无记录');
-                    }
-                };
+                    });
 
-                // 自动保存到本地（每次变化）
-                onMounted(() => {
-                    loadCategories();
+                    if (groupHasMatch || !lowerFilter) {
+                        groupHTML += `<li class="tree-li"><div class="cat-group">📁 ${escapeHtml(groupNumber)} - ${escapeHtml(groupName)}</div>`;
+                        groupHTML += `<ul class="tree-ul">${subItemsHTML}</ul></li>`;
+                    }
                 });
 
-                // 监听变化保存
-                Vue.watch([form, selectedSet, plan, needInvoice], () => {
-                    saveLastRecord();
-                }, { deep: true });
+                if (groupHTML || !lowerFilter) {
+                    const majorDisplay = `<div class="cat-major">📌 大类 ${escapeHtml(majorName)}</div>`;
+                    const ul = `<ul class="tree-ul">${groupHTML}</ul>`;
+                    treeElem.innerHTML += `<li class="tree-li">${majorDisplay}${ul}</li>`;
+                }
+            });
 
-                return {
-                    themeVars,
-                    categories,
-                    selectedSet,
-                    showCategoryPopup,
-                    searchText,
-                    filteredCategories,
-                    selectedSubDetails,
-                    selectedCount,
-                    form,
-                    imageList,
-                    imagePreview,
-                    plan,
-                    needInvoice,
-                    feeText,
-                    removeSub,
-                    afterImageRead,
-                    exportOrder,
-                    copySummary,
-                    clearAll,
-                    loadLastRecord
-                };
+            document.getElementById('searchCount').innerText = lowerFilter ? `🔍 匹配 ${matchCount} 项` : `共 ${getTotalSubCount()} 小类`;
+
+            document.querySelectorAll('.subclass-checkbox').forEach(cb => {
+                cb.removeEventListener('change', handleCheckboxChange);
+                cb.addEventListener('change', handleCheckboxChange);
+            });
+            syncCheckboxesFromSelected();
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe.replace(/[&<>"]/g, function(m) {
+                if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; if(m === '"') return '&quot;';
+                return m;
+            });
+        }
+        function escapeAttr(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function getTotalSubCount() {
+            let c = 0;
+            rawData.forEach(m => (m.children || []).forEach(g => (g.children || []).forEach(() => c++)));
+            return c;
+        }
+
+        // 加载JSON
+        async function loadJSON() {
+            try {
+                const response = await fetch('尼斯分类表_树状结构.json');
+                if (!response.ok) throw new Error('无法加载JSON (404)');
+                rawData = await response.json();
+                renderTree();
+                refreshUI();
+            } catch (e) {
+                alert('加载尼斯分类JSON失败，请将 "尼斯分类表_树状结构.json" 放在同目录下。\n错误：' + e.message);
+            }
+        }
+
+        // 清空
+        document.getElementById('clearSelectedBtn').addEventListener('click', function() {
+            if (confirm('清空所有已选小类？')) {
+                selectedSubclasses = {};
+                refreshUI();
+                renderTree(document.getElementById('searchInput').value);
             }
         });
 
-        app.use(vant);
-        app.mount('#app');
-    </script>
+        // 搜索防抖
+        let searchTimer;
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+                renderTree(e.target.value);
+            }, 300);
+        });
+
+        // 图片上传
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const previewBox = document.getElementById('imagePreview');
+        uploadArea.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                trademarkImageData = ev.target.result;
+                previewBox.innerHTML = `<img src="${ev.target.result}" alt="商标图样预览">`;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // 方案切换/发票更新
+        document.querySelectorAll('input[name="scheme"]').forEach(r => {
+            r.addEventListener('change', () => refreshUI());
+        });
+        document.getElementById('invoiceCheckbox').addEventListener('change', function() {
+            document.getElementById('invoiceLabel').style.color = this.checked ? '#c00000' : 'inherit';
+            refreshUI();
+        });
+
+        // 预览
+        document.getElementById('previewOrderBtn').addEventListener('click', function() {
+            alert('当前费用明细：\n\n' + computeFeeText());
+        });
+
+        // 导出Word (降级下载)
+        async function exportWord() {
+            const applicant = cleanInput(document.getElementById('applicantName').value) || '未填写';
+            const tmName = cleanInput(document.getElementById('trademarkName').value) || '未填写';
+            const phone = cleanInput(document.getElementById('contactPhone').value) || '';
+            const contact = cleanInput(document.getElementById('contactPerson').value) || '';
+
+            if (!applicant || !tmName) {
+                alert('请填写申请人全称和商标名称');
+                return;
+            }
+            if (Object.keys(selectedSubclasses).length === 0) {
+                alert('请至少选择一个小类');
+                return;
+            }
+
+            let htmlContent = `
+            <html>
+            <head><meta charset="UTF-8"><title>商标申请订单</title>
+            <style>body { font-family: 微软雅黑, sans-serif; margin:2cm; } h2 { color:#003d7c; } table { border-collapse: collapse; width:100%; } td,th { border:1px solid #aaa; padding:8px; } .bold { font-weight:600; } .red { color:#c00000; }</style>
+            </head>
+            <body>
+            <h2 style="text-align:center;">📄 商标申请订单</h2>
+            <p><strong>申请人全称：</strong>${escapeHtml(applicant)}</p>
+            <p><strong>商标名称：</strong>${escapeHtml(tmName)}</p>
+            <p><strong>联系电话：</strong>${escapeHtml(phone)}</p>
+            <p><strong>联系人：</strong>${escapeHtml(contact)}</p>
+            <p><strong>日期：</strong>${new Date().toLocaleDateString('zh-CN')}</p>
+            <h3>一、已选类别明细</h3>
+            <ul>`;
+            for (let major in selectedSubclasses) {
+                htmlContent += `<li><strong>【${escapeHtml(major)}】</strong><ul>`;
+                selectedSubclasses[major].forEach(s => htmlContent += `<li>${escapeHtml(s)}</li>`);
+                htmlContent += `</ul></li>`;
+            }
+            htmlContent += `</ul>`;
+            if (trademarkImageData) {
+                htmlContent += `<h3>二、商标图样</h3><img src="${trademarkImageData}" style="max-width:200px;" />`;
+            }
+            htmlContent += `<h3>三、服务方案及费用</h3><pre style="background:#f4f8ff; padding:16px;">${computeFeeText()}</pre>`;
+            htmlContent += `<p>—— 本订单由企优咨系统生成 ——</p></body></html>`;
+
+            const blob = new Blob([htmlContent], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `商标订单_${applicant}_${tmName}.doc`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        document.getElementById('exportWordBtn').addEventListener('click', exportWord);
+
+        // 启动
+        loadJSON();
+
+        // 让scheme-option点击选中radio
+        document.querySelectorAll('.scheme-option').forEach(opt => {
+            opt.addEventListener('click', function(e) {
+                if (e.target.tagName === 'INPUT') return;
+                const radio = this.querySelector('input[type="radio"]');
+                if (radio) radio.checked = true;
+                refreshUI();
+            });
+        });
+    })();
+</script>
 </body>
 </html>
