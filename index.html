@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>企优咨·商标申请下单系统</title>
+    <title>企优咨 · 商标申请下单系统</title>
     <style>
         * {
             box-sizing: border-box;
@@ -29,7 +29,7 @@
         .header {
             background: linear-gradient(135deg, #002856 0%, #003d7c 100%);
             color: white;
-            padding: 24px 22px;
+            padding: 24px 22px 16px;
         }
         .header h1 {
             font-size: 1.9rem;
@@ -43,10 +43,44 @@
             opacity: 0.8;
             font-size: 0.95rem;
         }
+        /* 新增选项卡导航 */
+        .tab-bar {
+            display: flex;
+            background: white;
+            padding: 0 24px;
+            gap: 28px;
+            border-bottom: 1px solid #e0e8f2;
+        }
+        .tab {
+            padding: 14px 0 10px;
+            cursor: pointer;
+            color: #4a5f7a;
+            font-weight: 600;
+            font-size: 1rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.1s;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tab.active {
+            color: #003d7c;
+            border-bottom-color: #003d7c;
+        }
+        .tab:hover {
+            color: #002856;
+        }
+        /* 原有下单区域 (三列) */
         .main-layout {
             display: grid;
             grid-template-columns: 1fr 1fr 1.2fr;
             gap: 20px;
+            padding: 24px;
+            background: #f9fafc;
+        }
+        /* 新流程面板布局 (单列卡片) */
+        .flow-layout {
             padding: 24px;
             background: #f9fafc;
         }
@@ -68,6 +102,58 @@
             border-bottom: 2px solid #eef2f6;
             padding-bottom: 10px;
         }
+        /* 流程步骤样式 */
+        .flow-steps {
+            display: flex;
+            flex-direction: column;
+        }
+        .flow-step {
+            display: flex;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px dashed #d9e2ef;
+        }
+        .flow-step:last-child {
+            border-bottom: none;
+        }
+        .step-num {
+            font-size: 1.9rem;
+            min-width: 60px;
+            font-weight: 500;
+            color: #003d7c;
+            line-height: 1.2;
+        }
+        .step-desc {
+            flex: 1;
+            font-size: 1rem;
+            color: #1f3a5f;
+            padding-top: 4px;
+        }
+        .step-desc strong {
+            color: #b45309;
+            background: #fff2e0;
+            padding: 2px 8px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-left: 6px;
+            white-space: nowrap;
+        }
+        .footnote {
+            margin-top: 24px;
+            background: #edf3fc;
+            border-radius: 40px;
+            padding: 14px 20px;
+            color: #2f4b74;
+            font-size: 0.9rem;
+            border: 1px solid #c9d8ec;
+        }
+        .footnote i {
+            color: #003d7c;
+            font-style: normal;
+            font-weight: 500;
+        }
+        /* 原有其他样式保持不变 */
         .search-box {
             display: flex;
             gap: 8px;
@@ -93,19 +179,18 @@
             padding: 8px 4px;
             background: #ffffff;
         }
-        /* 折叠展开样式 */
         .tree-ul {
             list-style: none;
             padding-left: 0;
         }
         .tree-ul ul {
-            display: none;  /* 默认隐藏子列表 */
+            display: none;
             margin-left: 16px;
             padding-left: 8px;
             border-left: 1px dashed #ccc;
         }
         .tree-ul li.expanded > ul {
-            display: block; /* 展开时显示子列表 */
+            display: block;
         }
         .folder-label {
             cursor: pointer;
@@ -117,7 +202,7 @@
             width: 100%;
         }
         .folder-label::before {
-            content: "▶";   /* 折叠状态图标 */
+            content: "▶";
             font-size: 0.8rem;
             color: #003d7c;
             transition: transform 0.1s;
@@ -125,7 +210,7 @@
             width: 16px;
         }
         li.expanded > .folder-label::before {
-            content: "▼";   /* 展开状态图标 */
+            content: "▼";
         }
         .cat-major {
             font-weight: 600;
@@ -260,7 +345,7 @@
         }
         .scheme-option {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 12px;
             padding: 14px 14px;
             background: white;
@@ -268,6 +353,7 @@
             margin-bottom: 8px;
             border: 1px solid #e0eaf7;
             cursor: pointer;
+            transition: border 0.1s;
         }
         .scheme-option.selected {
             border: 2px solid #003d7c;
@@ -278,15 +364,62 @@
             width: 18px;
             height: 18px;
             flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .scheme-option .scheme-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .scheme-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px 8px;
         }
         .scheme-name {
             font-weight: 600;
-            min-width: 120px;
             font-size: 0.95rem;
+            color: #00305c;
         }
         .scheme-desc {
             font-size: 0.85rem;
             color: #2f4b74;
+            background: #edf2fa;
+            padding: 2px 10px;
+            border-radius: 30px;
+            white-space: nowrap;
+        }
+        .scheme-features {
+            font-size: 0.75rem;
+            color: #3e5a7a;
+            margin-top: 6px;
+            line-height: 1.45;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 12px;
+            border-top: 1px dashed #d3dff0;
+            padding-top: 6px;
+        }
+        .scheme-features span {
+            background: #eef3fc;
+            padding: 2px 8px;
+            border-radius: 30px;
+            white-space: nowrap;
+        }
+        .legal-notice {
+            background: #fff8e7;
+            border-left: 4px solid #f0b342;
+            border-radius: 16px;
+            padding: 12px 14px;
+            margin: 18px 0 16px;
+            font-size: 0.8rem;
+            color: #4f3e1f;
+            line-height: 1.5;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+        }
+        .legal-notice strong {
+            color: #b45309;
         }
         .invoice-check {
             display: flex;
@@ -362,8 +495,6 @@
             font-size: 0.85rem;
             text-align: right;
         }
-
-        /* 移动端适配 */
         @media (max-width: 900px) {
             body { padding: 10px; }
             .main-layout {
@@ -371,14 +502,19 @@
                 gap: 16px;
                 padding: 16px;
             }
+            .flow-layout { padding: 16px; }
             .tree-container { max-height: 400px; }
             .selected-list { max-height: 200px; }
             .fee-box { max-height: 300px; }
+            .scheme-desc { white-space: normal; }
+            .step-num { min-width: 50px; font-size: 1.6rem; }
         }
         @media (max-width: 480px) {
             .header h1 { font-size: 1.5rem; }
             .card { padding: 16px; }
             .subclass-item { padding-left: 10px; }
+            .tab-bar { gap: 16px; padding: 0 16px; }
+            .tab { font-size: 0.9rem; padding: 12px 0 8px; }
         }
     </style>
 </head>
@@ -387,12 +523,20 @@
     <div class="header">
         <h1>📋 企优咨 · 商标申请注册下单</h1>
         <p>选要注册的小类-填写申请人信息-选服务方案-下单</p>
+        <p>如需帮助，联系陈工 13128311370</p>
     </div>
 
-    <div class="main-layout">
-        <!-- 左侧：分类树 + 搜索 -->
+    <!-- 新增的选项卡导航 -->
+    <div class="tab-bar">
+        <div class="tab active" id="tabOrder">📋 商标下单</div>
+        <div class="tab" id="tabFlow">📊 付款后流程</div>
+    </div>
+
+    <!-- 原下单面板 (三列) 默认显示 -->
+    <div id="orderPanel" class="main-layout">
+        <!-- 左侧：分类树 + 搜索 (内容完全保留) -->
         <div class="card">
-            <div class="card-title">🔍 一、商标分类选择</div>
+            <div class="card-title">🔍 一、选择商标分类</div>
             <div class="search-box">
                 <input type="text" id="searchInput" placeholder="输入关键词搜索...">
                 <span class="badge" id="searchCount">0 项</span>
@@ -441,29 +585,62 @@
             </div>
         </div>
 
-        <!-- 右侧：服务方案 + 费用 + 操作 -->
+        <!-- 右侧：服务方案 & 费用 & 操作 (含一键生成合同) -->
         <div class="card">
             <div class="card-title">🎯 三、服务方案 & 费用</div>
             <div class="scheme-panel">
                 <div class="scheme-option" id="schemeA">
                     <input type="radio" name="scheme" value="A" id="radioA" checked> 
-                    <span class="scheme-name">A方案·流程跟进</span>
-                    <span class="scheme-desc">380元/大类(含10小类)，超出38/小类</span>
+                    <div class="scheme-content">
+                        <div class="scheme-header">
+                            <span class="scheme-name">A方案·流程跟进</span>
+                            <span class="scheme-desc">380元/大类(含10小类)，超出38/小类</span>
+                        </div>
+                        <div class="scheme-features">
+                            <span>📎 材料形式审核</span>
+                            <span>📬 官方文件代收代发</span>
+                            <span>⏰ 关键节点人工提醒</span>
+                            <span>🔄 全流程进度同步</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="scheme-option" id="schemeB">
                     <input type="radio" name="scheme" value="B" id="radioB"> 
-                    <span class="scheme-name">B方案·专业辅导</span>
-                    <span class="scheme-desc">580元/大类，超出58/小类， 大类＞6，立减15%</span>
+                    <div class="scheme-content">
+                        <div class="scheme-header">
+                            <span class="scheme-name">B方案·专业辅导</span>
+                            <span class="scheme-desc">580元/大类，超出58/小类，大类＞6立减15%</span>
+                        </div>
+                        <div class="scheme-features">
+                            <span>🛡️ 注册前风险评估</span>
+                            <span>📌 类别规划建议</span>
+                            <span>📝 申请材料优化</span>
+                            <span>🎓 专业解读与指导</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="scheme-option" id="schemeC">
                     <input type="radio" name="scheme" value="C" id="radioC"> 
-                    <span class="scheme-name">C方案·后置付费</span>
-                    <span class="scheme-desc">1100元/大类，超出110/小类， 首付300官费</span>
+                    <div class="scheme-content">
+                        <div class="scheme-header">
+                            <span class="scheme-name">C方案·后置付费</span>
+                            <span class="scheme-desc">1100元/大类，超出110/小类，首付300官费</span>
+                        </div>
+                        <div class="scheme-features">
+                            <span>💰 启动成本更低(仅付官费)</span>
+                            <span>✅ 下证后再付服务费</span>
+                            <span>⏳ 后置付费更从容</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="invoice-check">
                     <input type="checkbox" id="invoiceCheckbox">
                     <label for="invoiceCheckbox" id="invoiceLabel">📄 开专票（加收5%）</label>
+                </div>
+
+                <div class="legal-notice">
+                    <strong>📢 特别声明：</strong> 商标审查权归属国家知识产权局，审查结果存在主观因素，任何代理机构均不得承诺“包过”！若被驳回、被异议，已收取费用不可退！如您担心商标注册证下不来，<strong>可选C方案：待下证后再付服务费。</strong>
                 </div>
             </div>
 
@@ -473,19 +650,44 @@
 
             <div class="button-group">
                 <button class="btn-secondary" id="previewOrderBtn">📋 预览</button>
+                <button class="btn-secondary" id="generateContractBtn">📄 一键生成合同</button>
                 <button class="btn-primary" id="exportWordBtn">📝 导出Word订单</button>
             </div>
             <p style="font-size:0.75rem; color:#7f8fa4; margin-top: 8px;">*导出时浏览器会提示下载，文件可保存至手机。</p>
         </div>
     </div>
+
+    <!-- 新增流程面板 (默认隐藏) -->
+    <div id="flowPanel" class="flow-layout" style="display: none;">
+        <div class="card">
+            <div class="card-title">📊 付款后服务流程图（参考时间）</div>
+            <div class="flow-steps">
+                <div class="flow-step"><span class="step-num">1️⃣</span><span class="step-desc">签订合同、付款后，开始服务流程 ↓↓↓</span></div>
+                <div class="flow-step"><span class="step-num">2️⃣</span><span class="step-desc">根据您所选方案进行对应服务流程</span></div>
+                <div class="flow-step"><span class="step-num">3️⃣</span><span class="step-desc">跟您再次确认商标申请信息表后，提交商标局</span></div>
+                <div class="flow-step"><span class="step-num">4️⃣</span><span class="step-desc">提交商标局后，最快当天有回执书给您</span></div>
+                <div class="flow-step"><span class="step-num">5️⃣</span><span class="step-desc">大概1个月，有受理通知书给您 —— 如遇补正：<strong>补正（免费）</strong></span></div>
+                <div class="flow-step"><span class="step-num">6️⃣</span><span class="step-desc">大概2-3个月，有审查意见给您（驳回或初步审定公告）</span></div>
+                <div class="flow-step"><span class="step-num">7️⃣</span><span class="step-desc">固定3个月的公告期</span></div>
+                <div class="flow-step"><span class="step-num">8️⃣</span><span class="step-desc">若被商标局驳回：如您想做驳回复审，您需另付费。复审周期约1年。</span></div>
+                <div class="flow-step"><span class="step-num">9️⃣</span><span class="step-desc">若被公众提出异议：如您想做异议答辩，您需另付费。答辩周期约1年。</span></div>
+                <div class="flow-step"><span class="step-num">🔟</span><span class="step-desc">大概1个月，有商标注册证给您 <strong>（如果您采用C方案，此时您需要结清尾款）</strong></span></div>
+            </div>
+            <div class="footnote">
+                <i>📌 以上时间周期为目前行情政策的大概估算时间，具体时间周期以实际审查情况为准。</i>
+            </div>
+            <p style="margin-top: 20px; color: #6f7d95; font-size:0.9rem; text-align:right;">—— 企优咨 · 透明流程 ——</p>
+        </div>
+    </div>
+
     <div class="footer-info">
-        数据来源: 尼斯分类表_树状结构.json | 实时计算
+        如需帮助，联系陈工 13128311370
     </div>
 </div>
 
 <script>
     (function() {
-        // ---------- 全局变量 ----------
+        // ---------- 原有全局变量和函数 (保持不变) ----------
         let rawData = [];
         let selectedSubclasses = {};          // 大类 -> 小类名称数组
         let trademarkImageData = null;         // base64
@@ -497,7 +699,6 @@
             C: { base: 1100, extra: 110, name: '后置付费' }
         };
 
-        // ---------- 工具函数 ----------
         function cleanInput(str) {
             return str.replace(/\s+/g, '');
         }
@@ -513,8 +714,16 @@
             return { majorCount, totalSubCount };
         }
 
-        // 核心费用计算
-        function computeFeeText() {
+        function updateSchemeSelection() {
+            const checkedRadio = document.querySelector('input[name="scheme"]:checked');
+            document.querySelectorAll('.scheme-option').forEach(opt => opt.classList.remove('selected'));
+            if (checkedRadio) {
+                const parent = checkedRadio.closest('.scheme-option');
+                if (parent) parent.classList.add('selected');
+            }
+        }
+
+        function computeFeeDetails() {
             const scheme = document.querySelector('input[name="scheme"]:checked')?.value || 'A';
             const params = schemeParams[scheme];
             const withInvoice = document.getElementById('invoiceCheckbox').checked;
@@ -531,77 +740,98 @@
             }
 
             const majorCount = Object.keys(selectedSubclasses).length;
-            let discountNote = '';
             let finalTotal = totalOriginal;
+            let discountNote = '';
+            let tailDiscount = 1.0;
             if (scheme === 'B' && majorCount > 6) {
                 finalTotal = totalOriginal * 0.85;
-                discountNote = '🎁 B方案大客户优惠: 总金额立减15%';
+                discountNote = 'B方案大客户优惠: 总金额立减15%';
             }
             let invoiceAmount = withInvoice ? finalTotal * 0.05 : 0;
             let totalWithInvoice = finalTotal + invoiceAmount;
 
+            let tailPercent = 800/1100; 
+            if (scheme === 'C' && majorCount > 6) {
+                tailPercent *= 0.85;
+                discountNote = 'C方案大客户优惠: 尾款减免15%';
+            }
+
+            return {
+                scheme,
+                params,
+                withInvoice,
+                majorDetails,
+                majorCount,
+                totalOriginal,
+                finalTotal,
+                invoiceAmount,
+                totalWithInvoice,
+                tailPercent,
+                discountNote
+            };
+        }
+
+        function computeFeeText() {
+            const d = computeFeeDetails();
+            if (Object.keys(selectedSubclasses).length === 0) return '⚠️ 尚未选择任何小类';
+
             let lines = [];
-            lines.push(`=== 服务方案: ${scheme}方案·${params.name} ===`);
-            lines.push(`💰 基础价格：每大类${params.base}元（含10小类），超出部分${params.extra}元/小类。`);
-            if (scheme === 'B' && majorCount > 6) lines.push(discountNote);
-            if (scheme === 'C') lines.push('🎁 C方案大客户优惠：大类＞6个，尾款减免15%');
+            lines.push(`=== 服务方案: ${d.scheme}方案·${d.params.name} ===`);
+            lines.push(`💰 基础价格：每大类${d.params.base}元（含10小类），超出部分${d.params.extra}元/小类。`);
+            if (d.discountNote) lines.push(`🎁 ${d.discountNote}`);
+            if (d.scheme === 'C') lines.push('🎁 C方案大客户优惠：大类＞6个，尾款减免15%');
             lines.push('');
 
             lines.push('=== 💰 费用明细 ===');
-            if (majorCount === 0) {
-                lines.push('⚠️ 尚未选择任何小类');
-            } else {
-                for (let major in majorDetails) {
-                    let d = majorDetails[major];
-                    lines.push(`📌 ${major}大类（${d.count}个小类） = ${d.cost}元`);
-                }
-                lines.push(`📊 小计（原价）: ${totalOriginal.toFixed(2)}元`);
-                if (scheme === 'B' && majorCount > 6) {
-                    lines.push(`📊 小计（优惠后）: ${finalTotal.toFixed(2)}元`);
-                }
-                if (withInvoice) {
-                    lines.push(`🧾 专票费用（加收5%）: ${invoiceAmount.toFixed(2)}元`);
-                    lines.push(`💎 总合计（含专票）: ${totalWithInvoice.toFixed(2)}元`);
-                } else {
-                    lines.push(`🧾 专票费用: 0元（未选择）`);
-                    lines.push(`💎 总合计: ${finalTotal.toFixed(2)}元`);
-                }
-                lines.push('');
-
-                if (scheme === 'A' || scheme === 'B') {
-                    lines.push(`【${scheme}方案·付款计划】`);
-                    let payAmount = withInvoice ? totalWithInvoice : finalTotal;
-                    lines.push(`📅 签合同后一次性付清: ${payAmount.toFixed(2)}元`);
-                } else if (scheme === 'C') {
-                    lines.push('【C方案·后置付费计划】');
-                    let baseForFirst = withInvoice ? totalWithInvoice : finalTotal;
-                    let firstPayment = baseForFirst * (300/1100);
-                    lines.push(`🔹 首付款（签合同后）: ${baseForFirst.toFixed(2)}×27.27% = ${firstPayment.toFixed(2)}元`);
-                    if (majorCount > 6) lines.push('🎁 【C方案尾款减免15%】');
-                    lines.push('🔹 尾款支付（每大类下发注册证后）:');
-                    let idx = 1;
-                    for (let major in majorDetails) {
-                        let cost = majorDetails[major].cost;
-                        let withInvoiceCost = withInvoice ? cost * 1.05 : cost;
-                        let tailPercent = 0.7273;
-                        if (majorCount > 6) tailPercent *= 0.85;
-                        let tail = withInvoiceCost * tailPercent;
-                        lines.push(`   ${idx}.第 ${major}大类尾款：${withInvoiceCost.toFixed(2)}×${(tailPercent*100).toFixed(2)}% = ${tail.toFixed(2)}元`);
-                        idx++;
-                    }
-                }
-                lines.push('');
-                lines.push('=== 💳 付款信息 ===');
-                lines.push('账户名称：企优咨（广州）咨询有限公司');
-                lines.push('账户号码：4405 0158 0107 0000 4275');
-                lines.push('开户银行：中国建设银行股份有限公司广州花城支行');
-                lines.push('【📌 重要提示】1. 付款水单发给陈工；2. 启动服务后不支持退款');
+            for (let major in d.majorDetails) {
+                let cost = d.majorDetails[major].cost;
+                lines.push(`📌 ${major}大类（${d.majorDetails[major].count}个小类） = ${cost}元`);
             }
+            lines.push(`📊 小计（原价）: ${d.totalOriginal.toFixed(2)}元`);
+            if (d.scheme === 'B' && d.majorCount > 6) {
+                lines.push(`📊 小计（优惠后）: ${d.finalTotal.toFixed(2)}元`);
+            }
+            if (d.withInvoice) {
+                lines.push(`🧾 专票费用（加收5%）: ${d.invoiceAmount.toFixed(2)}元`);
+                lines.push(`💎 总合计（含专票）: ${d.totalWithInvoice.toFixed(2)}元`);
+            } else {
+                lines.push(`🧾 专票费用: 0元（未选择）`);
+                lines.push(`💎 总合计: ${d.finalTotal.toFixed(2)}元`);
+            }
+            lines.push('');
+
+            if (d.scheme === 'A' || d.scheme === 'B') {
+                let payAmount = d.withInvoice ? d.totalWithInvoice : d.finalTotal;
+                lines.push(`【${d.scheme}方案·付款计划】`);
+                lines.push(`📅 签合同后一次性付清: ${payAmount.toFixed(2)}元`);
+            } else if (d.scheme === 'C') {
+                lines.push('【C方案·后置付费计划】');
+                let baseForFirst = d.withInvoice ? d.totalWithInvoice : d.finalTotal;
+                let firstPayment = baseForFirst * (300/1100);
+                lines.push(`🔹 首付款（签合同后）: ${baseForFirst.toFixed(2)}×27.27% = ${firstPayment.toFixed(2)}元`);
+                if (d.majorCount > 6) lines.push('🎁 【C方案尾款减免15%】');
+                lines.push('🔹 尾款支付（每大类下发注册证后）:');
+                let idx = 1;
+                for (let major in d.majorDetails) {
+                    let cost = d.majorDetails[major].cost;
+                    let withInvoiceCost = d.withInvoice ? cost * 1.05 : cost;
+                    let tail = withInvoiceCost * d.tailPercent;
+                    lines.push(`   ${idx}.第${major}大类尾款：${withInvoiceCost.toFixed(2)}×${(d.tailPercent*100).toFixed(2)}% = ${tail.toFixed(2)}元`);
+                    idx++;
+                }
+            }
+            lines.push('');
+            lines.push('=== 💳 付款信息 ===');
+            lines.push('账户名称：企优咨（广州）咨询有限公司');
+            lines.push('账户号码：4405 0158 0107 0000 4275');
+            lines.push('开户银行：中国建设银行股份有限公司广州花城支行');
+            lines.push('【📌 重要提示】1. 付款水单发给陈工；2. 启动服务后不支持退款');
             return lines.join('\n');
         }
 
         function refreshUI() {
-            // 更新已选列表显示
+            updateSchemeSelection();
+
             const ul = document.getElementById('selectedListUl');
             ul.innerHTML = '';
             for (let major in selectedSubclasses) {
@@ -656,7 +886,6 @@
             refreshUI();
         }
 
-        // 转义函数
         function escapeHtml(unsafe) {
             return unsafe.replace(/[&<>"]/g, function(m) {
                 if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; if(m === '"') return '&quot;';
@@ -673,7 +902,6 @@
             return c;
         }
 
-        // 渲染树（带折叠展开功能）
         function renderTree(filterText = '') {
             const treeElem = document.getElementById('categoryTree');
             treeElem.innerHTML = '';
@@ -718,9 +946,8 @@
                     });
 
                     if (groupHasMatch || !hasFilter) {
-                        // 如果群组下有匹配项（或没有过滤），则生成群组HTML，并根据是否有过滤决定是否自动展开
                         let groupLiClass = 'tree-li group-li';
-                        if (hasFilter && groupHasMatch) groupLiClass += ' expanded'; // 搜索时展开匹配的群组
+                        if (hasFilter && groupHasMatch) groupLiClass += ' expanded';
                         groupsHTML += `<li class="${groupLiClass}">
                             <div class="folder-label cat-group" data-group="${escapeAttr(groupNumber)}">📁 ${escapeHtml(groupNumber)} - ${escapeHtml(groupName)}</div>
                             <ul class="group-subs">${subItemsHTML}</ul>
@@ -729,9 +956,8 @@
                 });
 
                 if (majorHasMatch || !hasFilter) {
-                    // 生成大类HTML，并根据是否有过滤决定是否自动展开
                     let majorLiClass = 'tree-li major-li';
-                    if (hasFilter && majorHasMatch) majorLiClass += ' expanded'; // 搜索时展开匹配的大类
+                    if (hasFilter && majorHasMatch) majorLiClass += ' expanded';
                     const majorLi = document.createElement('li');
                     majorLi.className = majorLiClass;
                     majorLi.innerHTML = `
@@ -744,18 +970,14 @@
 
             document.getElementById('searchCount').innerText = hasFilter ? `🔍 匹配 ${matchCount} 项` : `共 ${getTotalSubCount()} 小类`;
 
-            // 重新绑定复选框事件
             document.querySelectorAll('.subclass-checkbox').forEach(cb => {
                 cb.removeEventListener('change', handleCheckboxChange);
                 cb.addEventListener('change', handleCheckboxChange);
             });
             syncCheckboxesFromSelected();
-
-            // 为所有可折叠的标题添加点击事件（大类、群组）
             attachFolderListeners();
         }
 
-        // 折叠/展开事件监听
         function attachFolderListeners() {
             document.querySelectorAll('.major-li > .folder-label').forEach(label => {
                 label.addEventListener('click', function(e) {
@@ -773,7 +995,6 @@
             });
         }
 
-        // 加载JSON
         async function loadJSON() {
             try {
                 const response = await fetch('尼斯分类表_树状结构.json');
@@ -795,7 +1016,6 @@
             }
         });
 
-        // 搜索防抖
         let searchTimer;
         document.getElementById('searchInput').addEventListener('input', function(e) {
             clearTimeout(searchTimer);
@@ -804,7 +1024,6 @@
             }, 300);
         });
 
-        // 图片上传
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
         const previewBox = document.getElementById('imagePreview');
@@ -820,21 +1039,21 @@
             reader.readAsDataURL(file);
         });
 
-        // 方案切换/发票更新
         document.querySelectorAll('input[name="scheme"]').forEach(r => {
-            r.addEventListener('change', () => refreshUI());
+            r.addEventListener('change', () => {
+                updateSchemeSelection();
+                refreshUI();
+            });
         });
         document.getElementById('invoiceCheckbox').addEventListener('change', function() {
             document.getElementById('invoiceLabel').style.color = this.checked ? '#c00000' : 'inherit';
             refreshUI();
         });
 
-        // 预览
         document.getElementById('previewOrderBtn').addEventListener('click', function() {
             alert('当前费用明细：\n\n' + computeFeeText());
         });
 
-        // 导出Word (降级下载)
         async function exportWord() {
             const applicant = cleanInput(document.getElementById('applicantName').value) || '未填写';
             const tmName = cleanInput(document.getElementById('trademarkName').value) || '未填写';
@@ -850,10 +1069,57 @@
                 return;
             }
 
+            const style = `
+                body {
+                    font-family: '微软雅黑', 'Segoe UI', sans-serif;
+                    margin: 1.5cm 1.5cm;
+                    font-size: 12pt;
+                    line-height: 1.4;
+                }
+                h2 {
+                    color: #003d7c;
+                    margin: 0.5em 0 0.3em;
+                    font-weight: 600;
+                }
+                h3 {
+                    margin: 0.8em 0 0.3em;
+                    color: #1f3a5f;
+                }
+                p {
+                    margin: 0.2em 0;
+                }
+                ul, ol {
+                    margin: 0.2em 0 0.2em 1.8em;
+                    padding: 0;
+                }
+                li {
+                    margin: 0;
+                    line-height: 1.4;
+                }
+                pre {
+                    background: #f4f8ff;
+                    padding: 10px;
+                    margin: 0.5em 0;
+                    line-height: 1.4;
+                    font-family: inherit;
+                    white-space: pre-wrap;
+                    border-radius: 8px;
+                    border: 1px solid #c9d8ec;
+                }
+                img {
+                    max-width: 200px;
+                    border: 1px solid #ddd;
+                    border-radius: 6px;
+                    margin: 0.5em 0;
+                }
+                .bold { font-weight: 600; }
+                .red { color: #c00000; }
+            `;
+
             let htmlContent = `
             <html>
             <head><meta charset="UTF-8"><title>商标申请订单</title>
-            <style>body { font-family: 微软雅黑, sans-serif; margin:2cm; } h2 { color:#003d7c; } table { border-collapse: collapse; width:100%; } td,th { border:1px solid #aaa; padding:8px; } .bold { font-weight:600; } .red { color:#c00000; }</style>
+            <style>${style}</style>
             </head>
             <body>
             <h2 style="text-align:center;">📄 商标申请订单</h2>
@@ -871,10 +1137,10 @@
             }
             htmlContent += `</ul>`;
             if (trademarkImageData) {
-                htmlContent += `<h3>二、商标图样</h3><img src="${trademarkImageData}" style="max-width:200px;" />`;
+                htmlContent += `<h3>二、商标图样</h3><img src="${trademarkImageData}" alt="商标图样" />`;
             }
-            htmlContent += `<h3>三、服务方案及费用</h3><pre style="background:#f4f8ff; padding:16px;">${computeFeeText()}</pre>`;
-            htmlContent += `<p>—— 本订单由企优咨系统生成 ——</p></body></html>`;
+            htmlContent += `<h3>三、服务方案及费用</h3><pre>${computeFeeText()}</pre>`;
+            htmlContent += `<p style="margin-top:1em;">—— 本订单由企优咨系统生成 ——</p></body></html>`;
 
             const blob = new Blob([htmlContent], { type: 'application/msword' });
             const url = URL.createObjectURL(blob);
@@ -889,18 +1155,201 @@
 
         document.getElementById('exportWordBtn').addEventListener('click', exportWord);
 
+        function generateContract() {
+            const applicant = cleanInput(document.getElementById('applicantName').value);
+            const tmName = cleanInput(document.getElementById('trademarkName').value);
+            const phone = cleanInput(document.getElementById('contactPhone').value);
+            const contact = cleanInput(document.getElementById('contactPerson').value);
+
+            if (!applicant || !tmName) {
+                alert('请填写申请人全称和商标名称');
+                return;
+            }
+            if (Object.keys(selectedSubclasses).length === 0) {
+                alert('请至少选择一个小类');
+                return;
+            }
+
+            const d = computeFeeDetails();
+            const stats = getSelectedStats();
+            const today = new Date().toLocaleDateString('zh-CN');
+            const contractNo = `QYZ-TM-${new Date().getFullYear()}${String(new Date().getMonth()+1).padStart(2,'0')}${String(new Date().getDate()).padStart(2,'0')}${String(Math.floor(Math.random()*1000)).padStart(3,'0')}`;
+
+            let feeRows = '';
+            let idx = 1;
+            for (let major in d.majorDetails) {
+                let cost = d.majorDetails[major].cost;
+                feeRows += `<tr><td>${idx}</td><td>${escapeHtml(major)}</td><td>${d.majorDetails[major].count}</td><td>${cost.toFixed(2)}</td></tr>`;
+                idx++;
+            }
+
+            let discountRow = '';
+            if (d.scheme === 'B' && d.majorCount > 6) {
+                discountRow = `<tr><td></td><td colspan="2" style="text-align:right; font-weight:bold;">B方案大客户优惠（立减15%）</td><td style="color:red;">-${(d.totalOriginal - d.finalTotal).toFixed(2)}</td></tr>`;
+            }
+            let invoiceRow = '';
+            if (d.withInvoice) {
+                invoiceRow = `<tr><td></td><td colspan="2" style="text-align:right; font-weight:bold;">专票费用（加收5%）</td><td>${d.invoiceAmount.toFixed(2)}</td></tr>`;
+            }
+
+            let paymentPlan = '';
+            if (d.scheme === 'A' || d.scheme === 'B') {
+                let totalPay = d.withInvoice ? d.totalWithInvoice : d.finalTotal;
+                paymentPlan = `<p><strong>付款计划：</strong>本合同签订后3个工作日内，甲方一次性支付合同总金额 ${totalPay.toFixed(2)} 元至乙方指定账户。</p>`;
+            } else {
+                let baseFirst = d.withInvoice ? d.totalWithInvoice : d.finalTotal;
+                let firstPay = baseFirst * (300/1100);
+                paymentPlan = `<p><strong>付款计划（后置付费）：</strong></p>
+                <p>① 首付款：合同签订后3个工作日内支付 ${firstPay.toFixed(2)} 元（合同总金额的27.27%）。</p>
+                <p>② 尾款：每有一个大类下发商标注册证后，甲方应在收到乙方通知之日起3个工作日内支付该大类的尾款。尾款明细如下：</p>
+                <ul>`;
+                for (let major in d.majorDetails) {
+                    let cost = d.majorDetails[major].cost;
+                    let withInvoiceCost = d.withInvoice ? cost * 1.05 : cost;
+                    let tail = withInvoiceCost * d.tailPercent;
+                    paymentPlan += `<li>【${escapeHtml(major)}】大类尾款：${withInvoiceCost.toFixed(2)} × ${(d.tailPercent*100).toFixed(2)}% = ${tail.toFixed(2)}元</li>`;
+                }
+                paymentPlan += `</ul>`;
+                if (d.majorCount > 6) {
+                    paymentPlan += `<p style="color:red;"><strong>🎁 C方案大客户优惠：尾款已减免15%</strong></p>`;
+                }
+            }
+
+            const contractHtml = `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>商标申请代理服务合同</title>
+<style>
+    body { font-family: '微软雅黑', '宋体', sans-serif; margin: 2cm 2cm; font-size: 12pt; line-height: 1.5; }
+    h2 { text-align: center; color: #003d7c; margin-bottom: 0.5cm; }
+    h3 { color: #1f3a5f; margin: 0.8cm 0 0.3cm; border-left: 5px solid #0078D7; padding-left: 8px; }
+    p { margin: 0.3cm 0; }
+    table { border-collapse: collapse; width: 100%; margin: 0.5cm 0; }
+    th, td { border: 1px solid #aaa; padding: 8px; text-align: left; }
+    th { background: #f0f4fa; font-weight: bold; }
+    .signature { margin-top: 1cm; display: flex; justify-content: space-between; }
+    .signature div { width: 45%; }
+    .underline { text-decoration: underline; color: #c00000; }
+    .legal { background: #f9f2e0; padding: 8px; border-left: 4px solid #f0b342; margin: 0.5cm 0; }
+</style>
+</head>
+<body>
+<h2>📝 商标申请代理服务合同</h2>
+<p><strong>合同编号：</strong>${contractNo}</p>
+<p><strong>签订日期：</strong>${today}</p>
+
+<h3>一、甲方（委托人）信息</h3>
+<p><strong>公司名称/个人姓名：</strong>${escapeHtml(applicant)}</p>
+<p><strong>统一社会信用代码/身份证号码：</strong><span class="underline">（填写详细）</span></p>
+<p><strong>工商注册地址/身份证地址：</strong><span class="underline">（填写详细）</span></p>
+<p><strong>联系人：</strong>${escapeHtml(contact || '（请填写）')}</p>
+<p><strong>联系电话：</strong>${escapeHtml(phone || '（请填写）')}</p>
+
+<h3>二、乙方（受托人）信息</h3>
+<p><strong>公司名称：</strong>企优咨（广州）咨询有限公司</p>
+<p><strong>统一社会信用代码：</strong>91440111MADMM9PF77</p>
+<p><strong>注册地址：</strong>广州市天河区体育东路140-148号2204房B51室</p>
+<p><strong>联系人：</strong>陈焕泽</p>
+<p><strong>电话：</strong>13128311370</p>
+
+<h3>三、委托事项</h3>
+<p>甲方委托乙方代理以下商标的注册申请事宜：</p>
+<p><strong>商标名称：</strong>${escapeHtml(tmName)}</p>
+<p><strong>商标图样：</strong>${trademarkImageData ? '（已上传，见附件）' : '（未上传，请补充）'}</p>
+<p><strong>申请类别及小类明细：</strong></p>
+<ul>
+${Object.entries(selectedSubclasses).map(([major, subs]) => 
+    `<li><strong>【${escapeHtml(major)}】</strong>：${subs.map(s => escapeHtml(s)).join('；')}</li>`
+).join('')}
+</ul>
+<p><strong>共计：</strong>${stats.majorCount}个大类，${stats.totalSubCount}个小类。</p>
+
+<h3>四、服务方案及费用</h3>
+<p><strong>服务方案：</strong>${d.scheme}方案 · ${d.params.name}</p>
+<div class="legal">📢 特别声明：商标审查权归属国家知识产权局，审查结果存在主观因素，任何代理机构均不得承诺“包过”！若被驳回、被异议，已收取费用不可退！如您担心注册证下不来，可选C方案：下证后再付服务费。</div>
+
+<table>
+    <tr><th>序号</th><th>大类</th><th>小类数量</th><th>费用(元)</th></tr>
+    ${feeRows}
+    <tr><td></td><td colspan="2" style="text-align:right;"><strong>小计（原价）</strong></td><td>${d.totalOriginal.toFixed(2)}</td></tr>
+    ${discountRow}
+    ${invoiceRow}
+    <tr><td></td><td colspan="2" style="text-align:right;"><strong>合同总金额</strong></td><td><strong style="color:#c00000;">${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}</strong></td></tr>
+</table>
+
+<h3>五、付款方式</h3>
+${paymentPlan}
+<p><strong>乙方收款账户：</strong></p>
+<p>账户名称：企优咨（广州）咨询有限公司<br>
+账户号码：4405 0158 0107 0000 4275<br>
+开户银行：中国建设银行股份有限公司广州花城支行</p>
+
+<h3>六、双方权利义务</h3>
+<p>（1）甲方应保证提供的资料真实、合法，并配合乙方完成申请；</p>
+<p>（2）甲方应按约定支付费用，自服务启动后不得以任何理由要求退款；</p>
+<p>（3）乙方应按照专业标准提供服务，并及时报告进展；</p>
+<p>（4）乙方对甲方信息保密，不承诺申请结果。</p>
+
+<h3>七、违约责任</h3>
+<p>甲方逾期付款的，每逾期一日按应付金额的千分之五支付违约金。因甲方资料问题导致驳回的，由甲方承担责任。</p>
+
+<h3>八、其他</h3>
+<p>本合同一式两份，甲乙双方各执一份，具有同等法律效力。未尽事宜可签订补充协议。</p>
+
+<div class="signature">
+    <div><strong>甲方（盖章）：</strong><br><br>授权代表：${escapeHtml(contact || '__________')}<br>日期：${today}</div>
+    <div><strong>乙方（盖章）：</strong>企优咨（广州）咨询有限公司<br><br>授权代表：陈焕泽<br>日期：${today}</div>
+</div>
+
+<p style="text-align:right;">—— 本合同由企优咨系统生成，请仔细核对 ——</p>
+</body>
+</html>`;
+
+            const blob = new Blob([contractHtml], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `商标合同_${applicant}_${tmName}.doc`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        document.getElementById('generateContractBtn').addEventListener('click', generateContract);
+
+        // ---------- 新增选项卡切换逻辑 ----------
+        const tabOrder = document.getElementById('tabOrder');
+        const tabFlow = document.getElementById('tabFlow');
+        const orderPanel = document.getElementById('orderPanel');
+        const flowPanel = document.getElementById('flowPanel');
+
+        tabOrder.addEventListener('click', function() {
+            tabOrder.classList.add('active');
+            tabFlow.classList.remove('active');
+            orderPanel.style.display = 'grid';
+            flowPanel.style.display = 'none';
+        });
+
+        tabFlow.addEventListener('click', function() {
+            tabFlow.classList.add('active');
+            tabOrder.classList.remove('active');
+            orderPanel.style.display = 'none';
+            flowPanel.style.display = 'block';
+        });
+
         // 启动
         loadJSON();
 
-        // 让scheme-option点击选中radio
         document.querySelectorAll('.scheme-option').forEach(opt => {
             opt.addEventListener('click', function(e) {
                 if (e.target.tagName === 'INPUT') return;
                 const radio = this.querySelector('input[type="radio"]');
                 if (radio) radio.checked = true;
-                refreshUI();
+                radio.dispatchEvent(new Event('change'));
             });
         });
+
+        updateSchemeSelection();
     })();
 </script>
 </body>
