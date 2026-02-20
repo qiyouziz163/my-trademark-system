@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>企优咨·商标申请下单系统 (折叠树版)</title>
+    <title>企优咨·商标申请下单系统</title>
     <style>
         * {
             box-sizing: border-box;
@@ -385,8 +385,8 @@
 <body>
 <div class="app-container">
     <div class="header">
-        <h1>📋 企优咨 · 商标申请</h1>
-        <p>移动/桌面自适应 | 折叠树版 | 数据加载同目录下 JSON</p>
+        <h1>📋 企优咨 · 商标申请注册下单</h1>
+        <p>选要注册的小类-填写申请人信息-选服务方案-下单</p>
     </div>
 
     <div class="main-layout">
@@ -453,12 +453,12 @@
                 <div class="scheme-option" id="schemeB">
                     <input type="radio" name="scheme" value="B" id="radioB"> 
                     <span class="scheme-name">B方案·专业辅导</span>
-                    <span class="scheme-desc">580元/大类，超出58/小类 大类＞6立减15%</span>
+                    <span class="scheme-desc">580元/大类，超出58/小类， 大类＞6，立减15%</span>
                 </div>
                 <div class="scheme-option" id="schemeC">
                     <input type="radio" name="scheme" value="C" id="radioC"> 
                     <span class="scheme-name">C方案·后置付费</span>
-                    <span class="scheme-desc">1100元/大类，超出110/小类 首付300官费</span>
+                    <span class="scheme-desc">1100元/大类，超出110/小类， 首付300官费</span>
                 </div>
 
                 <div class="invoice-check">
@@ -544,7 +544,7 @@
             lines.push(`=== 服务方案: ${scheme}方案·${params.name} ===`);
             lines.push(`💰 基础价格：每大类${params.base}元（含10小类），超出部分${params.extra}元/小类。`);
             if (scheme === 'B' && majorCount > 6) lines.push(discountNote);
-            if (scheme === 'C') lines.push('🎁 C方案大客户优惠：大类＞6个尾款减免15%');
+            if (scheme === 'C') lines.push('🎁 C方案大客户优惠：大类＞6个，尾款减免15%');
             lines.push('');
 
             lines.push('=== 💰 费用明细 ===');
@@ -586,7 +586,7 @@
                         let tailPercent = 0.7273;
                         if (majorCount > 6) tailPercent *= 0.85;
                         let tail = withInvoiceCost * tailPercent;
-                        lines.push(`   ${idx}. ${major}大类尾款：${withInvoiceCost.toFixed(2)}×${(tailPercent*100).toFixed(2)}% = ${tail.toFixed(2)}元`);
+                        lines.push(`   ${idx}.第 ${major}大类尾款：${withInvoiceCost.toFixed(2)}×${(tailPercent*100).toFixed(2)}% = ${tail.toFixed(2)}元`);
                         idx++;
                     }
                 }
