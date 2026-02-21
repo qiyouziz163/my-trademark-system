@@ -2290,7 +2290,7 @@
             alert(`订单预览：\n\n已选：${stats.majorCount}个大类，${stats.totalSubCount}个小类\n方案：${d.scheme}方案\n费用：¥${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}元`);
         });
 
-        // ==================== 导出Word（完全复刻Python版样式，但紧凑且图片缩略） ====================
+        // ==================== 导出Word（紧凑版，图片缩略40x40） ====================
         async function exportWord() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
@@ -2313,25 +2313,25 @@
             const d = computeFeeDetails();
             const today = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
 
-            // 构建HTML（紧凑样式，图片缩略40x40，移除多余<br>）
+            // 构建HTML（极致紧凑，图片缩略40x40）
             let htmlContent = `
             <html>
             <head><meta charset="UTF-8"><title>商标申请订单 - ${escapeHtml(tmName)}</title>
             <style>
-                body { font-family: '微软雅黑', sans-serif; margin: 1.5cm; font-size: 11pt; line-height: 1.2; color: #333; }
-                h1 { color: #003d7c; text-align: center; border-bottom: 2px solid #003d7c; padding-bottom: 4px; font-size: 18pt; margin: 0 0 8px; }
-                h2 { color: #1f3a5f; margin: 8px 0 4px; font-size: 14pt; border-left: 4px solid #003d7c; padding-left: 6px; }
-                p, div { margin: 0 0 2px; }
-                .info-table { border-collapse: collapse; width: 100%; margin: 6px 0; }
-                .info-table td { border: 1px solid #999; padding: 4px; }
+                body { font-family: '微软雅黑', sans-serif; margin: 0.8cm; font-size: 10.5pt; line-height: 1.1; color: #333; }
+                h1 { color: #003d7c; text-align: center; border-bottom: 2px solid #003d7c; padding-bottom: 3px; font-size: 16pt; margin: 0 0 5px; }
+                h2 { color: #1f3a5f; margin: 5px 0 2px; font-size: 12pt; border-left: 4px solid #003d7c; padding-left: 4px; }
+                p, div { margin: 0 0 1px; }
+                .info-table { border-collapse: collapse; width: 100%; margin: 3px 0; }
+                .info-table td { border: 1px solid #999; padding: 3px; }
                 .info-table td:first-child { font-weight: bold; background: #f5f5f5; width: 30%; }
-                .word-table { border-collapse: collapse; width: 100%; margin: 6px 0; font-size: 11pt; }
-                .word-table th { background: #e8e8e8; border: 1px solid #999; padding: 4px; text-align: center; font-weight: bold; }
-                .word-table td { border: 1px solid #999; padding: 4px; vertical-align: top; }
+                .word-table { border-collapse: collapse; width: 100%; margin: 3px 0; font-size: 10pt; }
+                .word-table th { background: #e8e8e8; border: 1px solid #999; padding: 3px; text-align: center; font-weight: bold; }
+                .word-table td { border: 1px solid #999; padding: 3px; vertical-align: top; }
                 .word-img { width: 40px; height: 40px; object-fit: contain; }
-                .bg-scheme, .bg-fee, .bg-payment-plan, .bg-payment-info, .bg-important { padding: 2px 8px; margin: 2px 0; }
+                .bg-scheme, .bg-fee, .bg-payment-plan, .bg-payment-info, .bg-important { padding: 1px 5px; margin: 1px 0; }
                 .total-red { color: #C00000; font-weight: bold; }
-                .footer { margin-top: 20px; text-align: center; color: #999; font-size: 9pt; border-top: 1px solid #eee; padding-top: 8px; }
+                .footer { margin-top: 10px; text-align: center; color: #999; font-size: 8pt; border-top: 1px solid #eee; padding-top: 3px; }
             </style>
             </head>
             <body>
@@ -2371,7 +2371,7 @@
                 if (trademarkImageData) {
                     htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样">`;
                 } else {
-                    htmlContent += `见附件`;
+                    htmlContent += `无图样`;
                 }
                 htmlContent += `</td>
                     <td style="text-align: center;">${escapeHtml(major)}</td>
@@ -2381,7 +2381,7 @@
             }
             htmlContent += `</table>`;
 
-            // 三、费用明细（背景色块，无多余<br>）
+            // 三、费用明细
             htmlContent += `<h2>三、费用明细</h2>`;
 
             htmlContent += `<div class="bg-scheme">=== 服务方案: ${d.scheme}方案 · ${d.params.name} ===</div>`;
@@ -2442,7 +2442,7 @@
             // 四、商标图样（缩略图40x40）
             htmlContent += `<h2>四、商标图样</h2>`;
             if (trademarkImageData) {
-                htmlContent += `<img src="${trademarkImageData}" style="width:40px; height:40px; object-fit: contain; border: 1px solid #ccc; border-radius: 4px;" /><br>`;
+                htmlContent += `<img src="${trademarkImageData}" style="width:40px; height:40px; object-fit: contain; border: 1px solid #ccc; border-radius: 2px;" /><br>`;
                 htmlContent += `<div>📎 文件: 已上传图片</div>`;
             } else {
                 htmlContent += `<div>⚠️ 未上传商标图样</div>`;
@@ -2454,7 +2454,7 @@
             htmlContent += `<div>📱 微信：扫码添加</div>`;
             htmlContent += `<div>📞 电话：13128311370</div>`;
             htmlContent += `<div>🕒 服务时间：周一至周五 9:00-18:00</div>`;
-            htmlContent += `<div style="margin-top: 10px;">[联系陈工微信二维码]</div>`;
+            htmlContent += `<div style="margin-top: 5px;">[联系陈工微信二维码]</div>`;
 
             htmlContent += `
             <div class="footer">
@@ -2475,7 +2475,7 @@
 
         document.getElementById('exportWordBtn').addEventListener('click', exportWord);
 
-        // ==================== 生成合同（紧凑样式，图片缩略） ====================
+        // ==================== 生成合同（紧凑版，图片缩略40x40） ====================
         function getCircledNumber(n) {
             const map = {
                 1:'①',2:'②',3:'③',4:'④',5:'⑤',6:'⑥',7:'⑦',8:'⑧',9:'⑨',10:'⑩',
@@ -2509,21 +2509,21 @@
             <html>
             <head><meta charset="UTF-8"><title>商标申请代理服务合同</title>
             <style>
-                body { font-family: '微软雅黑', sans-serif; margin: 1.5cm; font-size: 11pt; line-height: 1.2; color: #333; }
-                h1 { text-align: center; color: #003d7c; font-size: 20pt; margin: 0 0 6px; }
-                .contract-no { text-align: center; color: #666; margin: 0 0 10px; }
-                h2 { color: #1f3a5f; font-size: 14pt; margin: 8px 0 4px; border-bottom: 2px solid #003d7c; padding-bottom: 3px; }
-                .party { margin: 4px 0; }
+                body { font-family: '微软雅黑', sans-serif; margin: 0.8cm; font-size: 10.5pt; line-height: 1.1; color: #333; }
+                h1 { text-align: center; color: #003d7c; font-size: 18pt; margin: 0 0 4px; }
+                .contract-no { text-align: center; color: #666; margin: 0 0 5px; }
+                h2 { color: #1f3a5f; font-size: 12pt; margin: 5px 0 2px; border-bottom: 2px solid #003d7c; padding-bottom: 2px; }
+                .party { margin: 2px 0; }
                 .party-title { font-weight: bold; color: #003d7c; }
-                p, div { margin: 0 0 2px; }
-                table { border-collapse: collapse; width: 100%; margin: 6px 0; font-size: 10.5pt; }
-                th, td { border: 1px solid #333; padding: 4px; vertical-align: top; }
+                p, div { margin: 0 0 1px; }
+                table { border-collapse: collapse; width: 100%; margin: 3px 0; font-size: 10pt; }
+                th, td { border: 1px solid #333; padding: 3px; vertical-align: top; }
                 th { background: #e8e8e8; text-align: center; }
-                .highlight { background: #fffbeb; padding: 4px; border-left: 4px solid #f59e0b; margin: 4px 0; }
+                .highlight { background: #fffbeb; padding: 3px; border-left: 4px solid #f59e0b; margin: 3px 0; }
                 .underline-red { text-decoration: underline; color: red; }
-                .signature-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                .signature-table td { border: none; padding: 5px 10px; vertical-align: bottom; }
-                .signature-line { border-bottom: 1px solid #000; height: 30px; width: 100%; }
+                .signature-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+                .signature-table td { border: none; padding: 3px 8px; vertical-align: bottom; }
+                .signature-line { border-bottom: 1px solid #000; height: 25px; width: 100%; }
                 .total-row { font-weight: bold; color: #C00000; background: #f0f0f0; }
                 .bg-payment-plan { background-color: #FFF2CC; }
                 .bg-payment-info { background-color: #E6E6FA; }
@@ -2580,7 +2580,7 @@
                 if (trademarkImageData) {
                     htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样">`;
                 } else {
-                    htmlContent += `见附件`;
+                    htmlContent += `无图样`;
                 }
                 htmlContent += `</td>
                     <td style="text-align: center;">${escapeHtml(major)}</td>
@@ -2636,7 +2636,7 @@
 
             // 表格外显示合同总金额
             const totalAmount = (d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2);
-            htmlContent += `<p style="font-weight: bold; color: #C00000;">合同总金额：${totalAmount} 元${d.withInvoice ? '（含专票）' : ''}</p>`;
+            htmlContent += `<p style="font-weight: bold; color: #C00000; margin:2px 0;">合同总金额：${totalAmount} 元${d.withInvoice ? '（含专票）' : ''}</p>`;
 
             // 第三条 付款方式
             htmlContent += `<h2>第三条 付款方式</h2>`;
@@ -2713,7 +2713,7 @@
                     </td>
                 </tr>
             </table>
-            <p style="text-align: center; margin-top: 10px;">签订日期：${today}</p>
+            <p style="text-align: center; margin-top: 8px;">签订日期：${today}</p>
 
             </body></html>`;
 
