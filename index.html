@@ -2290,7 +2290,7 @@
             alert(`订单预览：\n\n已选：${stats.majorCount}个大类，${stats.totalSubCount}个小类\n方案：${d.scheme}方案\n费用：¥${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}元`);
         });
 
-        // ==================== 导出Word（完全复刻Python版样式） ====================
+        // ==================== 导出Word（完全复刻Python版样式，但紧凑且图片缩略） ====================
         async function exportWord() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
@@ -2313,28 +2313,25 @@
             const d = computeFeeDetails();
             const today = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
 
-            // 构建HTML（模仿Python版Word）
+            // 构建HTML（紧凑样式，图片缩略40x40，移除多余<br>）
             let htmlContent = `
             <html>
             <head><meta charset="UTF-8"><title>商标申请订单 - ${escapeHtml(tmName)}</title>
             <style>
-                body { font-family: '微软雅黑', sans-serif; margin: 2cm; font-size: 11pt; line-height: 1.4; color: #333; }
-                h1 { color: #003d7c; text-align: center; border-bottom: 3px solid #003d7c; padding-bottom: 8px; font-size: 18pt; }
-                h2 { color: #1f3a5f; margin-top: 24px; font-size: 14pt; border-left: 4px solid #003d7c; padding-left: 10px; }
-                .info-table { border-collapse: collapse; width: 100%; margin: 12px 0; }
-                .info-table td { border: 1px solid #999; padding: 8px; }
+                body { font-family: '微软雅黑', sans-serif; margin: 1.5cm; font-size: 11pt; line-height: 1.2; color: #333; }
+                h1 { color: #003d7c; text-align: center; border-bottom: 2px solid #003d7c; padding-bottom: 4px; font-size: 18pt; margin: 0 0 8px; }
+                h2 { color: #1f3a5f; margin: 8px 0 4px; font-size: 14pt; border-left: 4px solid #003d7c; padding-left: 6px; }
+                p, div { margin: 0 0 2px; }
+                .info-table { border-collapse: collapse; width: 100%; margin: 6px 0; }
+                .info-table td { border: 1px solid #999; padding: 4px; }
                 .info-table td:first-child { font-weight: bold; background: #f5f5f5; width: 30%; }
-                .word-table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 11pt; }
-                .word-table th { background: #e8e8e8; border: 1px solid #999; padding: 8px; text-align: center; font-weight: bold; }
-                .word-table td { border: 1px solid #999; padding: 6px; vertical-align: top; }
-                .word-img { max-width: 60px; max-height: 60px; object-fit: contain; }
-                .bg-scheme { background-color: #D4E6F1; padding: 4px 8px; font-weight: bold; }
-                .bg-fee { background-color: #D5E8D4; padding: 4px 8px; font-weight: bold; }
-                .bg-payment-plan { background-color: #FFF2CC; padding: 4px 8px; font-weight: bold; }
-                .bg-payment-info { background-color: #E6E6FA; padding: 4px 8px; font-weight: bold; }
-                .bg-important { background-color: #FCE4D6; padding: 4px 8px; font-weight: bold; }
+                .word-table { border-collapse: collapse; width: 100%; margin: 6px 0; font-size: 11pt; }
+                .word-table th { background: #e8e8e8; border: 1px solid #999; padding: 4px; text-align: center; font-weight: bold; }
+                .word-table td { border: 1px solid #999; padding: 4px; vertical-align: top; }
+                .word-img { width: 40px; height: 40px; object-fit: contain; }
+                .bg-scheme, .bg-fee, .bg-payment-plan, .bg-payment-info, .bg-important { padding: 2px 8px; margin: 2px 0; }
                 .total-red { color: #C00000; font-weight: bold; }
-                .footer { margin-top: 40px; text-align: center; color: #999; font-size: 9pt; border-top: 1px solid #eee; padding-top: 20px; }
+                .footer { margin-top: 20px; text-align: center; color: #999; font-size: 9pt; border-top: 1px solid #eee; padding-top: 8px; }
             </style>
             </head>
             <body>
@@ -2358,7 +2355,7 @@
             <h2>二、已选类别明细</h2>
             `;
 
-            // 五列明细表（复刻Python版）
+            // 五列明细表
             htmlContent += `
             <table class="word-table">
                 <tr><th>序号</th><th>商标名称</th><th>商标图样</th><th>已选大类</th><th>小类</th></tr>
@@ -2384,17 +2381,15 @@
             }
             htmlContent += `</table>`;
 
-            // 三、费用明细（逐行带背景色）
+            // 三、费用明细（背景色块，无多余<br>）
             htmlContent += `<h2>三、费用明细</h2>`;
 
-            // 方案行
             htmlContent += `<div class="bg-scheme">=== 服务方案: ${d.scheme}方案 · ${d.params.name} ===</div>`;
             htmlContent += `<div>💰 基础价格：每大类${d.params.base}元（含10个小类），超出部分${d.params.extra}元/小类。</div>`;
             if (d.scheme === 'A') htmlContent += `<div>A方案暂无大客户优惠。</div>`;
             if (d.scheme === 'B') htmlContent += `<div>🎁 B方案大客户优惠：一次性下单大类＞6个，总金额立减15%！</div>`;
             if (d.scheme === 'C') htmlContent += `<div>🎁 C方案大客户优惠：一次性下单大类＞6个，尾款减免15%！</div>`;
             htmlContent += `<div>💳 付款方式: ${d.scheme === 'C' ? '首付300元官费，剩余尾款待下证后支付' : '签合同后一次性付清'}</div>`;
-            htmlContent += `<br>`;
 
             htmlContent += `<div class="bg-fee">=== 💰 费用明细 ===</div>`;
             for (let major in d.majorDetails) {
@@ -2412,7 +2407,6 @@
                 htmlContent += `<div>🧾 专票费用: 0元（未选择）</div>`;
                 htmlContent += `<div class="total-red">💎 总合计: ${d.finalTotal.toFixed(2)}元</div>`;
             }
-            htmlContent += `<br>`;
 
             // 付款计划
             if (d.scheme === 'C') {
@@ -2435,7 +2429,6 @@
                 let payAmount = d.withInvoice ? d.totalWithInvoice : d.finalTotal;
                 htmlContent += `<div>📅 签合同后一次性付清: ${payAmount.toFixed(2)}元</div>`;
             }
-            htmlContent += `<br>`;
 
             htmlContent += `<div class="bg-payment-info">=== 💳 付款信息 ===</div>`;
             htmlContent += `<div>账户名称：企优咨（广州）咨询有限公司</div>`;
@@ -2446,10 +2439,10 @@
             htmlContent += `<div>2. 因我们是提供知识服务，启动服务后不支持退款</div>`;
             htmlContent += `<div>3. 如有疑问请联系陈工：13128311370</div>`;
 
-            // 四、商标图样
+            // 四、商标图样（缩略图40x40）
             htmlContent += `<h2>四、商标图样</h2>`;
             if (trademarkImageData) {
-                htmlContent += `<img src="${trademarkImageData}" style="max-width: 300px; max-height: 200px; border: 1px solid #ccc; border-radius: 4px;" /><br>`;
+                htmlContent += `<img src="${trademarkImageData}" style="width:40px; height:40px; object-fit: contain; border: 1px solid #ccc; border-radius: 4px;" /><br>`;
                 htmlContent += `<div>📎 文件: 已上传图片</div>`;
             } else {
                 htmlContent += `<div>⚠️ 未上传商标图样</div>`;
@@ -2461,7 +2454,6 @@
             htmlContent += `<div>📱 微信：扫码添加</div>`;
             htmlContent += `<div>📞 电话：13128311370</div>`;
             htmlContent += `<div>🕒 服务时间：周一至周五 9:00-18:00</div>`;
-            // 尝试嵌入二维码（base64无法直接引用本地文件，可忽略或留空）
             htmlContent += `<div style="margin-top: 10px;">[联系陈工微信二维码]</div>`;
 
             htmlContent += `
@@ -2483,7 +2475,7 @@
 
         document.getElementById('exportWordBtn').addEventListener('click', exportWord);
 
-        // ==================== 生成合同（完全复刻附件样式） ====================
+        // ==================== 生成合同（紧凑样式，图片缩略） ====================
         function getCircledNumber(n) {
             const map = {
                 1:'①',2:'②',3:'③',4:'④',5:'⑤',6:'⑥',7:'⑦',8:'⑧',9:'⑨',10:'⑩',
@@ -2517,24 +2509,25 @@
             <html>
             <head><meta charset="UTF-8"><title>商标申请代理服务合同</title>
             <style>
-                body { font-family: '微软雅黑', sans-serif; margin: 2cm; font-size: 11pt; line-height: 1.6; color: #333; }
-                h1 { text-align: center; color: #003d7c; font-size: 20pt; margin-bottom: 0.2cm; }
-                .contract-no { text-align: center; color: #666; margin-bottom: 0.8cm; }
-                h2 { color: #1f3a5f; font-size: 14pt; margin-top: 0.8cm; margin-bottom: 0.3cm; border-bottom: 2px solid #003d7c; padding-bottom: 5px; }
-                .party { margin: 0.4cm 0; }
+                body { font-family: '微软雅黑', sans-serif; margin: 1.5cm; font-size: 11pt; line-height: 1.2; color: #333; }
+                h1 { text-align: center; color: #003d7c; font-size: 20pt; margin: 0 0 6px; }
+                .contract-no { text-align: center; color: #666; margin: 0 0 10px; }
+                h2 { color: #1f3a5f; font-size: 14pt; margin: 8px 0 4px; border-bottom: 2px solid #003d7c; padding-bottom: 3px; }
+                .party { margin: 4px 0; }
                 .party-title { font-weight: bold; color: #003d7c; }
-                table { border-collapse: collapse; width: 100%; margin: 0.5cm 0; font-size: 10.5pt; }
-                th, td { border: 1px solid #333; padding: 8px; vertical-align: top; }
+                p, div { margin: 0 0 2px; }
+                table { border-collapse: collapse; width: 100%; margin: 6px 0; font-size: 10.5pt; }
+                th, td { border: 1px solid #333; padding: 4px; vertical-align: top; }
                 th { background: #e8e8e8; text-align: center; }
-                .highlight { background: #fffbeb; padding: 8px; border-left: 4px solid #f59e0b; margin: 0.4cm 0; }
+                .highlight { background: #fffbeb; padding: 4px; border-left: 4px solid #f59e0b; margin: 4px 0; }
                 .underline-red { text-decoration: underline; color: red; }
-                .signature-table { width: 100%; border-collapse: collapse; margin-top: 30px; }
-                .signature-table td { border: none; padding: 10px 20px; vertical-align: bottom; }
-                .signature-line { border-bottom: 1px solid #000; height: 40px; width: 100%; }
+                .signature-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                .signature-table td { border: none; padding: 5px 10px; vertical-align: bottom; }
+                .signature-line { border-bottom: 1px solid #000; height: 30px; width: 100%; }
                 .total-row { font-weight: bold; color: #C00000; background: #f0f0f0; }
                 .bg-payment-plan { background-color: #FFF2CC; }
                 .bg-payment-info { background-color: #E6E6FA; }
-                .word-img { max-width: 60px; max-height: 60px; object-fit: contain; }
+                .word-img { width: 40px; height: 40px; object-fit: contain; }
             </style>
             </head>
             <body>
@@ -2720,7 +2713,7 @@
                     </td>
                 </tr>
             </table>
-            <p style="text-align: center; margin-top: 20px;">签订日期：${today}</p>
+            <p style="text-align: center; margin-top: 10px;">签订日期：${today}</p>
 
             </body></html>`;
 
