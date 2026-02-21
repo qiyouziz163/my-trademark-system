@@ -1703,10 +1703,10 @@
                         <input type="radio" name="scheme" value="C" id="radioC" class="scheme-radio">
                         <div class="scheme-content">
                             <div class="scheme-header">
-                                <span class="scheme-name">C方案 · 后置付费</span>
+                                <span class="scheme-name">C方案 · 分期付费</span>
                                 <span class="scheme-price">¥1100<span style="font-size: 0.7rem; font-weight: 400;">/大类</span></span>
                             </div>
-                            <div class="scheme-desc">下证后付服务费，首付仅300元官费，降低注册风险</div>
+                            <div class="scheme-desc">下证后付服务费，首付仅300元首期款，降低注册风险</div>
                             <div class="scheme-features">
                                 <span class="feature-tag">✓ 启动成本低</span>
                                 <span class="feature-tag">✓ 下证后付款</span>
@@ -1891,7 +1891,7 @@
         const schemeParams = {
             A: { base: 380, extra: 38, name: '流程跟进' },
             B: { base: 580, extra: 58, name: '专业辅导' },
-            C: { base: 1100, extra: 110, name: '后置付费' }
+            C: { base: 1100, extra: 110, name: '分期付费' }  // 修改方案名称
         };
 
         // 工具函数
@@ -2042,13 +2042,20 @@
             html += '<div style="margin-top: 16px; padding-top: 16px; border-top: 2px solid var(--gray-200); font-size: 0.85rem; color: var(--gray-600);">';
             
             if (d.scheme === 'C') {
-                const firstPay = d.majorCount * 300; // 首付为官费300/大类，不受优惠影响
-                // 注意：如果大类有小类超出，官费也会增加，但为简化，我们仍按300/大类计算，与实际业务可能存在差异，但用户可接受。
-                // 更精确的计算应该根据每个大类的小类数量计算官费，但此处保持原逻辑。
-                const total = d.withInvoice ? d.totalWithInvoice : d.finalTotal;
+                // 重新计算含税首期款和尾款
+                const baseFirstPay = d.majorCount * 300; // 首期款总额（未税）
+                const baseServiceTotal = d.finalTotal - baseFirstPay; // 服务费总额（未税，已含优惠）
+                let firstPay, serviceTotal;
+                if (d.withInvoice) {
+                    firstPay = baseFirstPay * 1.05;
+                    serviceTotal = baseServiceTotal * 1.05;
+                } else {
+                    firstPay = baseFirstPay;
+                    serviceTotal = baseServiceTotal;
+                }
                 html += `<div style="margin-bottom: 8px;"><strong>付款计划：</strong></div>`;
-                html += `<div>① 首付款：¥${firstPay.toFixed(2)}（合同签订后，官费部分）</div>`;
-                html += `<div>② 尾款：每大类下证后支付，总额 ¥${(total - firstPay).toFixed(2)}，各大类尾款按该大类费用比例分摊。</div>`;
+                html += `<div>① 首期款：¥${firstPay.toFixed(2)}（合同签订后支付，${d.withInvoice?'含税':'未税'}）</div>`;
+                html += `<div>② 服务尾款：每大类下证后支付，总额 ¥${serviceTotal.toFixed(2)}，各大类尾款按该大类费用比例分摊。</div>`;
             } else {
                 html += `<div><strong>付款方式：</strong>合同签订后一次性支付</div>`;
             }
@@ -2456,7 +2463,7 @@
             return map[n] || n + '.';
         }
 
-        // ==================== 导出Word（优化版，图片缩略图+点击查看原图） ====================
+        // ==================== 导出Word（优化版） ====================
         async function exportWord() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
@@ -2511,7 +2518,7 @@
                 <tr><td>联系人姓名：</td><td>${escapeHtml(contact || '未填写')}</td></tr>
                 <tr><td>下订单日期：</td><td>${today}</td></tr>
                 <tr><td>服务方案：</td><td>${escapeHtml(d.scheme)}方案 · ${escapeHtml(d.params.name)}</td></tr>
-                <tr><td>方案描述：</td><td>${d.scheme === 'A' ? '适合需求：您懂商标但事务繁忙？流程跟进帮您省心省力。服务内容：材料形式审核、官方文件代收代发、关键节点人工提醒、全流程进度同步。' : d.scheme === 'B' ? '适合需求：希望提升商标注册规范性？专业辅导为您保驾护航。服务内容：注册前风险评估、类别规划建议、申请材料优化、专业解读与指导。' : '适合需求：担心注册不下来，服务费白给？后置付费让您更从容。服务内容：启动成本更低，仅付官费；下发商标注册证后再付服务费！'}</td></tr>
+                <tr><td>方案描述：</td><td>${d.scheme === 'A' ? '适合需求：您懂商标但事务繁忙？流程跟进帮您省心省力。服务内容：材料形式审核、官方文件代收代发、关键节点人工提醒、全流程进度同步。' : d.scheme === 'B' ? '适合需求：希望提升商标注册规范性？专业辅导为您保驾护航。服务内容：注册前风险评估、类别规划建议、申请材料优化、专业解读与指导。' : '适合需求：担心注册不下来，服务费白给？分期付费让您更从容。服务内容：启动成本更低，仅付首期款；下发商标注册证后再付服务费！'}</td></tr>
                 <tr><td>专票选项：</td><td>${d.withInvoice ? '✓ 是（加收5%）' : '✗ 否'}</td></tr>
                 <tr><td>商标图样：</td><td>${trademarkImageData ? '✓ 已上传' : '✗ 未上传'}</td></tr>
                 <tr><td>已选大类数量：</td><td>${stats.majorCount}</td></tr>
@@ -2520,7 +2527,7 @@
 
             <h2>二、已选类别明细</h2>
             <table class="word-table">
-                <tr><th style="width:5%">序号</th><th style="width:15%">商标名称</th><th style="width:15%">商标图样</th><th style="width:10%">已选大类</th><th>小类</th></tr>
+                <tr><th>序号</th><th>商标名称</th><th>商标图样</th><th>已选大类</th><th>小类</th></tr>
             `;
             let idx = 1;
             for (const major in selectedSubclasses) {
@@ -2531,8 +2538,7 @@
                     <td style="text-align: center;">${escapeHtml(tmName)}</td>
                     <td style="text-align: center;">`;
                 if (trademarkImageData) {
-                    // 添加可点击的缩略图链接，点击在新窗口查看原图
-                    htmlContent += `<a href="${trademarkImageData}" target="_blank"><img src="${trademarkImageData}" width="40" height="40" style="object-fit: contain;" alt="商标图样"></a><br><span style="font-size:8pt;">(点击查看原图)</span>`;
+                    htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样">`;
                 } else {
                     htmlContent += `无图样`;
                 }
@@ -2550,7 +2556,7 @@
             if (d.scheme === 'A') htmlContent += `<div>A方案暂无大客户优惠。</div>`;
             if (d.scheme === 'B') htmlContent += `<div>🎁 B方案大客户优惠：一次性下单大类＞6个，总金额立减15%！</div>`;
             if (d.scheme === 'C') htmlContent += `<div>🎁 C方案大客户优惠：一次性下单大类＞6个，尾款减免15%！</div>`;
-            htmlContent += `<div>💳 付款方式: ${d.scheme === 'C' ? '首付300元/大类官费，剩余尾款待下证后支付' : '签合同后一次性付清'}</div>`;
+            htmlContent += `<div>💳 付款方式: ${d.scheme === 'C' ? '首付300元/大类首期款，剩余尾款待下证后支付' : '签合同后一次性付清'}</div>`;
 
             htmlContent += `<div class="bg-fee">=== 💰 费用明细 ===</div>`;
             for (const major in d.majorDetails) {
@@ -2570,11 +2576,20 @@
             }
 
             if (d.scheme === 'C') {
-                htmlContent += `<div class="bg-payment-plan">【C方案·后置付费计划】</div>`;
-                const firstPay = d.majorCount * 300; // 官费总额
-                const tailTotal = (d.withInvoice ? d.totalWithInvoice : d.finalTotal) - firstPay;
-                htmlContent += `<div>🔹 首付款（签合同后）: 官费部分 ${firstPay.toFixed(2)}元</div>`;
-                htmlContent += `<div>🔹 尾款总额（下证后支付）: ${tailTotal.toFixed(2)}元，各大类按费用比例分摊。</div>`;
+                // 重新计算含税首期款和尾款
+                const baseFirstPay = d.majorCount * 300;
+                const baseServiceTotal = d.finalTotal - baseFirstPay;
+                let firstPay, tailTotal;
+                if (d.withInvoice) {
+                    firstPay = baseFirstPay * 1.05;
+                    tailTotal = baseServiceTotal * 1.05;
+                } else {
+                    firstPay = baseFirstPay;
+                    tailTotal = baseServiceTotal;
+                }
+                htmlContent += `<div class="bg-payment-plan">【C方案·分期付费计划】</div>`;
+                htmlContent += `<div>🔹 首期款（签合同后）: ${firstPay.toFixed(2)}元 ${d.withInvoice ? '(含税)' : '(未税)'}</div>`;
+                htmlContent += `<div>🔹 服务尾款总额（下证后支付）: ${tailTotal.toFixed(2)}元，各大类尾款按该大类费用比例分摊。</div>`;
                 let subIdx = 1;
                 for (const major in d.majorDetails) {
                     const majorCost = d.majorDetails[major].cost;
@@ -2603,7 +2618,7 @@
 
             htmlContent += `<h2>四、商标图样</h2>`;
             if (trademarkImageData) {
-                htmlContent += `<a href="${trademarkImageData}" target="_blank"><img src="${trademarkImageData}" width="40" height="40" style="object-fit: contain; border: 1px solid #ccc; border-radius: 2px;" /></a> (点击图片查看原图)<br>`;
+                htmlContent += `<img src="${trademarkImageData}" style="width:40px; height:40px; object-fit: contain; border: 1px solid #ccc; border-radius: 2px;" /><br>`;
                 htmlContent += `<div>📎 文件: 已上传图片</div>`;
             } else {
                 htmlContent += `<div>⚠️ 未上传商标图样</div>`;
@@ -2635,7 +2650,7 @@
 
         document.getElementById('exportWordBtn').addEventListener('click', exportWord);
 
-        // ==================== 生成合同（优化版，图片缩略图+点击查看原图） ====================
+        // ==================== 生成合同（优化版，修正标题编号） ====================
         function generateContract() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
@@ -2715,7 +2730,7 @@
 
             <h3>已选类别明细</h3>
             <table>
-                <tr><th style="width:5%">序号</th><th style="width:15%">商标名称</th><th style="width:15%">商标图样</th><th style="width:10%">已选大类</th><th>小类</th></tr>
+                <tr><th>序号</th><th>商标名称</th><th>商标图样</th><th>已选大类</th><th>小类</th></tr>
             `;
             let idx = 1;
             for (const major in selectedSubclasses) {
@@ -2726,8 +2741,7 @@
                     <td style="text-align: center;">${escapeHtml(tmName)}</td>
                     <td style="text-align: center;">`;
                 if (trademarkImageData) {
-                    // 添加可点击的缩略图链接，点击在新窗口查看原图
-                    htmlContent += `<a href="${trademarkImageData}" target="_blank"><img src="${trademarkImageData}" width="40" height="40" style="object-fit: contain;" alt="商标图样"></a><br><span style="font-size:8pt;">(点击查看原图)</span>`;
+                    htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样">`;
                 } else {
                     htmlContent += `无图样`;
                 }
@@ -2742,7 +2756,7 @@
             htmlContent += `
             <h2>第四条 服务方案及费用</h2>
             <p>4.1 甲方选择乙方提供的【${escapeHtml(d.scheme)}方案 · ${escapeHtml(d.params.name)}】服务。</p>
-            <p>    方案描述：${d.scheme === 'A' ? '适合需求：您懂商标但事务繁忙？流程跟进帮您省心省力。服务内容：材料形式审核、官方文件代收代发、关键节点人工提醒、全流程进度同步。' : d.scheme === 'B' ? '适合需求：希望提升商标注册规范性？专业辅导为您保驾护航。服务内容：注册前风险评估、类别规划建议、申请材料优化、专业解读与指导。' : '适合需求：担心注册不下来，服务费白给？后置付费让您更从容。服务内容：启动成本更低，仅付官费；下发商标注册证后再付服务费！'}</p>
+            <p>    方案描述：${d.scheme === 'A' ? '适合需求：您懂商标但事务繁忙？流程跟进帮您省心省力。服务内容：材料形式审核、官方文件代收代发、关键节点人工提醒、全流程进度同步。' : d.scheme === 'B' ? '适合需求：希望提升商标注册规范性？专业辅导为您保驾护航。服务内容：注册前风险评估、类别规划建议、申请材料优化、专业解读与指导。' : '适合需求：担心注册不下来，服务费白给？分期付费让您更从容。服务内容：启动成本更低，仅付首期款；下发商标注册证后再付服务费！'}</p>
             <p>4.2 服务费用计算标准表：</p>
 
             <table>
@@ -2786,12 +2800,20 @@
 
             htmlContent += `<h2>第五条 付款方式</h2>`;
             if (d.scheme === 'C') {
-                const firstPay = d.majorCount * 300; // 官费总额
-                const tailTotal = (d.withInvoice ? d.totalWithInvoice : d.finalTotal) - firstPay;
-                htmlContent += `<p>5.1 甲方选择C方案·后置付费服务，付款方式如下：</p>`;
+                const baseFirstPay = d.majorCount * 300;
+                const baseServiceTotal = d.finalTotal - baseFirstPay;
+                let firstPay, tailTotal;
+                if (d.withInvoice) {
+                    firstPay = baseFirstPay * 1.05;
+                    tailTotal = baseServiceTotal * 1.05;
+                } else {
+                    firstPay = baseFirstPay;
+                    tailTotal = baseServiceTotal;
+                }
+                htmlContent += `<p>5.1 甲方选择C方案·分期付费服务，付款方式如下：</p>`;
                 htmlContent += `<p>   合同总金额：${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}元${d.withInvoice ? '（含专票）' : ''}</p>`;
-                htmlContent += `<p>   <strong>首付款</strong>（合同签订后3个工作日内）：官费部分 ${firstPay.toFixed(2)}元</p>`;
-                htmlContent += `<p>   <strong>尾款支付：</strong>每当有一个大类下发商标注册证后，甲方应在收到乙方通知之日起3个工作日内支付该大类的尾款。各大类尾款按费用比例分摊，具体金额如下：</p>`;
+                htmlContent += `<p>   <strong>首期款</strong>（合同签订后3个工作日内）：${firstPay.toFixed(2)}元 ${d.withInvoice ? '(含税)' : '(未税)'}</p>`;
+                htmlContent += `<p>   <strong>服务尾款支付：</strong>每当有一个大类下发商标注册证后，甲方应在收到乙方通知之日起3个工作日内支付该大类的尾款。各大类尾款按费用比例分摊，具体金额如下：</p>`;
                 let subIdx = 1;
                 for (const major in d.majorDetails) {
                     const majorCost = d.majorDetails[major].cost;
