@@ -5,16 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <meta name="description" content="企优咨商标申请下单系统 - 专业商标代理服务">
     <meta name="keywords" content="商标申请,商标注册,企优咨,商标代理">
-    <!-- 修正图标引用：使用“企优咨图标.ico”作为favicon -->
     <link rel="icon" type="image/x-icon" href="企优咨图标.ico">
     <title>企优咨 · 商标申请下单系统</title>
     <style>
-        /* 样式与原来保持一致，无改动 */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Roboto, 'Microsoft YaHei', '微软雅黑', system-ui, -apple-system, sans-serif;
+            font-family: 'Segoe UI', Roboto, 'Source Han Sans', 'Noto Sans CJK SC', '思源黑体', system-ui, -apple-system, sans-serif;
         }
         
         :root {
@@ -2437,29 +2435,6 @@
 
         document.getElementById('invoiceCheckbox').addEventListener('change', refreshUI);
 
-        // 预览按钮
-        document.getElementById('previewOrderBtn').addEventListener('click', function() {
-            const d = computeFeeDetails();
-            const stats = getSelectedStats();
-            
-            const modal = document.createElement('div');
-            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;';
-            modal.innerHTML = `
-                <div style="background: white; padding: 24px; border-radius: 16px; max-width: 400px; width: 90%;">
-                    <h3 style="margin-top: 0; color: var(--primary);">订单预览</h3>
-                    <p><strong>已选：</strong>${stats.majorCount}个大类，${stats.totalSubCount}个小类</p>
-                    <p><strong>方案：</strong>${d.scheme}方案 · ${d.params.name}</p>
-                    <p><strong>费用：</strong>¥${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}元 ${d.withInvoice ? '(含专票)' : '(普票)'}</p>
-                    <button type="button" onclick="this.closest('.modal').remove()" style="margin-top: 16px; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%;">关闭</button>
-                </div>
-            `;
-            modal.className = 'modal';
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) modal.remove();
-            });
-            document.body.appendChild(modal);
-        });
-
         // 带圈数字函数 - 提前定义
         function getCircledNumber(n) {
             const map = {
@@ -2469,7 +2444,200 @@
             return map[n] || n + '.';
         }
 
-        // ==================== 导出Word（优化版，去除“未税”字样，明确发票类型） ====================
+        // 生成订单预览 HTML 的函数（与 Word 订单内容一致）
+        function generateOrderPreviewHtml(applicant, tmName, phone, contact, stats, d, trademarkImageData) {
+            const today = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+            // 构建 HTML 字符串，参考 exportWord 中的主体部分
+            let html = `
+                <style>
+                    /* 复制 Word 导出样式 */
+                    .word-bg-scheme { background-color: #D4E6F1; padding: 4px 8px; font-weight: bold; }
+                    .word-bg-fee { background-color: #D5E8D4; padding: 4px 8px; font-weight: bold; }
+                    .word-bg-payment-plan { background-color: #FFF2CC; padding: 4px 8px; font-weight: bold; }
+                    .word-bg-payment-info { background-color: #E6E6FA; padding: 4px 8px; font-weight: bold; }
+                    .word-bg-important { background-color: #FCE4D6; padding: 4px 8px; font-weight: bold; }
+                    .word-total-red { color: #C00000; font-weight: bold; font-size: 12pt; }
+                    .underline-red { text-decoration: underline; color: red; }
+                    .word-table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 11pt; }
+                    .word-table th { background: #f0f0f0; border: 1px solid #999; padding: 8px; text-align: center; font-weight: bold; }
+                    .word-table td { border: 1px solid #999; padding: 6px; vertical-align: top; }
+                    .word-img-preview { max-width: 60px; max-height: 60px; object-fit: contain; }
+                    .word-contract-table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+                    .word-contract-table td, .word-contract-table th { border: 1px solid #333; padding: 8px; }
+                    .word-contract-table th { background: #e8e8e8; }
+                    .word-signature-table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+                    .word-signature-table td { border: none; padding: 10px 20px; vertical-align: bottom; }
+                    .word-signature-line { border-bottom: 1px solid #000; height: 40px; width: 100%; }
+                    .info-table { border-collapse: collapse; width: 100%; margin: 4px 0; }
+                    .info-table td { border: 1px solid #999; padding: 4px; }
+                    .info-table td:first-child { font-weight: bold; background: #f5f5f5; width: 30%; }
+                </style>
+                <h1 style="color: #003d7c; text-align: center; border-bottom: 2px solid #003d7c; padding-bottom: 3px; font-size: 14pt; margin: 0 0 4px;">📄 商标申请订单</h1>
+                
+                <h2 style="color: #1f3a5f; margin: 6px 0 3px; font-size: 11pt; border-left: 3px solid #003d7c; padding-left: 4px;">一、基本信息</h2>
+                <table class="info-table">
+                    <tr><td>申请人全称：</td><td>${escapeHtml(applicant)}</td></tr>
+                    <tr><td>商标名称：</td><td>${escapeHtml(tmName)}</td></tr>
+                    <tr><td>联系电话：</td><td>${escapeHtml(phone || '未填写')}</td></tr>
+                    <tr><td>联系人姓名：</td><td>${escapeHtml(contact || '未填写')}</td></tr>
+                    <tr><td>下订单日期：</td><td>${today}</td></tr>
+                    <tr><td>服务方案：</td><td>${escapeHtml(d.scheme)}方案 · ${escapeHtml(d.params.name)}</td></tr>
+                    <tr><td>方案描述：</td><td>${d.scheme === 'A' ? '适合需求：您懂商标但事务繁忙？流程跟进帮您省心省力。服务内容：材料形式审核、官方文件代收代发、关键节点人工提醒、全流程进度同步。' : d.scheme === 'B' ? '适合需求：希望提升商标注册规范性？专业辅导为您保驾护航。服务内容：注册前风险评估、类别规划建议、申请材料优化、专业解读与指导。' : '适合需求：担心注册不下来，服务费白给？分期付费让您更从容。服务内容：启动成本更低，仅付首期款；下发商标注册证后再付服务费！'}</td></tr>
+                    <tr><td>发票选项：</td><td>${d.withInvoice ? '✓ 增值税专用发票（加收5%）' : '✗ 增值税普通发票'}</td></tr>
+                    <tr><td>商标图样：</td><td>${trademarkImageData ? '✓ 已上传' : '✗ 未上传'}</td></tr>
+                    <tr><td>已选大类数量：</td><td>${stats.majorCount}</td></tr>
+                    <tr><td>已选小类总数：</td><td>${stats.totalSubCount}</td></tr>
+                </table>
+
+                <h2 style="color: #1f3a5f; margin: 6px 0 3px; font-size: 11pt; border-left: 3px solid #003d7c; padding-left: 4px;">二、已选类别明细</h2>
+                <table class="word-table">
+                    <tr><th>序号</th><th>商标名称</th><th>商标图样</th><th>已选大类</th><th>小类</th></tr>
+            `;
+            let idx = 1;
+            for (const major in selectedSubclasses) {
+                if (selectedSubclasses[major].length === 0) continue;
+                const subText = selectedSubclasses[major].map(s => escapeHtml(s)).join('；');
+                html += `<tr>
+                    <td style="text-align: center;">${idx}</td>
+                    <td style="text-align: center;">${escapeHtml(tmName)}</td>
+                    <td style="width:40px; height:40px; padding:0; text-align:center; vertical-align:middle;">`;
+                if (trademarkImageData) {
+                    html += `<img src="${trademarkImageData}" class="word-img" alt="商标图样" style="width:40px; height:40px; object-fit: contain;">`;
+                } else {
+                    html += `<span style="font-size:8pt;">无图样</span>`;
+                }
+                html += `</td>
+                    <td style="text-align: center;">${escapeHtml(major)}</td>
+                    <td>${subText}</td>
+                </tr>`;
+                idx++;
+            }
+            html += `</table>`;
+
+            html += `<h2 style="color: #1f3a5f; margin: 6px 0 3px; font-size: 11pt; border-left: 3px solid #003d7c; padding-left: 4px;">三、费用明细</h2>`;
+            html += `<div class="word-bg-scheme">=== 服务方案: ${escapeHtml(d.scheme)}方案 · ${escapeHtml(d.params.name)} ===</div>`;
+            html += `<div>💰 基础价格：每大类${d.params.base}元（含10个小类），超出部分${d.params.extra}元/小类。</div>`;
+            if (d.scheme === 'A') html += `<div>A方案暂无大客户优惠。</div>`;
+            if (d.scheme === 'B') html += `<div>🎁 B方案大客户优惠：一次性下单大类＞6个，总金额立减15%！</div>`;
+            if (d.scheme === 'C') html += `<div>🎁 C方案大客户优惠：一次性下单大类＞6个，尾款减免15%！</div>`;
+            html += `<div>💳 付款方式: ${d.scheme === 'C' ? '首付300元/大类首期款，剩余尾款待下证后支付' : '签合同后一次性付清'}</div>`;
+
+            html += `<div class="word-bg-fee">=== 💰 费用明细 ===</div>`;
+            for (const major in d.majorDetails) {
+                html += `<div>📌 ${escapeHtml(major)}大类（${d.majorDetails[major].count}个小类） = ${d.majorDetails[major].cost.toFixed(2)}元</div>`;
+            }
+            html += `<div>📊 小计（原价）: ${d.totalOriginal.toFixed(2)}元</div>`;
+            if (d.discountNote) {
+                html += `<div>🎉 【${d.discountNote}】</div>`;
+                html += `<div>📊 小计（优惠后）: ${d.finalTotal.toFixed(2)}元</div>`;
+            }
+            if (d.withInvoice) {
+                html += `<div>🧾 专票费用（加收5%）: ${d.invoiceAmount.toFixed(2)}元</div>`;
+                html += `<div class="word-total-red">💎 总合计（含专票）: ${d.totalWithInvoice.toFixed(2)}元</div>`;
+            } else {
+                html += `<div>🧾 发票类型: 增值税普通发票</div>`;
+                html += `<div class="word-total-red">💎 总合计: ${d.finalTotal.toFixed(2)}元</div>`;
+            }
+
+            if (d.scheme === 'C') {
+                const baseFirstPay = d.majorCount * 300;
+                const baseServiceTotal = d.finalTotal - baseFirstPay;
+                let firstPay, tailTotal;
+                if (d.withInvoice) {
+                    firstPay = baseFirstPay * 1.05;
+                    tailTotal = baseServiceTotal * 1.05;
+                } else {
+                    firstPay = baseFirstPay;
+                    tailTotal = baseServiceTotal;
+                }
+                html += `<div class="word-bg-payment-plan">【C方案·分期付费计划】</div>`;
+                html += `<div>🔹 首期款（签合同后）: ${firstPay.toFixed(2)}元 ${d.withInvoice ? '(含专票)' : '(普票)'}</div>`;
+                html += `<div>🔹 服务尾款总额（下证后支付）: ${tailTotal.toFixed(2)}元，各大类尾款按该大类费用比例分摊。</div>`;
+                let subIdx = 1;
+                for (const major in d.majorDetails) {
+                    const majorCost = d.majorDetails[major].cost;
+                    const majorWithInvoice = d.withInvoice ? majorCost * 1.05 : majorCost;
+                    const ratio = majorWithInvoice / (d.withInvoice ? d.totalWithInvoice : d.finalTotal);
+                    const tail = tailTotal * ratio;
+                    const circleNum = getCircledNumber(subIdx);
+                    html += `<div>   ${circleNum} ${escapeHtml(major)}大类尾款：${tail.toFixed(2)}元</div>`;
+                    subIdx++;
+                }
+            } else {
+                html += `<div class="word-bg-payment-plan">【${escapeHtml(d.scheme)}方案·付款计划】</div>`;
+                const payAmount = d.withInvoice ? d.totalWithInvoice : d.finalTotal;
+                html += `<div>📅 签合同后一次性付清: ${payAmount.toFixed(2)}元 ${d.withInvoice ? '(含专票)' : '(普票)'}</div>`;
+            }
+
+            html += `<div class="word-bg-payment-info">=== 💳 付款信息 ===</div>`;
+            html += `<div>账户名称：企优咨（广州）咨询有限公司</div>`;
+            html += `<div>账户号码：4405 0158 0107 0000 4275</div>`;
+            html += `<div>开户银行：中国建设银行股份有限公司广州花城支行</div>`;
+            html += `<div class="word-bg-important">【📌 重要提示】</div>`;
+            html += `<div>1. 下单后请将付款水单截图发给陈工</div>`;
+            html += `<div>2. 因我们是提供知识服务，启动服务后不支持退款</div>`;
+            html += `<div>3. 如有疑问请联系陈工：13128311370</div>`;
+
+            html += `<h2 style="color: #1f3a5f; margin: 6px 0 3px; font-size: 11pt; border-left: 3px solid #003d7c; padding-left: 4px;">四、商标图样</h2>`;
+            if (trademarkImageData) {
+                html += `<img src="${trademarkImageData}" style="width:40px; height:40px; object-fit: contain; border: 1px solid #ccc; border-radius: 2px;" />`;
+                html += `<div>📎 文件: 已上传图片</div>`;
+            } else {
+                html += `<div>⚠️ 未上传商标图样</div>`;
+            }
+
+            html += `<h2 style="color: #1f3a5f; margin: 6px 0 3px; font-size: 11pt; border-left: 3px solid #003d7c; padding-left: 4px;">五、售前咨询</h2>`;
+            html += `<div>如有疑问，联系陈工，专业顾问为您服务：</div>`;
+            html += `<div>📱 微信：扫码添加</div>`;
+            html += `<div>📞 电话：13128311370</div>`;
+            html += `<div>🕒 服务时间：周一至周五 9:00-18:00</div>`;
+            html += `<div style="margin-top: 5px;">[联系陈工微信二维码]</div>`;
+
+            html += `<div style="margin-top: 8px; text-align: center; color: #999; font-size: 8pt; border-top: 1px solid #eee; padding-top: 3px;">本订单由企优咨商标申请系统生成 · 咨询热线：13128311370</div>`;
+
+            return html;
+        }
+
+        // 预览按钮 - 修改为显示完整订单内容
+        document.getElementById('previewOrderBtn').addEventListener('click', function() {
+            const applicant = cleanInput(document.getElementById('applicantName').value);
+            const tmName = cleanInput(document.getElementById('trademarkName').value);
+            const phone = cleanInput(document.getElementById('contactPhone').value);
+            const contact = cleanInput(document.getElementById('contactPerson').value);
+
+            if (!applicant || !tmName) {
+                alert('请填写申请人全称和商标名称');
+                document.getElementById('applicantName').focus();
+                return;
+            }
+            
+            const stats = getSelectedStats();
+            if (stats.totalSubCount === 0) {
+                alert('请至少选择一个小类');
+                document.getElementById('searchInput').focus();
+                return;
+            }
+
+            const d = computeFeeDetails();
+            
+            const previewHtml = generateOrderPreviewHtml(applicant, tmName, phone, contact, stats, d, trademarkImageData);
+            
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;';
+            modal.innerHTML = `
+                <div style="background: white; padding: 24px; border-radius: 16px; max-width: 900px; width: 90%; max-height: 80vh; overflow-y: auto; position: relative;">
+                    <button type="button" onclick="this.closest('.modal').remove()" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 20px; cursor: pointer; color: #666;">&times;</button>
+                    ${previewHtml}
+                </div>
+            `;
+            modal.className = 'modal';
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
+            document.body.appendChild(modal);
+        });
+
+        // ==================== 导出Word（优化版，去除“未税”字样，明确发票类型，字体已替换为思源黑体） ====================
         async function exportWord() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
@@ -2496,7 +2664,7 @@
             <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
             <head><meta charset='UTF-8'><title>商标申请订单 - ${escapeHtml(tmName)}</title>
             <style>
-                body { font-family: 'Microsoft YaHei', '微软雅黑', sans-serif; margin: 0.6cm; font-size: 10.5pt; line-height: 1.2; color: #333; }
+                body { font-family: 'Source Han Sans', 'Noto Sans CJK SC', '思源黑体', sans-serif; margin: 0.6cm; font-size: 10.5pt; line-height: 1.2; color: #333; }
                 h1 { color: #003d7c; text-align: center; border-bottom: 2px solid #003d7c; padding-bottom: 3px; font-size: 14pt; margin: 0 0 4px; }
                 h2 { color: #1f3a5f; margin: 6px 0 3px; font-size: 11pt; border-left: 3px solid #003d7c; padding-left: 4px; }
                 p { margin: 0 0 2px; }
@@ -2656,7 +2824,7 @@
 
         document.getElementById('exportWordBtn').addEventListener('click', exportWord);
 
-        // ==================== 生成合同（优化版，去除“未税”，明确发票类型） ====================
+        // ==================== 生成合同（优化版，去除“未税”，明确发票类型，字体已替换为思源黑体） ====================
         function generateContract() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
@@ -2682,7 +2850,7 @@
             <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
             <head><meta charset='UTF-8'><title>商标申请代理服务合同</title>
             <style>
-                body { font-family: 'Microsoft YaHei', '微软雅黑', sans-serif; margin: 0.6cm; font-size: 10.5pt; line-height: 1.2; color: #333; }
+                body { font-family: 'Source Han Sans', 'Noto Sans CJK SC', '思源黑体', sans-serif; margin: 0.6cm; font-size: 10.5pt; line-height: 1.2; color: #333; }
                 h1 { text-align: center; color: #003d7c; font-size: 16pt; margin: 0 0 4px; }
                 .contract-no { text-align: center; color: #666; margin: 0 0 4px; font-size: 9pt; }
                 h2 { color: #1f3a5f; font-size: 11pt; margin: 6px 0 3px; border-bottom: 1px solid #003d7c; padding-bottom: 2px; }
