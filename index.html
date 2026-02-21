@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <link rel="icon" type="image/x-icon" href="企优咨图标.ico">
     <title>企优咨 · 商标申请下单系统</title>
     <style>
         * {
@@ -11,698 +12,1810 @@
             padding: 0;
             font-family: 'Segoe UI', Roboto, '微软雅黑', system-ui, -apple-system, sans-serif;
         }
-        body {
-            background: #f5f7fa;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            padding: 16px;
+        
+        :root {
+            --primary: #003d7c;
+            --primary-dark: #002856;
+            --primary-light: #e8f0fe;
+            --accent: #00c6ff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
         }
+        
+        body {
+            background: linear-gradient(135deg, #f0f4f8 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--gray-700);
+        }
+        
         .app-container {
-            max-width: 1200px;
-            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
             background: white;
-            border-radius: 28px;
-            box-shadow: 0 20px 40px rgba(0,20,60,0.08);
+            border-radius: 24px;
+            box-shadow: var(--shadow-xl);
             overflow: hidden;
         }
+        
+        /* 头部优化 */
         .header {
-            background: linear-gradient(135deg, #002856 0%, #003d7c 100%);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, #0066cc 100%);
             color: white;
-            padding: 24px 22px 16px;
+            padding: 32px 40px;
+            position: relative;
+            overflow: hidden;
         }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
         .header h1 {
-            font-size: 1.9rem;
-            font-weight: 500;
+            font-size: 2.2rem;
+            font-weight: 600;
             margin: 0;
-            letter-spacing: 0.5px;
-            line-height: 1.2;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
-        .header p {
-            margin: 8px 0 0;
-            opacity: 0.8;
-            font-size: 0.95rem;
+        
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
         }
-        /* 新增选项卡导航 */
+        
+        .header-subtitle {
+            margin-top: 12px;
+            opacity: 0.9;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        
+        .header-contact {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        /* 导航优化 */
         .tab-bar {
             display: flex;
             background: white;
-            padding: 0 24px;
-            gap: 28px;
-            border-bottom: 1px solid #e0e8f2;
+            padding: 0 40px;
+            gap: 0;
+            border-bottom: 2px solid var(--gray-100);
         }
+        
         .tab {
-            padding: 14px 0 10px;
+            padding: 20px 32px;
             cursor: pointer;
-            color: #4a5f7a;
+            color: var(--gray-500);
             font-weight: 600;
             font-size: 1rem;
             border-bottom: 3px solid transparent;
-            transition: all 0.1s;
+            transition: all 0.3s ease;
             user-select: none;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 10px;
+            position: relative;
         }
-        .tab.active {
-            color: #003d7c;
-            border-bottom-color: #003d7c;
-        }
+        
         .tab:hover {
-            color: #002856;
+            color: var(--primary);
+            background: var(--gray-50);
         }
-        /* 原有下单区域 (三列) */
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .tab-badge {
+            background: var(--gray-200);
+            color: var(--gray-600);
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .tab.active .tab-badge {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* 主布局优化 */
         .main-layout {
             display: grid;
-            grid-template-columns: 1fr 1fr 1.2fr;
-            gap: 20px;
-            padding: 24px;
-            background: #f9fafc;
+            grid-template-columns: 1.2fr 1fr 1.1fr;
+            gap: 24px;
+            padding: 32px;
+            background: var(--gray-50);
+            min-height: calc(100vh - 200px);
         }
-        /* 新流程面板布局 (单列卡片) */
-        .flow-layout {
-            padding: 24px;
-            background: #f9fafc;
-        }
+        
+        /* 卡片优化 */
         .card {
             background: white;
-            border-radius: 24px;
-            box-shadow: 0 6px 16px rgba(0,0,0,0.02);
-            padding: 20px;
-            border: 1px solid rgba(0,40,86,0.06);
-        }
-        .card-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: #003d7c;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            border-bottom: 2px solid #eef2f6;
-            padding-bottom: 10px;
-        }
-        /* 流程步骤样式 */
-        .flow-steps {
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--gray-100);
+            transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
-        .flow-step {
+        
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+        
+        .card-header {
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid var(--gray-100);
+            background: linear-gradient(to right, white, var(--gray-50));
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--gray-800);
             display: flex;
-            gap: 16px;
-            padding: 16px 0;
-            border-bottom: 1px dashed #d9e2ef;
+            align-items: center;
+            gap: 10px;
         }
-        .flow-step:last-child {
-            border-bottom: none;
-        }
-        .step-num {
-            font-size: 1.9rem;
-            min-width: 60px;
-            font-weight: 500;
-            color: #003d7c;
-            line-height: 1.2;
-        }
-        .step-desc {
-            flex: 1;
-            font-size: 1rem;
-            color: #1f3a5f;
-            padding-top: 4px;
-        }
-        .step-desc strong {
-            color: #b45309;
-            background: #fff2e0;
-            padding: 2px 8px;
-            border-radius: 30px;
+        
+        .step-indicator {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 0.9rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .card-subtitle {
+            font-size: 0.85rem;
+            color: var(--gray-500);
+            margin-top: 6px;
+            margin-left: 42px;
+        }
+        
+        .card-body {
+            padding: 20px 24px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        /* 搜索框优化 */
+        .search-section {
+            margin-bottom: 16px;
+        }
+        
+        .search-box {
+            position: relative;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .search-input-wrapper {
+            position: relative;
+            flex: 1;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            font-size: 1.1rem;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 14px 16px 14px 44px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            outline: none;
+            background: white;
+            transition: all 0.2s;
+        }
+        
+        .search-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(0,61,124,0.1);
+        }
+        
+        .search-box input::placeholder {
+            color: var(--gray-400);
+        }
+        
+        .search-stats {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
             font-weight: 600;
-            margin-left: 6px;
             white-space: nowrap;
         }
-        .footnote {
-            margin-top: 24px;
-            background: #edf3fc;
-            border-radius: 40px;
-            padding: 14px 20px;
-            color: #2f4b74;
-            font-size: 0.9rem;
-            border: 1px solid #c9d8ec;
-        }
-        .footnote i {
-            color: #003d7c;
-            font-style: normal;
-            font-weight: 500;
-        }
-        /* 原有其他样式保持不变 */
-        .search-box {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 18px;
-        }
-        .search-box input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 1px solid #d9e1ec;
-            border-radius: 40px;
-            font-size: 1rem;
-            outline: none;
-        }
-        .search-box input:focus {
-            border-color: #003d7c;
-            box-shadow: 0 0 0 3px rgba(0,61,124,0.1);
-        }
+        
+        /* 树形结构优化 */
         .tree-container {
-            max-height: 500px;
+            max-height: 480px;
             overflow-y: auto;
-            border: 1px solid #eaeef4;
-            border-radius: 20px;
-            padding: 8px 4px;
-            background: #ffffff;
+            border: 1px solid var(--gray-200);
+            border-radius: 16px;
+            padding: 12px;
+            background: white;
         }
+        
+        .tree-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .tree-container::-webkit-scrollbar-track {
+            background: var(--gray-100);
+            border-radius: 4px;
+        }
+        
+        .tree-container::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: 4px;
+        }
+        
         .tree-ul {
             list-style: none;
             padding-left: 0;
         }
+        
         .tree-ul ul {
             display: none;
-            margin-left: 16px;
-            padding-left: 8px;
-            border-left: 1px dashed #ccc;
+            margin-left: 12px;
+            padding-left: 12px;
+            border-left: 2px solid var(--gray-200);
         }
+        
         .tree-ul li.expanded > ul {
             display: block;
         }
+        
         .folder-label {
             cursor: pointer;
             user-select: none;
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 6px;
-            padding: 4px 0;
+            gap: 10px;
+            padding: 10px 12px;
             width: 100%;
-        }
-        .folder-label::before {
-            content: "▶";
-            font-size: 0.8rem;
-            color: #003d7c;
-            transition: transform 0.1s;
-            display: inline-block;
-            width: 16px;
-        }
-        li.expanded > .folder-label::before {
-            content: "▼";
-        }
-        .cat-major {
             font-weight: 600;
-            color: #1e2f4e;
-            background: #f2f6fc;
-            padding: 8px 16px;
-            border-radius: 30px;
-            margin: 12px 0 6px;
-            font-size: 1rem;
+            border-radius: 10px;
+            transition: all 0.2s;
+            font-size: 0.9rem;
         }
+        
+        .folder-label:hover {
+            background: var(--gray-50);
+        }
+        
+        .folder-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            transition: transform 0.2s;
+            font-size: 0.8rem;
+        }
+        
+        li.expanded > .folder-label .folder-icon {
+            transform: rotate(90deg);
+        }
+        
+        .cat-major {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #dbeafe 100%);
+            color: var(--primary-dark);
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin: 8px 0;
+            font-size: 0.95rem;
+            border: 1px solid #bfdbfe;
+        }
+        
         .cat-group {
+            color: var(--gray-700);
+            padding: 8px 0 8px 8px;
             font-weight: 500;
-            color: #2a4b7c;
-            padding: 6px 0 4px 12px;
-            background: #f8faff;
-            border-radius: 20px 0 0 20px;
-            margin: 4px 0;
+            font-size: 0.9rem;
         }
+        
         .subclass-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 6px 8px 6px 20px;
-            border-radius: 30px;
+            gap: 12px;
+            padding: 8px 12px 8px 32px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            margin: 2px 0;
         }
+        
         .subclass-item:hover {
-            background: #edf3ff;
+            background: var(--primary-light);
         }
+        
         .subclass-item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            accent-color: #003d7c;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
             flex-shrink: 0;
-        }
-        .subclass-name {
-            font-size: 0.95rem;
-            word-break: break-word;
-        }
-        .selected-list {
-            min-height: 150px;
-            max-height: 250px;
-            overflow-y: auto;
-            background: #f8fafd;
-            border-radius: 18px;
-            padding: 12px;
-            border: 1px solid #dee7f0;
-            margin: 15px 0;
-        }
-        .selected-list ul {
-            padding-left: 20px;
-        }
-        .selected-list li {
-            margin: 5px 0;
-            color: #1f3a5f;
-        }
-        .badge {
-            background: #d3e5ff;
-            color: #003d7c;
-            border-radius: 30px;
-            padding: 4px 12px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-        .btn-clear {
-            background: white;
-            border: 1px solid #ccdae9;
-            border-radius: 40px;
-            padding: 8px 18px;
             cursor: pointer;
+        }
+        
+        .subclass-name {
             font-size: 0.9rem;
-            transition: 0.1s;
+            color: var(--gray-600);
+            cursor: pointer;
         }
-        .btn-clear:hover {
-            background: #f0f4fe;
+        
+        .subclass-item:hover .subclass-name {
+            color: var(--primary);
         }
+        
+        /* 已选列表优化 */
+        .selected-section {
+            margin-bottom: 24px;
+        }
+        
+        .section-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .selected-list {
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: var(--gray-50);
+            border-radius: 16px;
+            padding: 16px;
+            border: 2px dashed var(--gray-300);
+        }
+        
+        .selected-list.has-items {
+            border-style: solid;
+            border-color: var(--primary-light);
+            background: white;
+        }
+        
+        .selected-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .selected-tag {
+            background: white;
+            border: 1px solid var(--primary-light);
+            border-radius: 20px;
+            padding: 6px 14px;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow-sm);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .tag-major {
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .tag-sub {
+            color: var(--gray-600);
+        }
+        
+        .tag-remove {
+            cursor: pointer;
+            color: var(--gray-400);
+            font-size: 1.1rem;
+            line-height: 1;
+            padding: 0 2px;
+        }
+        
+        .tag-remove:hover {
+            color: var(--danger);
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: var(--gray-400);
+            padding: 20px;
+            font-style: italic;
+        }
+        
+        /* 表单优化 */
+        .form-section {
+            margin-bottom: 20px;
+        }
+        
         .form-row {
-            margin-bottom: 18px;
+            margin-bottom: 16px;
         }
+        
         .form-row label {
             display: block;
-            font-weight: 500;
-            color: #1f3a5f;
-            margin-bottom: 6px;
-            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
         }
+        
+        .required-star {
+            color: var(--danger);
+            margin-left: 4px;
+        }
+        
         .form-row input {
             width: 100%;
             padding: 12px 16px;
-            border: 1px solid #d0ddee;
-            border-radius: 40px;
-            font-size: 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            font-size: 0.95rem;
             outline: none;
+            background: white;
+            transition: all 0.2s;
         }
+        
         .form-row input:focus {
-            border-color: #003d7c;
-            box-shadow: 0 0 0 3px rgba(0,61,124,0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(0,61,124,0.1);
         }
+        
+        .form-row input::placeholder {
+            color: var(--gray-400);
+        }
+        
+        .form-row input.error {
+            border-color: var(--danger);
+            background: #fef2f2;
+        }
+        
+        .form-hint {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            margin-top: 4px;
+        }
+        
+        .form-row-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        /* 上传区域优化 */
+        .upload-section {
+            margin-top: 24px;
+        }
+        
         .upload-area {
-            border: 2px dashed #b6cae0;
-            border-radius: 24px;
-            padding: 24px;
+            border: 2px dashed var(--gray-300);
+            border-radius: 16px;
+            padding: 32px 24px;
             text-align: center;
-            background: #fcfdff;
+            background: var(--gray-50);
             cursor: pointer;
-            margin: 10px 0;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
         }
+        
         .upload-area:hover {
-            background: #f2f8ff;
-            border-color: #003d7c;
+            border-color: var(--primary);
+            background: var(--primary-light);
         }
+        
+        .upload-area.has-file {
+            border-color: var(--success);
+            background: #f0fdf4;
+        }
+        
+        .upload-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            color: var(--gray-400);
+        }
+        
+        .upload-area:hover .upload-icon {
+            color: var(--primary);
+        }
+        
+        .upload-text {
+            font-weight: 600;
+            color: var(--gray-600);
+            margin-bottom: 4px;
+        }
+        
+        .upload-hint {
+            font-size: 0.85rem;
+            color: var(--gray-400);
+        }
+        
         .preview-box {
-            margin-top: 12px;
+            margin-top: 16px;
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--gray-100);
+            min-height: 150px;
             display: flex;
-            justify-content: center;
-            background: #f4f8ff;
-            border-radius: 18px;
-            padding: 16px;
-            min-height: 120px;
             align-items: center;
+            justify-content: center;
+            position: relative;
         }
+        
         .preview-box img {
             max-width: 100%;
-            max-height: 160px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-height: 200px;
+            object-fit: contain;
         }
+        
+        .preview-placeholder {
+            color: var(--gray-400);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* 方案选择优化 */
         .scheme-panel {
-            background: #f6faff;
-            border-radius: 20px;
-            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
+        
         .scheme-option {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
-            padding: 14px 14px;
+            gap: 16px;
+            padding: 20px;
             background: white;
-            border-radius: 40px;
-            margin-bottom: 8px;
-            border: 1px solid #e0eaf7;
+            border-radius: 16px;
+            border: 2px solid var(--gray-200);
             cursor: pointer;
-            transition: border 0.1s;
+            transition: all 0.3s;
+            position: relative;
         }
+        
+        .scheme-option:hover {
+            border-color: var(--primary-light);
+            transform: translateX(4px);
+        }
+        
         .scheme-option.selected {
-            border: 2px solid #003d7c;
-            background: #eaf3ff;
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            box-shadow: var(--shadow);
         }
-        .scheme-option input[type="radio"] {
-            accent-color: #003d7c;
-            width: 18px;
-            height: 18px;
+        
+        .scheme-option.selected::before {
+            content: '✓';
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .scheme-radio {
+            width: 22px;
+            height: 22px;
+            accent-color: var(--primary);
             flex-shrink: 0;
             margin-top: 2px;
+            cursor: pointer;
         }
-        .scheme-option .scheme-content {
+        
+        .scheme-content {
             flex: 1;
-            min-width: 0;
         }
+        
         .scheme-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 8px;
             flex-wrap: wrap;
-            gap: 4px 8px;
+            gap: 8px;
         }
+        
         .scheme-name {
-            font-weight: 600;
-            font-size: 0.95rem;
-            color: #00305c;
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--gray-800);
         }
+        
+        .scheme-option.selected .scheme-name {
+            color: var(--primary);
+        }
+        
+        .scheme-price {
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        
         .scheme-desc {
             font-size: 0.85rem;
-            color: #2f4b74;
-            background: #edf2fa;
-            padding: 2px 10px;
-            border-radius: 30px;
-            white-space: nowrap;
+            color: var(--gray-600);
+            margin-bottom: 12px;
+            line-height: 1.5;
         }
+        
         .scheme-features {
-            font-size: 0.75rem;
-            color: #3e5a7a;
-            margin-top: 6px;
-            line-height: 1.45;
             display: flex;
             flex-wrap: wrap;
-            gap: 6px 12px;
-            border-top: 1px dashed #d3dff0;
-            padding-top: 6px;
+            gap: 8px;
         }
-        .scheme-features span {
-            background: #eef3fc;
-            padding: 2px 8px;
-            border-radius: 30px;
-            white-space: nowrap;
-        }
-        .legal-notice {
-            background: #fff8e7;
-            border-left: 4px solid #f0b342;
-            border-radius: 16px;
-            padding: 12px 14px;
-            margin: 18px 0 16px;
+        
+        .feature-tag {
+            background: var(--gray-100);
+            padding: 4px 10px;
+            border-radius: 12px;
             font-size: 0.8rem;
-            color: #4f3e1f;
-            line-height: 1.5;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            color: var(--gray-600);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
-        .legal-notice strong {
-            color: #b45309;
+        
+        .scheme-option.selected .feature-tag {
+            background: white;
+            color: var(--primary);
         }
+        
+        /* 发票选项 */
+        .invoice-section {
+            margin: 20px 0;
+            padding: 16px;
+            background: var(--gray-50);
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+        }
+        
         .invoice-check {
             display: flex;
             align-items: center;
             gap: 12px;
-            background: white;
-            padding: 14px 18px;
-            border-radius: 40px;
-            border: 1px solid #dae3f0;
-            margin: 18px 0;
+            cursor: pointer;
         }
+        
         .invoice-check input {
             width: 20px;
             height: 20px;
-            accent-color: #003d7c;
+            accent-color: var(--primary);
         }
-        .invoice-check label {
-            font-weight: 500;
-            font-size: 1rem;
+        
+        .invoice-label {
+            font-weight: 600;
+            color: var(--gray-700);
         }
-        .fee-box {
-            background: #f2f6fd;
-            border-radius: 20px;
+        
+        .invoice-hint {
+            font-size: 0.85rem;
+            color: var(--gray-500);
+            margin-left: 32px;
+            margin-top: 4px;
+        }
+        
+        /* 法律声明 */
+        .legal-notice {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border-left: 4px solid var(--warning);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+            color: #92400e;
+            line-height: 1.6;
+        }
+        
+        .legal-notice strong {
+            color: #78350f;
+        }
+        
+        /* 费用显示优化 */
+        .fee-section {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-radius: 16px;
             padding: 20px;
             margin: 20px 0;
-            white-space: pre-wrap;
+            border: 1px solid #bae6fd;
+        }
+        
+        .fee-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .fee-title {
+            font-weight: 700;
+            color: var(--gray-800);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .fee-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .fee-details {
             font-size: 0.9rem;
             line-height: 1.6;
-            max-height: 350px;
+            color: var(--gray-600);
+            max-height: 300px;
             overflow-y: auto;
-            border: 1px solid #c9d8ec;
         }
+        
+        .fee-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--gray-300);
+        }
+        
+        .fee-row:last-child {
+            border-bottom: none;
+            font-weight: 700;
+            color: var(--gray-800);
+            font-size: 1.1rem;
+            margin-top: 8px;
+            padding-top: 12px;
+            border-top: 2px solid var(--gray-300);
+        }
+        
+        .fee-highlight {
+            color: var(--primary);
+            font-weight: 700;
+        }
+        
+        /* 按钮组优化 */
         .button-group {
             display: flex;
+            flex-direction: column;
             gap: 12px;
-            justify-content: flex-end;
-            margin-top: 20px;
-            flex-wrap: wrap;
+            margin-top: 24px;
         }
-        .btn-primary {
-            background: #003d7c;
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 40px;
+        
+        .btn {
+            padding: 14px 24px;
+            border-radius: 12px;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.95rem;
             cursor: pointer;
-            box-shadow: 0 8px 16px rgba(0,61,124,0.2);
-            transition: 0.1s;
-            flex: 1 1 auto;
+            transition: all 0.3s;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,61,124,0.3);
+        }
+        
         .btn-primary:hover {
-            background: #002856;
-            transform: scale(0.98);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,61,124,0.4);
         }
+        
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        
         .btn-secondary {
             background: white;
-            border: 1px solid #b6cae0;
-            padding: 14px 24px;
-            border-radius: 40px;
-            font-weight: 500;
-            cursor: pointer;
-            flex: 1 1 auto;
+            border: 2px solid var(--gray-300);
+            color: var(--gray-700);
         }
+        
         .btn-secondary:hover {
-            background: #f2f8ff;
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
         }
+        
+        .btn-row {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn-row .btn {
+            flex: 1;
+        }
+        
+        /* 底部信息 */
         .footer-info {
-            color: #6f7d95;
-            padding: 14px 24px;
-            border-top: 1px solid #e0e8f2;
-            font-size: 0.85rem;
-            text-align: right;
+            background: var(--gray-50);
+            color: var(--gray-500);
+            padding: 20px 40px;
+            font-size: 0.9rem;
+            text-align: center;
+            border-top: 1px solid var(--gray-200);
         }
-        @media (max-width: 900px) {
-            body { padding: 10px; }
+        
+        /* ==================== 流程图样式 ==================== */
+        .flow-panel-container {
+            padding: 32px;
+            background: var(--gray-50);
+            min-height: calc(100vh - 200px);
+        }
+        
+        .flow-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: clamp(20px, 5vw, 40px);
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(10px);
+            overflow-x: hidden;
+        }
+        
+        /* 顶部起始框 */
+        .start-box {
+            background: #f0f4f8;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: clamp(20px, 4vw, 30px);
+            text-align: center;
+            margin-bottom: clamp(30px, 6vw, 40px);
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .start-box:active {
+            transform: scale(0.98);
+        }
+        
+        .start-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,61,124,0.2);
+        }
+        
+        .start-box.completed {
+            background: #e8f5e9;
+            border-color: var(--success);
+        }
+        
+        /* 二维码容器 */
+        .qr-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+            max-width: 150px;
+            margin: 0 auto;
+        }
+        
+        .qr-code {
+            width: 100%;
+            max-width: 120px;
+            height: auto;
+            aspect-ratio: 1;
+            object-fit: contain;
+            margin: 0 auto 15px;
+            display: block;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: white;
+            padding: 5px;
+            -webkit-user-drag: none;
+            user-select: none;
+        }
+        
+        .qr-fallback {
+            width: 100%;
+            max-width: 120px;
+            aspect-ratio: 1;
+            background: #fff;
+            border: 2px dashed #ddd;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(11px, 3vw, 12px);
+            color: #999;
+            border-radius: 8px;
+            text-align: center;
+            padding: 10px;
+        }
+        
+        .start-text {
+            font-size: clamp(16px, 4vw, 18px);
+            color: #2c3e50;
+            font-weight: 600;
+            letter-spacing: 1px;
+            line-height: 1.4;
+            word-break: break-all;
+        }
+        
+        .arrow-down {
+            text-align: center;
+            font-size: clamp(20px, 5vw, 24px);
+            color: var(--primary);
+            margin: -15px 0 20px;
+            animation: bounce 2s infinite;
+            user-select: none;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+        }
+        
+        /* 流程步骤 */
+        .flow-container {
+            position: relative;
+            padding-left: clamp(30px, 8vw, 40px);
+        }
+        
+        .flow-line {
+            position: absolute;
+            left: clamp(10px, 3vw, 15px);
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #00d2d3);
+            border-radius: 2px;
+        }
+        
+        .flow-step {
+            position: relative;
+            margin-bottom: clamp(20px, 4vw, 25px);
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: slideIn 0.5s ease forwards;
+            cursor: pointer;
+        }
+        
+        .flow-step:nth-child(1) { animation-delay: 0.1s; }
+        .flow-step:nth-child(2) { animation-delay: 0.2s; }
+        .flow-step:nth-child(3) { animation-delay: 0.3s; }
+        .flow-step:nth-child(4) { animation-delay: 0.4s; }
+        .flow-step:nth-child(5) { animation-delay: 0.5s; }
+        .flow-step:nth-child(6) { animation-delay: 0.6s; }
+        .flow-step:nth-child(7) { animation-delay: 0.7s; }
+        
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .step-marker {
+            position: absolute;
+            left: clamp(-28px, -7vw, -33px);
+            top: 50%;
+            transform: translateY(-50%);
+            width: clamp(24px, 6vw, 30px);
+            height: clamp(24px, 6vw, 30px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: clamp(12px, 3vw, 14px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            z-index: 2;
+            user-select: none;
+            transition: transform 0.2s;
+        }
+        
+        .flow-step:active .step-marker {
+            transform: translateY(-50%) scale(0.9);
+        }
+        
+        .step-content {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: clamp(15px, 4vw, 20px) clamp(15px, 4vw, 25px);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .flow-step:hover .step-content {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        
+        @media (hover: none) {
+            .flow-step:active .step-content {
+                transform: translateX(5px);
+                box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            }
+        }
+        
+        .step-text {
+            flex: 1;
+            font-size: clamp(14px, 3.5vw, 15px);
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+        
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: clamp(20px, 5vw, 24px);
+            height: clamp(20px, 5vw, 24px);
+            border-radius: 50%;
+            color: white;
+            font-size: clamp(11px, 3vw, 12px);
+            font-weight: bold;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+        
+        /* 不同步骤的颜色 */
+        .flow-step-1 .step-marker, .flow-step-1 .step-number { background: #ff6b6b; }
+        .flow-step-1 .step-content { border-left-color: #ff6b6b; }
+        
+        .flow-step-2 .step-marker, .flow-step-2 .step-number { background: #feca57; color: #333; }
+        .flow-step-2 .step-content { border-left-color: #feca57; }
+        
+        .flow-step-3 .step-marker, .flow-step-3 .step-number { background: #48dbfb; color: #333; }
+        .flow-step-3 .step-content { border-left-color: #48dbfb; }
+        
+        .flow-step-4 .step-marker, .flow-step-4 .step-number { background: #ff9ff3; }
+        .flow-step-4 .step-content { border-left-color: #ff9ff3; }
+        
+        .flow-step-5 .step-marker, .flow-step-5 .step-number { background: #54a0ff; }
+        .flow-step-5 .step-content { border-left-color: #54a0ff; }
+        
+        .flow-step-6 .step-marker, .flow-step-6 .step-number { background: #5f27cd; }
+        .flow-step-6 .step-content { border-left-color: #5f27cd; }
+        
+        .flow-step-7 .step-marker, .flow-step-7 .step-number { background: #00d2d3; }
+        .flow-step-7 .step-content { border-left-color: #00d2d3; }
+        
+        /* 注释信息 */
+        .note {
+            margin-left: clamp(10px, 3vw, 20px);
+            margin-top: 8px;
+            padding: clamp(10px, 3vw, 12px) clamp(12px, 3vw, 16px);
+            background: #fff3cd;
+            border-radius: 8px;
+            font-size: clamp(12px, 3.2vw, 13px);
+            color: #856404;
+            border-left: 3px solid #ffc107;
+            position: relative;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+        
+        .note::before {
+            content: "→";
+            position: absolute;
+            left: -25px;
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .note.warning {
+            background: #f8d7da;
+            color: #721c24;
+            border-left-color: #dc3545;
+        }
+        
+        .note.warning::before {
+            content: "●";
+            color: #dc3545;
+            left: -27px;
+            font-size: 12px;
+        }
+        
+        /* 底部提示框 */
+        .footer-notice {
+            margin-top: clamp(20px, 5vw, 30px);
+            background: #1e8449;
+            color: white;
+            padding: clamp(15px, 4vw, 20px);
+            border-radius: 12px;
+            text-align: center;
+            font-size: clamp(13px, 3.5vw, 14px);
+            line-height: 1.8;
+            box-shadow: 0 4px 15px rgba(30, 132, 73, 0.3);
+            position: relative;
+            overflow: hidden;
+            word-wrap: break-word;
+        }
+        
+        .footer-notice::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        /* 交互提示 */
+        .interactive-hint {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: clamp(11px, 3vw, 12px);
+            margin-bottom: 20px;
+            font-style: italic;
+            user-select: none;
+        }
+        
+        /* 完成标记 */
+        .flow-step.completed .step-content {
+            background: #e8f5e9;
+            border-left-color: #4caf50 !important;
+        }
+        
+        .flow-step.completed .step-marker {
+            background: #4caf50 !important;
+            color: white !important;
+        }
+        
+        .check-icon::after {
+            content: "✓";
+            margin-left: 8px;
+            color: #4caf50;
+            font-weight: bold;
+        }
+        
+        /* 响应式优化 */
+        @media (max-width: 1200px) {
+            .main-layout {
+                grid-template-columns: 1fr 1fr;
+            }
+            .main-layout > .card:last-child {
+                grid-column: 1 / -1;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+            }
+            .app-container {
+                border-radius: 0;
+            }
+            .header {
+                padding: 24px 20px;
+            }
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            .tab-bar {
+                padding: 0 20px;
+                overflow-x: auto;
+            }
+            .tab {
+                padding: 16px 20px;
+                white-space: nowrap;
+            }
             .main-layout {
                 grid-template-columns: 1fr;
-                gap: 16px;
-                padding: 16px;
+                padding: 20px;
+                gap: 20px;
             }
-            .flow-layout { padding: 16px; }
-            .tree-container { max-height: 400px; }
-            .selected-list { max-height: 200px; }
-            .fee-box { max-height: 300px; }
-            .scheme-desc { white-space: normal; }
-            .step-num { min-width: 50px; font-size: 1.6rem; }
+            .main-layout > .card:last-child {
+                grid-column: auto;
+            }
+            .form-row-grid {
+                grid-template-columns: 1fr;
+            }
+            .btn-row {
+                flex-direction: column;
+            }
+            .flow-panel-container {
+                padding: 20px;
+            }
+            .flow-container {
+                padding-left: 25px;
+            }
+            .step-marker {
+                left: -22px;
+                width: 20px;
+                height: 20px;
+                font-size: 11px;
+            }
+            .note::before {
+                display: none;
+            }
+            .note {
+                margin-left: 0;
+                font-size: 12px;
+            }
         }
-        @media (max-width: 480px) {
-            .header h1 { font-size: 1.5rem; }
-            .card { padding: 16px; }
-            .subclass-item { padding-left: 10px; }
-            .tab-bar { gap: 16px; padding: 0 16px; }
-            .tab { font-size: 0.9rem; padding: 12px 0 8px; }
+        
+        /* 平板优化 */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .flow-wrapper {
+                max-width: 700px;
+            }
+        }
+        
+        /* 横屏手机优化 */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .flow-panel-container {
+                padding: 10px;
+            }
+            .start-box {
+                margin-bottom: 20px;
+                padding: 15px;
+            }
+            .qr-code {
+                max-width: 80px;
+            }
+        }
+        
+        /* 动画效果 */
+        @keyframes slideInCard {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .card {
+            animation: slideInCard 0.4s ease;
+        }
+        
+        /* 工具提示 */
+        .tooltip {
+            position: relative;
+        }
+        
+        .tooltip:hover::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gray-800);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 1000;
+            margin-bottom: 6px;
+        }
+        
+        /* 加载状态 */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 减少动画（尊重用户偏好） */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 </head>
 <body>
 <div class="app-container">
     <div class="header">
-        <h1>📋 企优咨 · 商标申请注册下单</h1>
-        <p>选要注册的小类-填写申请人信息-选服务方案-下单</p>
-        <p>如需帮助，联系陈工 13128311370</p>
+        <div class="header-content">
+            <h1>
+                <div class="header-icon">™</div>
+                企优咨 · 商标申请注册下单
+            </h1>
+            <div class="header-subtitle">
+                <span>选分类 → 填信息 → 选方案 → 下单</span>
+                <span class="header-contact">
+                    <span>📞</span>
+                    <span>陈工 13128311370</span>
+                </span>
+            </div>
+        </div>
     </div>
 
-    <!-- 新增的选项卡导航 -->
+    <!-- 选项卡导航 -->
     <div class="tab-bar">
-        <div class="tab active" id="tabOrder">📋 商标下单</div>
-        <div class="tab" id="tabFlow">📊 付款后流程</div>
+        <div class="tab active" id="tabOrder">
+            <span>📝</span>
+            <span>商标下单</span>
+            <span class="tab-badge" id="orderBadge">3步</span>
+        </div>
+        <div class="tab" id="tabFlow">
+            <span>📊</span>
+            <span>付款后流程</span>
+        </div>
     </div>
 
-    <!-- 原下单面板 (三列) 默认显示 -->
+    <!-- 下单面板 -->
     <div id="orderPanel" class="main-layout">
-        <!-- 左侧：分类树 + 搜索 (内容完全保留) -->
+        <!-- 左侧：分类选择 -->
         <div class="card">
-            <div class="card-title">🔍 一、选择商标分类</div>
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="输入关键词搜索...">
-                <span class="badge" id="searchCount">0 项</span>
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="step-indicator">1</span>
+                    选择商标分类
+                </div>
+                <div class="card-subtitle">搜索或浏览选择需要注册的商品/服务类别</div>
             </div>
-            <div class="tree-container" id="treeContainer">
-                <ul class="tree-ul" id="categoryTree"></ul>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
-                <button class="btn-clear" id="clearSelectedBtn">🧹 清空已选</button>
-                <span class="badge" id="selectedCountBadge">已选 0 个小类</span>
+            <div class="card-body">
+                <div class="search-section">
+                    <div class="search-box">
+                        <div class="search-input-wrapper">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="searchInput" placeholder="输入关键词，如“服装”、“科技”...">
+                        </div>
+                        <span class="search-stats" id="searchCount">加载中...</span>
+                    </div>
+                </div>
+                
+                <div class="tree-container" id="treeContainer">
+                    <ul class="tree-ul" id="categoryTree">
+                        <li class="empty-state">正在加载分类数据...</li>
+                    </ul>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--gray-200);">
+                    <button class="btn btn-secondary" id="clearSelectedBtn" style="padding: 10px 20px; font-size: 0.9rem;">
+                        <span>🗑️</span>
+                        <span>清空已选</span>
+                    </button>
+                    <span class="search-stats" id="selectedCountBadge">已选 0 个小类</span>
+                </div>
             </div>
         </div>
 
-        <!-- 中间：已选小类 & 申请人信息 & 图样 -->
+        <!-- 中间：申请人信息 -->
         <div class="card">
-            <div class="card-title">📋 二、已选小类 & 申请人</div>
-            <div><strong>📌 已选小类列表</strong></div>
-            <div class="selected-list" id="selectedListContainer">
-                <ul id="selectedListUl" style="padding-left: 16px;"></ul>
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="step-indicator">2</span>
+                    填写申请信息
+                </div>
+                <div class="card-subtitle">完善申请人资料，上传商标图样</div>
             </div>
+            <div class="card-body">
+                <div class="selected-section">
+                    <div class="section-label">
+                        <span>📋 已选小类（点击标签可删除）</span>
+                    </div>
+                    <div class="selected-list" id="selectedListContainer">
+                        <div class="empty-state" id="selectedEmpty">暂无选择，请从左侧添加</div>
+                        <div class="selected-tags" id="selectedTags" style="display: none;"></div>
+                    </div>
+                </div>
 
-            <div class="form-row">
-                <label>申请人全称 <span style="color:#a00;">*</span></label>
-                <input type="text" id="applicantName" placeholder="如：企优咨有限公司">
-            </div>
-            <div class="form-row">
-                <label>商标名称 <span style="color:#a00;">*</span></label>
-                <input type="text" id="trademarkName" placeholder="如：企优咨">
-            </div>
-            <div class="form-row">
-                <label>联系电话</label>
-                <input type="text" id="contactPhone" placeholder="手机/固话">
-            </div>
-            <div class="form-row">
-                <label>联系人姓名</label>
-                <input type="text" id="contactPerson" placeholder="姓名">
-            </div>
+                <div class="form-section">
+                    <div class="form-row">
+                        <label>申请人全称 <span class="required-star">*</span></label>
+                        <input type="text" id="applicantName" placeholder="请输入营业执照上的完整名称">
+                        <div class="form-hint">个人申请请填写姓名，公司申请请填写全称</div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label>商标名称 <span class="required-star">*</span></label>
+                        <input type="text" id="trademarkName" placeholder="请输入商标名称">
+                    </div>
+                    
+                    <div class="form-row-grid">
+                        <div class="form-row" style="margin-bottom: 0;">
+                            <label>联系电话</label>
+                            <input type="text" id="contactPhone" placeholder="手机号码">
+                        </div>
+                        <div class="form-row" style="margin-bottom: 0;">
+                            <label>联系人姓名</label>
+                            <input type="text" id="contactPerson" placeholder="真实姓名">
+                        </div>
+                    </div>
+                </div>
 
-            <div><strong>🖼️ 商标图样</strong></div>
-            <div class="upload-area" id="uploadArea">
-                📎 点击上传图片 (PNG/JPG等)
-                <input type="file" id="fileInput" accept="image/*" style="display: none;">
-            </div>
-            <div class="preview-box" id="imagePreview">
-                <span style="color:#99aec6;">暂无预览</span>
+                <div class="upload-section">
+                    <div class="section-label">🖼️ 商标图样（建议上传）</div>
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📎</div>
+                        <div class="upload-text">点击或拖拽上传图片</div>
+                        <div class="upload-hint">支持 PNG、JPG 格式，建议尺寸 800×800 像素</div>
+                        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                    </div>
+                    <div class="preview-box" id="imagePreview" style="display: none;">
+                        <img id="previewImg" src="" alt="商标预览">
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- 右侧：服务方案 & 费用 & 操作 (含一键生成合同) -->
+        <!-- 右侧：服务方案 -->
         <div class="card">
-            <div class="card-title">🎯 三、服务方案 & 费用</div>
-            <div class="scheme-panel">
-                <div class="scheme-option" id="schemeA">
-                    <input type="radio" name="scheme" value="A" id="radioA" checked> 
-                    <div class="scheme-content">
-                        <div class="scheme-header">
-                            <span class="scheme-name">A方案·流程跟进</span>
-                            <span class="scheme-desc">380元/大类(含10小类)，超出38/小类</span>
-                        </div>
-                        <div class="scheme-features">
-                            <span>📎 材料形式审核</span>
-                            <span>📬 官方文件代收代发</span>
-                            <span>⏰ 关键节点人工提醒</span>
-                            <span>🔄 全流程进度同步</span>
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="step-indicator">3</span>
+                    选择服务方案
+                </div>
+                <div class="card-subtitle">选择适合的服务方案，查看费用明细</div>
+            </div>
+            <div class="card-body">
+                <div class="scheme-panel">
+                    <div class="scheme-option selected" id="schemeA" data-scheme="A">
+                        <input type="radio" name="scheme" value="A" id="radioA" class="scheme-radio" checked>
+                        <div class="scheme-content">
+                            <div class="scheme-header">
+                                <span class="scheme-name">A方案 · 流程跟进</span>
+                                <span class="scheme-price">¥380<span style="font-size: 0.7rem; font-weight: 400;">/大类</span></span>
+                            </div>
+                            <div class="scheme-desc">适合有明确注册需求的客户，含10个小类，超出38元/个</div>
+                            <div class="scheme-features">
+                                <span class="feature-tag">✓ 材料审核</span>
+                                <span class="feature-tag">✓ 进度提醒</span>
+                                <span class="feature-tag">✓ 官方代收</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="scheme-option" id="schemeB">
-                    <input type="radio" name="scheme" value="B" id="radioB"> 
-                    <div class="scheme-content">
-                        <div class="scheme-header">
-                            <span class="scheme-name">B方案·专业辅导</span>
-                            <span class="scheme-desc">580元/大类，超出58/小类，大类＞6立减15%</span>
-                        </div>
-                        <div class="scheme-features">
-                            <span>🛡️ 注册前风险评估</span>
-                            <span>📌 类别规划建议</span>
-                            <span>📝 申请材料优化</span>
-                            <span>🎓 专业解读与指导</span>
+                    
+                    <div class="scheme-option" id="schemeB" data-scheme="B">
+                        <input type="radio" name="scheme" value="B" id="radioB" class="scheme-radio">
+                        <div class="scheme-content">
+                            <div class="scheme-header">
+                                <span class="scheme-name">B方案 · 专业辅导</span>
+                                <span class="scheme-price">¥580<span style="font-size: 0.7rem; font-weight: 400;">/大类</span></span>
+                            </div>
+                            <div class="scheme-desc">含风险评估与类别规划，6个大类以上享85折优惠</div>
+                            <div class="scheme-features">
+                                <span class="feature-tag">✓ 风险评估</span>
+                                <span class="feature-tag">✓ 类别规划</span>
+                                <span class="feature-tag">✓ 专家解读</span>
+                                <span class="feature-tag">✓ 材料优化</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="scheme-option" id="schemeC">
-                    <input type="radio" name="scheme" value="C" id="radioC"> 
-                    <div class="scheme-content">
-                        <div class="scheme-header">
-                            <span class="scheme-name">C方案·后置付费</span>
-                            <span class="scheme-desc">1100元/大类，超出110/小类，首付300官费</span>
-                        </div>
-                        <div class="scheme-features">
-                            <span>💰 启动成本更低(仅付官费)</span>
-                            <span>✅ 下证后再付服务费</span>
-                            <span>⏳ 后置付费更从容</span>
+                    
+                    <div class="scheme-option" id="schemeC" data-scheme="C">
+                        <input type="radio" name="scheme" value="C" id="radioC" class="scheme-radio">
+                        <div class="scheme-content">
+                            <div class="scheme-header">
+                                <span class="scheme-name">C方案 · 后置付费</span>
+                                <span class="scheme-price">¥1100<span style="font-size: 0.7rem; font-weight: 400;">/大类</span></span>
+                            </div>
+                            <div class="scheme-desc">下证后付服务费，首付仅300元官费，降低注册风险</div>
+                            <div class="scheme-features">
+                                <span class="feature-tag">✓ 启动成本低</span>
+                                <span class="feature-tag">✓ 下证后付款</span>
+                                <span class="feature-tag">✓ 风险可控</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="invoice-check">
-                    <input type="checkbox" id="invoiceCheckbox">
-                    <label for="invoiceCheckbox" id="invoiceLabel">📄 开专票（加收5%）</label>
+                <div class="invoice-section">
+                    <label class="invoice-check">
+                        <input type="checkbox" id="invoiceCheckbox">
+                        <span class="invoice-label">开具增值税专用发票（加收5%）</span>
+                    </label>
+                    <div class="invoice-hint">如需发票，总费用将增加5%的税点</div>
                 </div>
 
                 <div class="legal-notice">
-                    <strong>📢 特别声明：</strong> 商标审查权归属国家知识产权局，审查结果存在主观因素，任何代理机构均不得承诺“包过”！若被驳回、被异议，已收取费用不可退！如您担心商标注册证下不来，<strong>可选C方案：待下证后再付服务费。</strong>
+                    <strong>⚠️ 重要声明：</strong>商标审查权归属国家知识产权局，审查结果存在主观因素，<strong>任何代理机构均不得承诺"包过"</strong>！若被驳回或异议，已收费用不可退。担心风险请选择C方案。
+                </div>
+
+                <div class="fee-section">
+                    <div class="fee-header">
+                        <span class="fee-title">
+                            <span>💰</span>
+                            <span>费用明细</span>
+                        </span>
+                        <span class="fee-amount" id="totalAmount">¥0</span>
+                    </div>
+                    <div class="fee-details" id="feeDisplay">
+                        <div class="empty-state" style="padding: 20px 0;">请先选择商标小类</div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-primary" id="exportWordBtn">
+                        <span>📝</span>
+                        <span>导出Word订单</span>
+                    </button>
+                    <div class="btn-row">
+                        <button class="btn btn-secondary" id="previewOrderBtn">
+                            <span>👁️</span>
+                            <span>预览</span>
+                        </button>
+                        <button class="btn btn-secondary" id="generateContractBtn">
+                            <span>📄</span>
+                            <span>生成合同</span>
+                        </button>
+                    </div>
                 </div>
             </div>
-
-            <div class="fee-box" id="feeDisplay">
-                ⚠️ 请先选择小类
-            </div>
-
-            <div class="button-group">
-                <button class="btn-secondary" id="previewOrderBtn">📋 预览</button>
-                <button class="btn-secondary" id="generateContractBtn">📄 一键生成合同</button>
-                <button class="btn-primary" id="exportWordBtn">📝 导出Word订单</button>
-            </div>
-            <p style="font-size:0.75rem; color:#7f8fa4; margin-top: 8px;">*导出时浏览器会提示下载，文件可保存至手机。</p>
         </div>
     </div>
 
-    <!-- 新增流程面板 (默认隐藏) -->
-    <div id="flowPanel" class="flow-layout" style="display: none;">
-        <div class="card">
-            <div class="card-title">📊 付款后服务流程图（参考时间）</div>
-            <div class="flow-steps">
-                <div class="flow-step"><span class="step-num">1️⃣</span><span class="step-desc">签订合同、付款后，开始服务流程 ↓↓↓</span></div>
-                <div class="flow-step"><span class="step-num">2️⃣</span><span class="step-desc">根据您所选方案进行对应服务流程</span></div>
-                <div class="flow-step"><span class="step-num">3️⃣</span><span class="step-desc">跟您再次确认商标申请信息表后，提交商标局</span></div>
-                <div class="flow-step"><span class="step-num">4️⃣</span><span class="step-desc">提交商标局后，最快当天有回执书给您</span></div>
-                <div class="flow-step"><span class="step-num">5️⃣</span><span class="step-desc">大概1个月，有受理通知书给您 —— 如遇补正：<strong>补正（免费）</strong></span></div>
-                <div class="flow-step"><span class="step-num">6️⃣</span><span class="step-desc">大概2-3个月，有审查意见给您（驳回或初步审定公告）</span></div>
-                <div class="flow-step"><span class="step-num">7️⃣</span><span class="step-desc">固定3个月的公告期</span></div>
-                <div class="flow-step"><span class="step-num">8️⃣</span><span class="step-desc">若被商标局驳回：如您想做驳回复审，您需另付费。复审周期约1年。</span></div>
-                <div class="flow-step"><span class="step-num">9️⃣</span><span class="step-desc">若被公众提出异议：如您想做异议答辩，您需另付费。答辩周期约1年。</span></div>
-                <div class="flow-step"><span class="step-num">🔟</span><span class="step-desc">大概1个月，有商标注册证给您 <strong>（如果您采用C方案，此时您需要结清尾款）</strong></span></div>
+    <!-- 流程面板 - 整合流程图.html内容 -->
+    <div id="flowPanel" class="flow-panel-container" style="display: none;">
+        <div class="flow-wrapper">
+            <!-- 顶部起始框 -->
+            <div class="start-box" id="flowStartBox" onclick="toggleFlowStart()">
+                <div class="qr-container">
+                    <img src="联系陈工-微信二维码.png" 
+                         alt="联系陈工微信二维码" 
+                         class="qr-code"
+                         loading="lazy"
+                         onerror="handleQRImageError(this)"
+                         onload="handleQRImageLoad(this)">
+                    <div class="qr-fallback" style="display: none;">
+                        二维码加载失败<br>请检查文件路径
+                    </div>
+                </div>
+                <div class="start-text">签订合同、付款后，开始服务流程↓↓↓</div>
             </div>
-            <div class="footnote">
-                <i>📌 以上时间周期为目前行情政策的大概估算时间，具体时间周期以实际审查情况为准。</i>
+            
+            <div class="arrow-down">↓</div>
+
+            <div class="interactive-hint">点击步骤标记完成状态</div>
+
+            <!-- 流程步骤 -->
+            <div class="flow-container">
+                <div class="flow-line"></div>
+
+                <!-- 步骤1 -->
+                <div class="flow-step flow-step-1" onclick="toggleFlowStep(this)">
+                    <div class="step-marker">1</div>
+                    <div class="step-content">
+                        <div class="step-text">
+                            <span class="step-number">1</span>
+                            根据您所选方案进行对应服务流程
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤2 -->
+                <div class="flow-step flow-step-2" onclick="toggleFlowStep(this)">
+                    <div class="step-marker">2</div>
+                    <div class="step-content">
+                        <div class="step-text">
+                            <span class="step-number">2</span>
+                            跟您再次确认商标申请信息表后，提交商标局
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤3 -->
+                <div class="flow-step flow-step-3" onclick="toggleFlowStep(this)">
+                    <div class="step-marker">3</div>
+                    <div class="step-content">
+                        <div class="step-text">
+                            <span class="step-number">3</span>
+                            提交商标局后，最快当天有回执书给您
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 步骤4 -->
+                <div class="flow-step flow-step-4" onclick="toggleFlowStep(this)">
+                    <div class="step-marker">4</div>
+                    <div class="step-content">
+                        <div class="step-text">
+                            <span class="step-number">4</span>
+                            受理通知书（约1个月）：商标局形式审查通过，下发受理通知书
+                        </div>
+                    </div>
+                    <div class="note">如遇补正，免费协助处理。</div>
+                </div>
+
+                <!-- 步骤5 -->
+                <div class="flow-step flow-step-5" onclick="toggleFlowStep(this)">
+                    <div class="step-marker">5</div>
+                    <div class="step-content">
+                        <div class="step-text">
+                            <span class="step-number">5</span>
+                            实质审查（约2-3个月）：审查员进行实质审查，结果可能是初步审定公告或驳回
+                        </div>
+                    </div>
+                    <div class="note warning">
+                        如遇驳回：可选择是否进行驳回复审（需另付费，周期约1年）
+                    </div>
+                </div>
+
+                <!-- 步骤6 -->
+                <div class="flow-step flow-step-6" onclick="toggleFlowStep(this)">
+                    <div class="step-marker">6</div>
+                    <div class="step-content">
+                        <div class="step-text">
+                            <span class="step-number">6</span>
+                            公告期（3个月）：初步审定后进入公告期，接受公众监督，可能被提出异议
+                        </div>
+                    </div>
+                    <div class="note warning">
+                        如遇异议：可选择是否进行异议答辩（需另付费，周期约1年）
+                    </div>
+                </div>
+
+                <!-- 步骤7 -->
+                <div class="flow-step flow-step-7" onclick="toggleFlowStep(this)">
+                    <div class="step-marker">7</div>
+                    <div class="step-content">
+                        <div class="step-text">
+                            <span class="step-number">7</span>
+                            获得注册证（约1个月）：公告期满无异议或异议不成立，颁发商标注册证书（C方案需此时结清尾款）
+                        </div>
+                    </div>
+                </div>
             </div>
-            <p style="margin-top: 20px; color: #6f7d95; font-size:0.9rem; text-align:right;">—— 企优咨 · 透明流程 ——</p>
+
+            <!-- 底部提示 -->
+            <div class="footer-notice">
+                以上时间为目前政策下的估算周期，具体以商标局实际审查进度为准。
+            </div>
         </div>
     </div>
 
     <div class="footer-info">
-        如需帮助，联系陈工 13128311370
+        企优咨（广州）咨询有限公司 · 专业商标代理服务 · 咨询热线：13128311370
     </div>
 </div>
 
 <script>
     (function() {
-        // ---------- 原有全局变量和函数 (保持不变) ----------
+        // 数据存储
         let rawData = [];
-        let selectedSubclasses = {};          // 大类 -> 小类名称数组
-        let trademarkImageData = null;         // base64
-        let imageFileName = '';
-
+        let selectedSubclasses = {};
+        let trademarkImageData = null;
+        
+        // 方案参数
         const schemeParams = {
             A: { base: 380, extra: 38, name: '流程跟进' },
             B: { base: 580, extra: 58, name: '专业辅导' },
             C: { base: 1100, extra: 110, name: '后置付费' }
         };
 
+        // 工具函数
         function cleanInput(str) {
             return str.replace(/\s+/g, '');
         }
 
+        function escapeHtml(unsafe) {
+            return unsafe.replace(/[&<>"]/g, function(m) {
+                if(m === '&') return '&amp;';
+                if(m === '<') return '&lt;';
+                if(m === '>') return '&gt;';
+                if(m === '"') return '&quot;';
+                return m;
+            });
+        }
+
+        function escapeAttr(str) {
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        // 获取统计信息
         function getSelectedStats() {
             let majorCount = 0, totalSubCount = 0;
             for (let major in selectedSubclasses) {
@@ -714,15 +1827,7 @@
             return { majorCount, totalSubCount };
         }
 
-        function updateSchemeSelection() {
-            const checkedRadio = document.querySelector('input[name="scheme"]:checked');
-            document.querySelectorAll('.scheme-option').forEach(opt => opt.classList.remove('selected'));
-            if (checkedRadio) {
-                const parent = checkedRadio.closest('.scheme-option');
-                if (parent) parent.classList.add('selected');
-            }
-        }
-
+        // 计算费用
         function computeFeeDetails() {
             const scheme = document.querySelector('input[name="scheme"]:checked')?.value || 'A';
             const params = schemeParams[scheme];
@@ -739,22 +1844,23 @@
                 totalOriginal += cost;
             }
 
-            const majorCount = Object.keys(selectedSubclasses).length;
+            const majorCount = Object.keys(majorDetails).length;
             let finalTotal = totalOriginal;
             let discountNote = '';
-            let tailDiscount = 1.0;
+            let tailPercent = 800/1100; 
+
             if (scheme === 'B' && majorCount > 6) {
                 finalTotal = totalOriginal * 0.85;
-                discountNote = 'B方案大客户优惠: 总金额立减15%';
+                discountNote = 'B方案大客户优惠：立减15%';
             }
-            let invoiceAmount = withInvoice ? finalTotal * 0.05 : 0;
-            let totalWithInvoice = finalTotal + invoiceAmount;
-
-            let tailPercent = 800/1100; 
+            
             if (scheme === 'C' && majorCount > 6) {
                 tailPercent *= 0.85;
-                discountNote = 'C方案大客户优惠: 尾款减免15%';
+                discountNote = 'C方案大客户优惠：尾款减免15%';
             }
+
+            let invoiceAmount = withInvoice ? finalTotal * 0.05 : 0;
+            let totalWithInvoice = finalTotal + invoiceAmount;
 
             return {
                 scheme,
@@ -771,89 +1877,138 @@
             };
         }
 
+        // 生成费用文本
         function computeFeeText() {
             const d = computeFeeDetails();
-            if (Object.keys(selectedSubclasses).length === 0) return '⚠️ 尚未选择任何小类';
+            if (Object.keys(d.majorDetails).length === 0) {
+                return '<div class="empty-state">请先选择商标小类以查看费用</div>';
+            }
 
-            let lines = [];
-            lines.push(`=== 服务方案: ${d.scheme}方案·${d.params.name} ===`);
-            lines.push(`💰 基础价格：每大类${d.params.base}元（含10小类），超出部分${d.params.extra}元/小类。`);
-            if (d.discountNote) lines.push(`🎁 ${d.discountNote}`);
-            if (d.scheme === 'C') lines.push('🎁 C方案大客户优惠：大类＞6个，尾款减免15%');
-            lines.push('');
-
-            lines.push('=== 💰 费用明细 ===');
+            let html = '<div class="fee-rows">';
+            
+            // 方案信息
+            html += `<div class="fee-row"><span>服务方案</span><span class="fee-highlight">${d.scheme}方案 · ${d.params.name}</span></div>`;
+            html += `<div class="fee-row"><span>计价方式</span><span>¥${d.params.base}/大类（含10小类），超出¥${d.params.extra}/小类</span></div>`;
+            
+            if (d.discountNote) {
+                html += `<div class="fee-row" style="color: var(--success);"><span>🎁 优惠活动</span><span>${d.discountNote}</span></div>`;
+            }
+            
+            html += '<div style="margin: 12px 0; border-top: 1px solid var(--gray-200);"></div>';
+            
+            // 明细
             for (let major in d.majorDetails) {
-                let cost = d.majorDetails[major].cost;
-                lines.push(`📌 ${major}大类（${d.majorDetails[major].count}个小类） = ${cost}元`);
+                html += `<div class="fee-row"><span>【${escapeHtml(major)}】${d.majorDetails[major].count}个小类</span><span>¥${d.majorDetails[major].cost.toFixed(2)}</span></div>`;
             }
-            lines.push(`📊 小计（原价）: ${d.totalOriginal.toFixed(2)}元`);
+            
+            html += '<div style="margin: 12px 0; border-top: 1px solid var(--gray-200);"></div>';
+            
+            html += `<div class="fee-row"><span>小计</span><span>¥${d.totalOriginal.toFixed(2)}</span></div>`;
+            
             if (d.scheme === 'B' && d.majorCount > 6) {
-                lines.push(`📊 小计（优惠后）: ${d.finalTotal.toFixed(2)}元`);
+                html += `<div class="fee-row" style="color: var(--success);"><span>优惠后</span><span>¥${d.finalTotal.toFixed(2)}</span></div>`;
             }
+            
             if (d.withInvoice) {
-                lines.push(`🧾 专票费用（加收5%）: ${d.invoiceAmount.toFixed(2)}元`);
-                lines.push(`💎 总合计（含专票）: ${d.totalWithInvoice.toFixed(2)}元`);
+                html += `<div class="fee-row"><span>增值税专票（5%）</span><span>¥${d.invoiceAmount.toFixed(2)}</span></div>`;
+            }
+            
+            html += `<div class="fee-row" style="font-size: 1.2rem; color: var(--primary); margin-top: 8px;"><span>应付总额</span><span>¥${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}</span></div>`;
+            
+            // 付款计划
+            html += '<div style="margin-top: 16px; padding-top: 16px; border-top: 2px solid var(--gray-200); font-size: 0.85rem; color: var(--gray-600);">';
+            
+            if (d.scheme === 'C') {
+                let firstPay = (d.withInvoice ? d.totalWithInvoice : d.finalTotal) * (300/1100);
+                html += `<div style="margin-bottom: 8px;"><strong>付款计划：</strong></div>`;
+                html += `<div>① 首付款：¥${firstPay.toFixed(2)}（合同签订后）</div>`;
+                html += `<div>② 尾款：每大类下证后支付 ¥${((d.withInvoice ? d.totalWithInvoice : d.finalTotal) * d.tailPercent / d.majorCount).toFixed(2)}/大类</div>`;
             } else {
-                lines.push(`🧾 专票费用: 0元（未选择）`);
-                lines.push(`💎 总合计: ${d.finalTotal.toFixed(2)}元`);
+                html += `<div><strong>付款方式：</strong>合同签订后一次性支付</div>`;
             }
-            lines.push('');
-
-            if (d.scheme === 'A' || d.scheme === 'B') {
-                let payAmount = d.withInvoice ? d.totalWithInvoice : d.finalTotal;
-                lines.push(`【${d.scheme}方案·付款计划】`);
-                lines.push(`📅 签合同后一次性付清: ${payAmount.toFixed(2)}元`);
-            } else if (d.scheme === 'C') {
-                lines.push('【C方案·后置付费计划】');
-                let baseForFirst = d.withInvoice ? d.totalWithInvoice : d.finalTotal;
-                let firstPayment = baseForFirst * (300/1100);
-                lines.push(`🔹 首付款（签合同后）: ${baseForFirst.toFixed(2)}×27.27% = ${firstPayment.toFixed(2)}元`);
-                if (d.majorCount > 6) lines.push('🎁 【C方案尾款减免15%】');
-                lines.push('🔹 尾款支付（每大类下发注册证后）:');
-                let idx = 1;
-                for (let major in d.majorDetails) {
-                    let cost = d.majorDetails[major].cost;
-                    let withInvoiceCost = d.withInvoice ? cost * 1.05 : cost;
-                    let tail = withInvoiceCost * d.tailPercent;
-                    lines.push(`   ${idx}.第${major}大类尾款：${withInvoiceCost.toFixed(2)}×${(d.tailPercent*100).toFixed(2)}% = ${tail.toFixed(2)}元`);
-                    idx++;
-                }
-            }
-            lines.push('');
-            lines.push('=== 💳 付款信息 ===');
-            lines.push('账户名称：企优咨（广州）咨询有限公司');
-            lines.push('账户号码：4405 0158 0107 0000 4275');
-            lines.push('开户银行：中国建设银行股份有限公司广州花城支行');
-            lines.push('【📌 重要提示】1. 付款水单发给陈工；2. 启动服务后不支持退款');
-            return lines.join('\n');
+            
+            html += '</div></div>';
+            
+            return html;
         }
 
+        // 更新UI
         function refreshUI() {
-            updateSchemeSelection();
+            // 更新方案选中状态
+            document.querySelectorAll('.scheme-option').forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.querySelector('input').checked) {
+                    opt.classList.add('selected');
+                }
+            });
 
-            const ul = document.getElementById('selectedListUl');
-            ul.innerHTML = '';
+            // 更新已选标签
+            const tagsContainer = document.getElementById('selectedTags');
+            const emptyState = document.getElementById('selectedEmpty');
+            const selectedList = document.getElementById('selectedListContainer');
+            
+            tagsContainer.innerHTML = '';
+            
+            let hasItems = false;
             for (let major in selectedSubclasses) {
                 if (selectedSubclasses[major].length === 0) continue;
-                let li = document.createElement('li');
-                li.innerHTML = `<strong>【${escapeHtml(major)}】</strong>`;
-                ul.appendChild(li);
-                let subUl = document.createElement('ul');
+                hasItems = true;
+                
                 selectedSubclasses[major].forEach(sub => {
-                    let subLi = document.createElement('li');
-                    subLi.textContent = sub;
-                    subUl.appendChild(subLi);
+                    const tag = document.createElement('div');
+                    tag.className = 'selected-tag';
+                    tag.innerHTML = `
+                        <span class="tag-major">${escapeHtml(major)}</span>
+                        <span class="tag-sub">${escapeHtml(sub)}</span>
+                        <span class="tag-remove" data-major="${escapeAttr(major)}" data-sub="${escapeAttr(sub)}">×</span>
+                    `;
+                    tagsContainer.appendChild(tag);
                 });
-                ul.appendChild(subUl);
             }
-            if (ul.children.length === 0) {
-                ul.innerHTML = '<span style="color:#aaa;">暂无已选小类</span>';
+            
+            if (hasItems) {
+                emptyState.style.display = 'none';
+                tagsContainer.style.display = 'flex';
+                selectedList.classList.add('has-items');
+            } else {
+                emptyState.style.display = 'block';
+                tagsContainer.style.display = 'none';
+                selectedList.classList.remove('has-items');
             }
 
+            // 添加删除事件
+            document.querySelectorAll('.tag-remove').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const major = this.dataset.major;
+                    const sub = this.dataset.sub;
+                    if (selectedSubclasses[major]) {
+                        const idx = selectedSubclasses[major].indexOf(sub);
+                        if (idx > -1) {
+                            selectedSubclasses[major].splice(idx, 1);
+                            if (selectedSubclasses[major].length === 0) {
+                                delete selectedSubclasses[major];
+                            }
+                        }
+                    }
+                    refreshUI();
+                    syncCheckboxesFromSelected();
+                });
+            });
+
+            // 更新统计
             let stats = getSelectedStats();
             document.getElementById('selectedCountBadge').innerText = `已选 ${stats.totalSubCount} 个小类`;
-            document.getElementById('feeDisplay').innerText = computeFeeText();
+            
+            // 更新费用显示
+            const feeHtml = computeFeeText();
+            document.getElementById('feeDisplay').innerHTML = feeHtml;
+            
+            // 更新总金额
+            const d = computeFeeDetails();
+            const total = d.withInvoice ? d.totalWithInvoice : d.finalTotal;
+            document.getElementById('totalAmount').innerText = '¥' + total.toFixed(0);
+            
+            // 同步复选框
             syncCheckboxesFromSelected();
         }
 
@@ -871,6 +2026,7 @@
             const major = cb.dataset.major;
             const sub = cb.dataset.sub;
             if (!major || !sub) return;
+            
             if (cb.checked) {
                 if (!selectedSubclasses[major]) selectedSubclasses[major] = [];
                 if (!selectedSubclasses[major].includes(sub)) {
@@ -886,27 +2042,13 @@
             refreshUI();
         }
 
-        function escapeHtml(unsafe) {
-            return unsafe.replace(/[&<>"]/g, function(m) {
-                if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; if(m === '"') return '&quot;';
-                return m;
-            });
-        }
-        function escapeAttr(str) {
-            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-        }
-
-        function getTotalSubCount() {
-            let c = 0;
-            rawData.forEach(m => (m.children || []).forEach(g => (g.children || []).forEach(() => c++)));
-            return c;
-        }
-
+        // 渲染树
         function renderTree(filterText = '') {
             const treeElem = document.getElementById('categoryTree');
             treeElem.innerHTML = '';
+            
             if (!rawData || rawData.length === 0) {
-                treeElem.innerHTML = '<li style="padding:20px; color:red;">⚠️ 未加载分类数据</li>';
+                treeElem.innerHTML = '<li class="empty-state" style="color: var(--danger);">⚠️ 未加载分类数据，请确保JSON文件存在</li>';
                 return;
             }
 
@@ -949,7 +2091,10 @@
                         let groupLiClass = 'tree-li group-li';
                         if (hasFilter && groupHasMatch) groupLiClass += ' expanded';
                         groupsHTML += `<li class="${groupLiClass}">
-                            <div class="folder-label cat-group" data-group="${escapeAttr(groupNumber)}">📁 ${escapeHtml(groupNumber)} - ${escapeHtml(groupName)}</div>
+                            <div class="folder-label cat-group" data-group="${escapeAttr(groupNumber)}">
+                                <span class="folder-icon">▶</span>
+                                <span>${escapeHtml(groupNumber)} - ${escapeHtml(groupName)}</span>
+                            </div>
                             <ul class="group-subs">${subItemsHTML}</ul>
                         </li>`;
                     }
@@ -961,19 +2106,34 @@
                     const majorLi = document.createElement('li');
                     majorLi.className = majorLiClass;
                     majorLi.innerHTML = `
-                        <div class="folder-label cat-major" data-major="${escapeAttr(majorName)}">📌 大类 ${escapeHtml(majorName)}</div>
+                        <div class="folder-label cat-major" data-major="${escapeAttr(majorName)}">
+                            <span class="folder-icon">▶</span>
+                            <span>大类 ${escapeHtml(majorName)}</span>
+                        </div>
                         <ul class="major-groups">${groupsHTML}</ul>
                     `;
                     treeElem.appendChild(majorLi);
                 }
             });
 
-            document.getElementById('searchCount').innerText = hasFilter ? `🔍 匹配 ${matchCount} 项` : `共 ${getTotalSubCount()} 小类`;
+            document.getElementById('searchCount').innerText = hasFilter ? `匹配 ${matchCount} 项` : `共 ${getTotalSubCount()} 小类`;
 
+            // 绑定事件
             document.querySelectorAll('.subclass-checkbox').forEach(cb => {
                 cb.removeEventListener('change', handleCheckboxChange);
                 cb.addEventListener('change', handleCheckboxChange);
             });
+            
+            document.querySelectorAll('.subclass-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (e.target.tagName !== 'INPUT') {
+                        const cb = this.querySelector('input[type="checkbox"]');
+                        cb.checked = !cb.checked;
+                        cb.dispatchEvent(new Event('change'));
+                    }
+                });
+            });
+            
             syncCheckboxesFromSelected();
             attachFolderListeners();
         }
@@ -995,21 +2155,34 @@
             });
         }
 
+        function getTotalSubCount() {
+            let c = 0;
+            rawData.forEach(m => (m.children || []).forEach(g => (g.children || []).forEach(() => c++)));
+            return c;
+        }
+
+        // 加载数据
         async function loadJSON() {
             try {
                 const response = await fetch('尼斯分类表_树状结构.json');
-                if (!response.ok) throw new Error('无法加载JSON (404)');
+                if (!response.ok) throw new Error('无法加载JSON');
                 rawData = await response.json();
                 renderTree();
                 refreshUI();
             } catch (e) {
-                alert('加载尼斯分类JSON失败，请将 "尼斯分类表_树状结构.json" 放在同目录下。\n错误：' + e.message);
+                document.getElementById('categoryTree').innerHTML = 
+                    `<li class="empty-state" style="color: var(--danger); padding: 40px 20px;">
+                        <div style="font-size: 2rem; margin-bottom: 12px;">⚠️</div>
+                        <div>无法加载分类数据</div>
+                        <div style="font-size: 0.85rem; margin-top: 8px; color: var(--gray-500);">请确保"尼斯分类表_树状结构.json"文件存在</div>
+                     </li>`;
             }
         }
 
-        // 清空
+        // 事件绑定
         document.getElementById('clearSelectedBtn').addEventListener('click', function() {
-            if (confirm('清空所有已选小类？')) {
+            if (Object.keys(selectedSubclasses).length === 0) return;
+            if (confirm('确定清空所有已选小类吗？')) {
                 selectedSubclasses = {};
                 refreshUI();
                 renderTree(document.getElementById('searchInput').value);
@@ -1024,123 +2197,162 @@
             }, 300);
         });
 
+        // 文件上传
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
         const previewBox = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+        
         uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--primary)';
+            uploadArea.style.background = 'var(--primary-light)';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = '';
+            uploadArea.style.background = '';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = '';
+            uploadArea.style.background = '';
+            const files = e.dataTransfer.files;
+            if (files.length > 0) handleFile(files[0]);
+        });
+        
         fileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+            if (e.target.files[0]) handleFile(e.target.files[0]);
+        });
+        
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('请上传图片文件');
+                return;
+            }
             const reader = new FileReader();
             reader.onload = (ev) => {
                 trademarkImageData = ev.target.result;
-                previewBox.innerHTML = `<img src="${ev.target.result}" alt="商标图样预览">`;
+                previewImg.src = ev.target.result;
+                previewBox.style.display = 'flex';
+                uploadArea.classList.add('has-file');
+                uploadArea.innerHTML = `
+                    <div class="upload-icon">✓</div>
+                    <div class="upload-text">已上传：${file.name}</div>
+                    <div class="upload-hint">点击重新上传</div>
+                `;
             };
             reader.readAsDataURL(file);
-        });
+        }
 
-        document.querySelectorAll('input[name="scheme"]').forEach(r => {
-            r.addEventListener('change', () => {
-                updateSchemeSelection();
+        // 方案选择
+        document.querySelectorAll('.scheme-option').forEach(opt => {
+            opt.addEventListener('click', function(e) {
+                if (e.target.tagName === 'INPUT') return;
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
                 refreshUI();
             });
         });
-        document.getElementById('invoiceCheckbox').addEventListener('change', function() {
-            document.getElementById('invoiceLabel').style.color = this.checked ? '#c00000' : 'inherit';
-            refreshUI();
+
+        document.querySelectorAll('input[name="scheme"]').forEach(r => {
+            r.addEventListener('change', refreshUI);
         });
 
+        document.getElementById('invoiceCheckbox').addEventListener('change', refreshUI);
+
+        // 预览按钮
         document.getElementById('previewOrderBtn').addEventListener('click', function() {
-            alert('当前费用明细：\n\n' + computeFeeText());
+            const d = computeFeeDetails();
+            const stats = getSelectedStats();
+            alert(`订单预览：\n\n已选：${stats.majorCount}个大类，${stats.totalSubCount}个小类\n方案：${d.scheme}方案\n费用：¥${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}元`);
         });
 
+        // 导出Word
         async function exportWord() {
-            const applicant = cleanInput(document.getElementById('applicantName').value) || '未填写';
-            const tmName = cleanInput(document.getElementById('trademarkName').value) || '未填写';
-            const phone = cleanInput(document.getElementById('contactPhone').value) || '';
-            const contact = cleanInput(document.getElementById('contactPerson').value) || '';
+            const applicant = cleanInput(document.getElementById('applicantName').value);
+            const tmName = cleanInput(document.getElementById('trademarkName').value);
+            const phone = cleanInput(document.getElementById('contactPhone').value);
+            const contact = cleanInput(document.getElementById('contactPerson').value);
 
             if (!applicant || !tmName) {
                 alert('请填写申请人全称和商标名称');
+                document.getElementById('applicantName').focus();
                 return;
             }
-            if (Object.keys(selectedSubclasses).length === 0) {
+            
+            const stats = getSelectedStats();
+            if (stats.totalSubCount === 0) {
                 alert('请至少选择一个小类');
+                document.getElementById('searchInput').focus();
                 return;
             }
 
+            const d = computeFeeDetails();
             const style = `
-                body {
-                    font-family: '微软雅黑', 'Segoe UI', sans-serif;
-                    margin: 1.5cm 1.5cm;
-                    font-size: 12pt;
-                    line-height: 1.4;
-                }
-                h2 {
-                    color: #003d7c;
-                    margin: 0.5em 0 0.3em;
-                    font-weight: 600;
-                }
-                h3 {
-                    margin: 0.8em 0 0.3em;
-                    color: #1f3a5f;
-                }
-                p {
-                    margin: 0.2em 0;
-                }
-                ul, ol {
-                    margin: 0.2em 0 0.2em 1.8em;
-                    padding: 0;
-                }
-                li {
-                    margin: 0;
-                    line-height: 1.4;
-                }
-                pre {
-                    background: #f4f8ff;
-                    padding: 10px;
-                    margin: 0.5em 0;
-                    line-height: 1.4;
-                    font-family: inherit;
-                    white-space: pre-wrap;
-                    border-radius: 8px;
-                    border: 1px solid #c9d8ec;
-                }
-                img {
-                    max-width: 200px;
-                    border: 1px solid #ddd;
-                    border-radius: 6px;
-                    margin: 0.5em 0;
-                }
-                .bold { font-weight: 600; }
-                .red { color: #c00000; }
+                body { font-family: '微软雅黑', sans-serif; margin: 2cm; font-size: 12pt; line-height: 1.6; color: #333; }
+                h1 { color: #003d7c; text-align: center; border-bottom: 3px solid #003d7c; padding-bottom: 10px; }
+                h2 { color: #1f3a5f; margin-top: 24px; font-size: 14pt; border-left: 4px solid #003d7c; padding-left: 10px; }
+                .info-row { margin: 8px 0; }
+                .label { font-weight: bold; color: #555; }
+                .category { background: #f0f5ff; padding: 12px; margin: 8px 0; border-radius: 8px; }
+                .category-title { font-weight: bold; color: #003d7c; margin-bottom: 4px; }
+                .fee-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 8px; margin: 16px 0; font-family: monospace; white-space: pre-wrap; }
+                .total { font-size: 16pt; color: #003d7c; font-weight: bold; text-align: right; margin-top: 16px; }
+                img { max-width: 300px; border: 1px solid #ddd; border-radius: 8px; margin: 16px 0; }
+                .footer { margin-top: 40px; text-align: center; color: #999; font-size: 10pt; border-top: 1px solid #eee; padding-top: 20px; }
             `;
 
             let htmlContent = `
             <html>
-            <head><meta charset="UTF-8"><title>商标申请订单</title>
+            <head><meta charset="UTF-8"><title>商标申请订单 - ${escapeHtml(tmName)}</title>
             <style>${style}</style>
             </head>
             <body>
-            <h2 style="text-align:center;">📄 商标申请订单</h2>
-            <p><strong>申请人全称：</strong>${escapeHtml(applicant)}</p>
-            <p><strong>商标名称：</strong>${escapeHtml(tmName)}</p>
-            <p><strong>联系电话：</strong>${escapeHtml(phone)}</p>
-            <p><strong>联系人：</strong>${escapeHtml(contact)}</p>
-            <p><strong>日期：</strong>${new Date().toLocaleDateString('zh-CN')}</p>
-            <h3>一、已选类别明细</h3>
-            <ul>`;
-            for (let major in selectedSubclasses) {
-                htmlContent += `<li><strong>【${escapeHtml(major)}】</strong><ul>`;
-                selectedSubclasses[major].forEach(s => htmlContent += `<li>${escapeHtml(s)}</li>`);
-                htmlContent += `</ul></li>`;
-            }
-            htmlContent += `</ul>`;
+            <h1>商标申请服务订单</h1>
+            
+            <h2>一、申请人信息</h2>
+            <div class="info-row"><span class="label">申请人全称：</span>${escapeHtml(applicant)}</div>
+            <div class="info-row"><span class="label">商标名称：</span>${escapeHtml(tmName)}</div>
+            <div class="info-row"><span class="label">联系电话：</span>${escapeHtml(phone || '未填写')}</div>
+            <div class="info-row"><span class="label">联系人：</span>${escapeHtml(contact || '未填写')}</div>
+            <div class="info-row"><span class="label">订单日期：</span>${new Date().toLocaleDateString('zh-CN')}</div>
+            
+            <h2>二、申请类别明细</h2>
+            <div style="margin-left: 20px;">
+            ${Object.entries(selectedSubclasses).map(([major, subs]) => `
+                <div class="category">
+                    <div class="category-title">【${escapeHtml(major)}】</div>
+                    <div>${subs.map(s => escapeHtml(s)).join('；')}</div>
+                </div>
+            `).join('')}
+            </div>
+            <div style="text-align: right; margin: 16px 0; color: #666;">
+                共计：${stats.majorCount}个大类，${stats.totalSubCount}个小类
+            </div>
+            `;
+            
             if (trademarkImageData) {
-                htmlContent += `<h3>二、商标图样</h3><img src="${trademarkImageData}" alt="商标图样" />`;
+                htmlContent += `
+                <h2>三、商标图样</h2>
+                <img src="${trademarkImageData}" alt="商标图样" />
+                `;
             }
-            htmlContent += `<h3>三、服务方案及费用</h3><pre>${computeFeeText()}</pre>`;
-            htmlContent += `<p style="margin-top:1em;">—— 本订单由企优咨系统生成 ——</p></body></html>`;
+            
+            htmlContent += `
+            <h2>${trademarkImageData ? '四' : '三'}、服务方案及费用</h2>
+            <div class="fee-box">${document.getElementById('feeDisplay').innerText}</div>
+            <div class="total">应付总额：¥${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)} 元</div>
+            
+            <div class="footer">
+                <p>本订单由企优咨商标申请系统生成</p>
+                <p>咨询电话：13128311370 | 企优咨（广州）咨询有限公司</p>
+            </div>
+            </body>
+            </html>`;
 
             const blob = new Blob([htmlContent], { type: 'application/msword' });
             const url = URL.createObjectURL(blob);
@@ -1155,6 +2367,7 @@
 
         document.getElementById('exportWordBtn').addEventListener('click', exportWord);
 
+        // 生成合同
         function generateContract() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
@@ -1165,142 +2378,127 @@
                 alert('请填写申请人全称和商标名称');
                 return;
             }
-            if (Object.keys(selectedSubclasses).length === 0) {
+            
+            const stats = getSelectedStats();
+            if (stats.totalSubCount === 0) {
                 alert('请至少选择一个小类');
                 return;
             }
 
             const d = computeFeeDetails();
-            const stats = getSelectedStats();
             const today = new Date().toLocaleDateString('zh-CN');
             const contractNo = `QYZ-TM-${new Date().getFullYear()}${String(new Date().getMonth()+1).padStart(2,'0')}${String(new Date().getDate()).padStart(2,'0')}${String(Math.floor(Math.random()*1000)).padStart(3,'0')}`;
 
-            let feeRows = '';
-            let idx = 1;
-            for (let major in d.majorDetails) {
-                let cost = d.majorDetails[major].cost;
-                feeRows += `<tr><td>${idx}</td><td>${escapeHtml(major)}</td><td>${d.majorDetails[major].count}</td><td>${cost.toFixed(2)}</td></tr>`;
-                idx++;
-            }
-
-            let discountRow = '';
-            if (d.scheme === 'B' && d.majorCount > 6) {
-                discountRow = `<tr><td></td><td colspan="2" style="text-align:right; font-weight:bold;">B方案大客户优惠（立减15%）</td><td style="color:red;">-${(d.totalOriginal - d.finalTotal).toFixed(2)}</td></tr>`;
-            }
-            let invoiceRow = '';
-            if (d.withInvoice) {
-                invoiceRow = `<tr><td></td><td colspan="2" style="text-align:right; font-weight:bold;">专票费用（加收5%）</td><td>${d.invoiceAmount.toFixed(2)}</td></tr>`;
-            }
-
-            let paymentPlan = '';
-            if (d.scheme === 'A' || d.scheme === 'B') {
-                let totalPay = d.withInvoice ? d.totalWithInvoice : d.finalTotal;
-                paymentPlan = `<p><strong>付款计划：</strong>本合同签订后3个工作日内，甲方一次性支付合同总金额 ${totalPay.toFixed(2)} 元至乙方指定账户。</p>`;
-            } else {
-                let baseFirst = d.withInvoice ? d.totalWithInvoice : d.finalTotal;
-                let firstPay = baseFirst * (300/1100);
-                paymentPlan = `<p><strong>付款计划（后置付费）：</strong></p>
-                <p>① 首付款：合同签订后3个工作日内支付 ${firstPay.toFixed(2)} 元（合同总金额的27.27%）。</p>
-                <p>② 尾款：每有一个大类下发商标注册证后，甲方应在收到乙方通知之日起3个工作日内支付该大类的尾款。尾款明细如下：</p>
-                <ul>`;
-                for (let major in d.majorDetails) {
-                    let cost = d.majorDetails[major].cost;
-                    let withInvoiceCost = d.withInvoice ? cost * 1.05 : cost;
-                    let tail = withInvoiceCost * d.tailPercent;
-                    paymentPlan += `<li>【${escapeHtml(major)}】大类尾款：${withInvoiceCost.toFixed(2)} × ${(d.tailPercent*100).toFixed(2)}% = ${tail.toFixed(2)}元</li>`;
-                }
-                paymentPlan += `</ul>`;
-                if (d.majorCount > 6) {
-                    paymentPlan += `<p style="color:red;"><strong>🎁 C方案大客户优惠：尾款已减免15%</strong></p>`;
-                }
-            }
-
             const contractHtml = `<!DOCTYPE html>
 <html>
-<head><meta charset="UTF-8"><title>商标申请代理服务合同</title>
+<head><meta charset="UTF-8"><title>商标代理服务合同</title>
 <style>
-    body { font-family: '微软雅黑', '宋体', sans-serif; margin: 2cm 2cm; font-size: 12pt; line-height: 1.5; }
-    h2 { text-align: center; color: #003d7c; margin-bottom: 0.5cm; }
-    h3 { color: #1f3a5f; margin: 0.8cm 0 0.3cm; border-left: 5px solid #0078D7; padding-left: 8px; }
-    p { margin: 0.3cm 0; }
-    table { border-collapse: collapse; width: 100%; margin: 0.5cm 0; }
-    th, td { border: 1px solid #aaa; padding: 8px; text-align: left; }
-    th { background: #f0f4fa; font-weight: bold; }
-    .signature { margin-top: 1cm; display: flex; justify-content: space-between; }
-    .signature div { width: 45%; }
-    .underline { text-decoration: underline; color: #c00000; }
-    .legal { background: #f9f2e0; padding: 8px; border-left: 4px solid #f0b342; margin: 0.5cm 0; }
+    body { font-family: '微软雅黑', '宋体', sans-serif; margin: 2cm; font-size: 12pt; line-height: 1.8; color: #333; }
+    h1 { text-align: center; color: #003d7c; font-size: 22pt; margin-bottom: 0.5cm; }
+    .contract-no { text-align: center; color: #666; margin-bottom: 1cm; }
+    h2 { color: #1f3a5f; font-size: 14pt; margin-top: 0.8cm; margin-bottom: 0.3cm; border-bottom: 2px solid #003d7c; padding-bottom: 5px; }
+    .party { margin: 0.5cm 0; }
+    .party-title { font-weight: bold; color: #003d7c; }
+    table { width: 100%; border-collapse: collapse; margin: 0.5cm 0; }
+    th, td { border: 1px solid #999; padding: 10px; text-align: left; }
+    th { background: #f0f5ff; font-weight: bold; }
+    .highlight { background: #fffbeb; padding: 10px; border-left: 4px solid #f59e0b; margin: 0.5cm 0; }
+    .signature { margin-top: 1.5cm; display: flex; justify-content: space-between; }
+    .signature-box { width: 45%; }
+    .signature-line { border-bottom: 1px solid #333; height: 60px; margin-bottom: 10px; }
+    .total-row { font-weight: bold; font-size: 13pt; color: #003d7c; background: #f0f5ff; }
 </style>
 </head>
 <body>
-<h2>📝 商标申请代理服务合同</h2>
-<p><strong>合同编号：</strong>${contractNo}</p>
-<p><strong>签订日期：</strong>${today}</p>
+<h1>商标申请代理服务合同</h1>
+<div class="contract-no">合同编号：${contractNo} &nbsp;&nbsp;&nbsp; 签订日期：${today}</div>
 
-<h3>一、甲方（委托人）信息</h3>
-<p><strong>公司名称/个人姓名：</strong>${escapeHtml(applicant)}</p>
-<p><strong>统一社会信用代码/身份证号码：</strong><span class="underline">（填写详细）</span></p>
-<p><strong>工商注册地址/身份证地址：</strong><span class="underline">（填写详细）</span></p>
-<p><strong>联系人：</strong>${escapeHtml(contact || '（请填写）')}</p>
-<p><strong>联系电话：</strong>${escapeHtml(phone || '（请填写）')}</p>
-
-<h3>二、乙方（受托人）信息</h3>
-<p><strong>公司名称：</strong>企优咨（广州）咨询有限公司</p>
-<p><strong>统一社会信用代码：</strong>91440111MADMM9PF77</p>
-<p><strong>注册地址：</strong>广州市天河区体育东路140-148号2204房B51室</p>
-<p><strong>联系人：</strong>陈焕泽</p>
-<p><strong>电话：</strong>13128311370</p>
-
-<h3>三、委托事项</h3>
-<p>甲方委托乙方代理以下商标的注册申请事宜：</p>
-<p><strong>商标名称：</strong>${escapeHtml(tmName)}</p>
-<p><strong>商标图样：</strong>${trademarkImageData ? '（已上传，见附件）' : '（未上传，请补充）'}</p>
-<p><strong>申请类别及小类明细：</strong></p>
-<ul>
-${Object.entries(selectedSubclasses).map(([major, subs]) => 
-    `<li><strong>【${escapeHtml(major)}】</strong>：${subs.map(s => escapeHtml(s)).join('；')}</li>`
-).join('')}
-</ul>
-<p><strong>共计：</strong>${stats.majorCount}个大类，${stats.totalSubCount}个小类。</p>
-
-<h3>四、服务方案及费用</h3>
-<p><strong>服务方案：</strong>${d.scheme}方案 · ${d.params.name}</p>
-<div class="legal">📢 特别声明：商标审查权归属国家知识产权局，审查结果存在主观因素，任何代理机构均不得承诺“包过”！若被驳回、被异议，已收取费用不可退！如您担心注册证下不来，可选C方案：下证后再付服务费。</div>
-
-<table>
-    <tr><th>序号</th><th>大类</th><th>小类数量</th><th>费用(元)</th></tr>
-    ${feeRows}
-    <tr><td></td><td colspan="2" style="text-align:right;"><strong>小计（原价）</strong></td><td>${d.totalOriginal.toFixed(2)}</td></tr>
-    ${discountRow}
-    ${invoiceRow}
-    <tr><td></td><td colspan="2" style="text-align:right;"><strong>合同总金额</strong></td><td><strong style="color:#c00000;">${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}</strong></td></tr>
-</table>
-
-<h3>五、付款方式</h3>
-${paymentPlan}
-<p><strong>乙方收款账户：</strong></p>
-<p>账户名称：企优咨（广州）咨询有限公司<br>
-账户号码：4405 0158 0107 0000 4275<br>
-开户银行：中国建设银行股份有限公司广州花城支行</p>
-
-<h3>六、双方权利义务</h3>
-<p>（1）甲方应保证提供的资料真实、合法，并配合乙方完成申请；</p>
-<p>（2）甲方应按约定支付费用，自服务启动后不得以任何理由要求退款；</p>
-<p>（3）乙方应按照专业标准提供服务，并及时报告进展；</p>
-<p>（4）乙方对甲方信息保密，不承诺申请结果。</p>
-
-<h3>七、违约责任</h3>
-<p>甲方逾期付款的，每逾期一日按应付金额的千分之五支付违约金。因甲方资料问题导致驳回的，由甲方承担责任。</p>
-
-<h3>八、其他</h3>
-<p>本合同一式两份，甲乙双方各执一份，具有同等法律效力。未尽事宜可签订补充协议。</p>
-
-<div class="signature">
-    <div><strong>甲方（盖章）：</strong><br><br>授权代表：${escapeHtml(contact || '__________')}<br>日期：${today}</div>
-    <div><strong>乙方（盖章）：</strong>企优咨（广州）咨询有限公司<br><br>授权代表：陈焕泽<br>日期：${today}</div>
+<h2>甲方（委托人）信息</h2>
+<div class="party">
+    <div><span class="party-title">名称：</span>${escapeHtml(applicant)}</div>
+    <div><span class="party-title">统一社会信用代码/身份证号：</span>____________________</div>
+    <div><span class="party-title">地址：</span>____________________</div>
+    <div><span class="party-title">联系人：</span>${escapeHtml(contact || '____________________')}</div>
+    <div><span class="party-title">联系电话：</span>${escapeHtml(phone || '____________________')}</div>
 </div>
 
-<p style="text-align:right;">—— 本合同由企优咨系统生成，请仔细核对 ——</p>
+<h2>乙方（受托人）信息</h2>
+<div class="party">
+    <div><span class="party-title">名称：</span>企优咨（广州）咨询有限公司</div>
+    <div><span class="party-title">统一社会信用代码：</span>91440111MADMM9PF77</div>
+    <div><span class="party-title">地址：</span>广州市天河区体育东路140-148号2204房B51室</div>
+    <div><span class="party-title">联系人：</span>陈焕泽</div>
+    <div><span class="party-title">联系电话：</span>13128311370</div>
+</div>
+
+<h2>委托事项</h2>
+<p>甲方委托乙方代理以下商标的注册申请事宜：</p>
+<div style="margin-left: 20px;">
+    <div><strong>商标名称：</strong>${escapeHtml(tmName)}</div>
+    <div><strong>商标图样：</strong>${trademarkImageData ? '（见附件）' : '（未提供）'}</div>
+    <div><strong>申请类别：</strong></div>
+    <table>
+        <tr><th>大类</th><th>小类明细</th><th>数量</th></tr>
+        ${Object.entries(selectedSubclasses).map(([major, subs]) => `
+            <tr><td>${escapeHtml(major)}</td><td>${subs.map(s => escapeHtml(s)).join('；')}</td><td>${subs.length}</td></tr>
+        `).join('')}
+    </table>
+    <p style="text-align: right;"><strong>合计：${stats.majorCount}个大类，${stats.totalSubCount}个小类</strong></p>
+</div>
+
+<h2>服务方案及费用</h2>
+<div class="highlight">
+    <strong>服务方案：</strong>${d.scheme}方案 · ${d.params.name}<br>
+    <strong>计费标准：</strong>¥${d.params.base}/大类（含10小类），超出部分¥${d.params.extra}/小类
+    ${d.discountNote ? '<br><strong>优惠说明：</strong>' + d.discountNote : ''}
+</div>
+
+<table>
+    <tr><th>项目</th><th>金额（元）</th></tr>
+    ${Object.entries(d.majorDetails).map(([major, info]) => `
+        <tr><td>【${escapeHtml(major)}】${info.count}个小类</td><td style="text-align: right;">${info.cost.toFixed(2)}</td></tr>
+    `).join('')}
+    <tr><td style="text-align: right;"><strong>小计</strong></td><td style="text-align: right;">${d.totalOriginal.toFixed(2)}</td></tr>
+    ${d.scheme === 'B' && d.majorCount > 6 ? `<tr><td style="text-align: right; color: green;">优惠后</td><td style="text-align: right; color: green;">${d.finalTotal.toFixed(2)}</td></tr>` : ''}
+    ${d.withInvoice ? `<tr><td style="text-align: right;">增值税专票（5%）</td><td style="text-align: right;">${d.invoiceAmount.toFixed(2)}</td></tr>` : ''}
+    <tr class="total-row"><td style="text-align: right;">合同总金额</td><td style="text-align: right;">${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}</td></tr>
+</table>
+
+<h2>付款方式</h2>
+${d.scheme === 'C' ? `
+<p><strong>后置付费方案：</strong></p>
+<p>1. 首付款：合同签订后3个工作日内支付 ¥${((d.withInvoice ? d.totalWithInvoice : d.finalTotal) * (300/1100)).toFixed(2)} 元；</p>
+<p>2. 尾款：每大类获得注册证后3个工作日内支付该大类尾款。</p>
+` : `
+<p>合同签订后3个工作日内一次性支付全部费用 <strong>¥${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}</strong> 元。</p>
+`}
+<p><strong>收款账户：</strong><br>
+账户名称：企优咨（广州）咨询有限公司<br>
+开户银行：中国建设银行股份有限公司广州花城支行<br>
+银行账号：4405 0158 0107 0000 4275</p>
+
+<h2>双方权利义务</h2>
+<p>1. 甲方应保证所提供资料的真实性和合法性；</p>
+<p>2. 甲方应按约定支付费用，服务启动后不予退款；</p>
+<p>3. 乙方应勤勉尽责，按专业标准提供代理服务；</p>
+<p>4. <strong>重要提示：</strong>商标审查存在主观性，乙方不承诺注册成功。如被驳回，已收费用不退，可选择复审（另收费）。</p>
+
+<div class="signature">
+    <div class="signature-box">
+        <div class="party-title">甲方（盖章）：</div>
+        <div class="signature-line"></div>
+        <div>授权代表：${escapeHtml(contact || '__________')}</div>
+        <div>日期：${today}</div>
+    </div>
+    <div class="signature-box">
+        <div class="party-title">乙方（盖章）：</div>
+        <div class="signature-line"></div>
+        <div>授权代表：陈焕泽</div>
+        <div>日期：${today}</div>
+    </div>
+</div>
+
+<p style="text-align: center; margin-top: 2cm; color: #999; font-size: 10pt;">本合同一式两份，甲乙双方各执一份，具有同等法律效力</p>
 </body>
 </html>`;
 
@@ -1317,7 +2515,7 @@ ${paymentPlan}
 
         document.getElementById('generateContractBtn').addEventListener('click', generateContract);
 
-        // ---------- 新增选项卡切换逻辑 ----------
+        // 选项卡切换
         const tabOrder = document.getElementById('tabOrder');
         const tabFlow = document.getElementById('tabFlow');
         const orderPanel = document.getElementById('orderPanel');
@@ -1339,18 +2537,93 @@ ${paymentPlan}
 
         // 启动
         loadJSON();
-
-        document.querySelectorAll('.scheme-option').forEach(opt => {
-            opt.addEventListener('click', function(e) {
-                if (e.target.tagName === 'INPUT') return;
-                const radio = this.querySelector('input[type="radio"]');
-                if (radio) radio.checked = true;
-                radio.dispatchEvent(new Event('change'));
-            });
-        });
-
-        updateSchemeSelection();
     })();
+
+    // ==================== 流程图相关函数 ====================
+    
+    // 切换步骤完成状态
+    function toggleFlowStep(element) {
+        element.classList.toggle('completed');
+        const text = element.querySelector('.step-text');
+        
+        if (element.classList.contains('completed')) {
+            text.classList.add('check-icon');
+            // 触觉反馈（如果设备支持）
+            if (navigator.vibrate) navigator.vibrate(50);
+        } else {
+            text.classList.remove('check-icon');
+        }
+        
+        // 保存到本地存储
+        saveFlowState();
+    }
+
+    // 切换起始框状态
+    function toggleFlowStart() {
+        const startBox = document.getElementById('flowStartBox');
+        startBox.classList.toggle('completed');
+        saveFlowState();
+    }
+
+    // 图片错误处理
+    function handleQRImageError(img) {
+        img.style.display = 'none';
+        img.nextElementSibling.style.display = 'flex';
+        console.warn('二维码图片加载失败，请检查文件路径');
+    }
+
+    // 图片加载成功
+    function handleQRImageLoad(img) {
+        img.style.display = 'block';
+        if (img.nextElementSibling) {
+            img.nextElementSibling.style.display = 'none';
+        }
+    }
+
+    // 保存状态到本地存储
+    function saveFlowState() {
+        const completedSteps = [];
+        document.querySelectorAll('.flow-step.completed').forEach((step, index) => {
+            completedSteps.push(index);
+        });
+        
+        const startCompleted = document.querySelector('.start-box.completed') ? true : false;
+        
+        localStorage.setItem('trademarkFlowState', JSON.stringify({
+            steps: completedSteps,
+            start: startCompleted,
+            timestamp: new Date().toISOString()
+        }));
+    }
+
+    // 恢复状态
+    function restoreFlowState() {
+        const saved = localStorage.getItem('trademarkFlowState');
+        if (saved) {
+            try {
+                const state = JSON.parse(saved);
+                const steps = document.querySelectorAll('.flow-step');
+                
+                state.steps.forEach(index => {
+                    if (steps[index]) {
+                        steps[index].classList.add('completed');
+                        steps[index].querySelector('.step-text').classList.add('check-icon');
+                    }
+                });
+                
+                if (state.start) {
+                    document.getElementById('flowStartBox').classList.add('completed');
+                }
+            } catch (e) {
+                console.error('恢复状态失败', e);
+            }
+        }
+    }
+
+    // 页面加载完成后恢复流程图状态
+    document.addEventListener('DOMContentLoaded', function() {
+        restoreFlowState();
+    });
 </script>
 </body>
 </html>
