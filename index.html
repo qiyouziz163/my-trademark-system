@@ -2483,7 +2483,7 @@
 
         document.getElementById('exportWordBtn').addEventListener('click', exportWord);
 
-        // ==================== 生成合同（完全复刻Python版合同） ====================
+        // ==================== 生成合同（完全复刻附件样式） ====================
         function getCircledNumber(n) {
             const map = {
                 1:'①',2:'②',3:'③',4:'④',5:'⑤',6:'⑥',7:'⑦',8:'⑧',9:'⑨',10:'⑩',
@@ -2534,6 +2534,7 @@
                 .total-row { font-weight: bold; color: #C00000; background: #f0f0f0; }
                 .bg-payment-plan { background-color: #FFF2CC; }
                 .bg-payment-info { background-color: #E6E6FA; }
+                .word-img { max-width: 60px; max-height: 60px; object-fit: contain; }
             </style>
             </head>
             <body>
@@ -2566,7 +2567,12 @@
             <div><span class="party-title">统一社会信用代码：</span><span class="underline-red">（填写详细）</span></div>
             <div><span class="party-title">商标注册地址：</span><span class="underline-red">（填写详细）</span></div>
 
-            <!-- 明细表格（与订单相同） -->
+            <h2>二、已选类别明细</h2>
+            <div><span class="party-title">商标申请主体：</span>${escapeHtml(applicant)}</div>
+            <div><span class="party-title">统一社会信用代码：</span><span class="underline-red">（填写详细）</span></div>
+            <div><span class="party-title">商标注册地址：</span><span class="underline-red">（填写详细）</span></div>
+
+            <!-- 明细表格 -->
             <table>
                 <tr><th>序号</th><th>商标名称</th><th>商标图样</th><th>已选大类</th><th>小类</th></tr>
             `;
@@ -2577,7 +2583,13 @@
                 htmlContent += `<tr>
                     <td style="text-align: center;">${idx}</td>
                     <td style="text-align: center;">${escapeHtml(tmName)}</td>
-                    <td style="text-align: center;">${trademarkImageData ? '<span>见附件</span>' : '见附件'}</td>
+                    <td style="text-align: center;">`;
+                if (trademarkImageData) {
+                    htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样">`;
+                } else {
+                    htmlContent += `见附件`;
+                }
+                htmlContent += `</td>
                     <td style="text-align: center;">${escapeHtml(major)}</td>
                     <td>${subText}</td>
                 </tr>`;
@@ -2591,7 +2603,7 @@
             <p>    方案描述：${d.scheme === 'A' ? '适合需求：您懂商标但事务繁忙？流程跟进帮您省心省力。服务内容：材料形式审核、官方文件代收代发、关键节点人工提醒、全流程进度同步。' : d.scheme === 'B' ? '适合需求：希望提升商标注册规范性？专业辅导为您保驾护航。服务内容：注册前风险评估、类别规划建议、申请材料优化、专业解读与指导。' : '适合需求：担心注册不下来，服务费白给？后置付费让您更从容。服务内容：启动成本更低，仅付官费；下发商标注册证后再付服务费！'}</p>
             <p>2.2 服务费用计算标准表：</p>
 
-            <!-- 费用表格（与Python版一致） -->
+            <!-- 费用表格 -->
             <table>
                 <tr><th>序号</th><th>已选大类</th><th>小类数量</th><th>费用（元）</th></tr>
             `;
@@ -2606,20 +2618,32 @@
                 rowIdx++;
             }
 
-            // 小计行
-            htmlContent += `<tr><td colspan="2" style="text-align: right; font-weight: bold;">小计（原价）</td><td style="text-align: center;">${stats.totalSubCount}</td><td style="text-align: right;">${d.totalOriginal.toFixed(2)}</td></tr>`;
+            // 小计行（合并前两列）
+            htmlContent += `<tr>
+                <td colspan="2" style="text-align: right; font-weight: bold;">小计（原价）：</td>
+                <td style="text-align: center;">${stats.totalSubCount}</td>
+                <td style="text-align: right;">${d.totalOriginal.toFixed(2)}</td>
+            </tr>`;
 
             if (d.scheme === 'B' && d.majorCount > 6) {
-                htmlContent += `<tr><td colspan="3" style="text-align: right; color: green;">B方案大客户优惠（立减15%）</td><td style="text-align: right;">-${(d.totalOriginal - d.finalTotal).toFixed(2)}</td></tr>`;
-                htmlContent += `<tr><td colspan="3" style="text-align: right; font-weight: bold;">小计（优惠后）</td><td style="text-align: right; font-weight: bold;">${d.finalTotal.toFixed(2)}</td></tr>`;
+                htmlContent += `<tr>
+                    <td colspan="3" style="text-align: right; color: green;">B方案大客户优惠（立减15%）</td>
+                    <td style="text-align: right;">-${(d.totalOriginal - d.finalTotal).toFixed(2)}</td>
+                </tr>`;
             }
 
             if (d.withInvoice) {
-                htmlContent += `<tr><td colspan="3" style="text-align: right;">专票费用（加收5%）</td><td style="text-align: right;">${d.invoiceAmount.toFixed(2)}</td></tr>`;
+                htmlContent += `<tr>
+                    <td colspan="3" style="text-align: right;">专票费用（加收5%）</td>
+                    <td style="text-align: right;">${d.invoiceAmount.toFixed(2)}</td>
+                </tr>`;
             }
 
-            htmlContent += `<tr class="total-row"><td colspan="3" style="text-align: right; font-weight: bold;">合同总金额${d.withInvoice ? '（含专票）' : ''}</td><td style="text-align: right; font-weight: bold;">${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}</td></tr>`;
             htmlContent += `</table>`;
+
+            // 表格外显示合同总金额
+            const totalAmount = (d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2);
+            htmlContent += `<p style="font-weight: bold; color: #C00000;">合同总金额：${totalAmount} 元${d.withInvoice ? '（含专票）' : ''}</p>`;
 
             // 第三条 付款方式
             htmlContent += `<h2>第三条 付款方式</h2>`;
@@ -2627,15 +2651,15 @@
                 let firstPay = (d.withInvoice ? d.totalWithInvoice : d.finalTotal) * (300/1100);
                 htmlContent += `<p>3.1 甲方选择C方案·后置付费服务，付款方式如下：</p>`;
                 htmlContent += `<p>   合同总金额：${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}元${d.withInvoice ? '（含专票）' : ''}</p>`;
-                htmlContent += `<p>   首付款（合同签订后3个工作日内）：${firstPay.toFixed(2)}元（合同总金额的27.27%）</p>`;
-                htmlContent += `<p>   尾款支付：每当有一个大类下发商标注册证后，甲方应在收到乙方通知之日起3个工作日内支付该大类的尾款。每个大类下发商标注册证后的具体尾款费用：</p>`;
+                htmlContent += `<p>   <strong>首付款</strong>（合同签订后3个工作日内）：${firstPay.toFixed(2)}元（合同总金额的27.27%）</p>`;
+                htmlContent += `<p>   <strong>尾款支付：</strong>每当有一个大类下发商标注册证后，甲方应在收到乙方通知之日起3个工作日内支付该大类的尾款。每个大类下发商标注册证后的具体尾款费用:</p>`;
                 let subIdx = 1;
                 for (let major in d.majorDetails) {
                     let majorCost = d.majorDetails[major].cost;
                     let majorWithInvoice = d.withInvoice ? majorCost * 1.05 : majorCost;
                     let tail = majorWithInvoice * (d.majorCount > 6 ? 0.7273 * 0.85 : 0.7273);
                     const circle = getCircledNumber(subIdx);
-                    htmlContent += `<p>   ${circle} ${escapeHtml(major)}大类尾款：${majorWithInvoice.toFixed(2)}×72.73%${d.majorCount > 6 ? '×85%' : ''} = ${tail.toFixed(2)}元</p>`;
+                    htmlContent += `<p>   ${circle} ${escapeHtml(major)}大类<strong>尾款</strong>：${majorWithInvoice.toFixed(2)}×72.73%${d.majorCount > 6 ? '×85%' : ''} = ${tail.toFixed(2)}元</p>`;
                     subIdx++;
                 }
             } else {
