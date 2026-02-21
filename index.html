@@ -2456,7 +2456,7 @@
             return map[n] || n + '.';
         }
 
-        // ==================== 导出Word（优化版） ====================
+        // ==================== 导出Word（优化版，图片缩略图+点击查看原图） ====================
         async function exportWord() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
@@ -2520,7 +2520,7 @@
 
             <h2>二、已选类别明细</h2>
             <table class="word-table">
-                <tr><th>序号</th><th>商标名称</th><th>商标图样</th><th>已选大类</th><th>小类</th></tr>
+                <tr><th style="width:5%">序号</th><th style="width:15%">商标名称</th><th style="width:15%">商标图样</th><th style="width:10%">已选大类</th><th>小类</th></tr>
             `;
             let idx = 1;
             for (const major in selectedSubclasses) {
@@ -2531,7 +2531,8 @@
                     <td style="text-align: center;">${escapeHtml(tmName)}</td>
                     <td style="text-align: center;">`;
                 if (trademarkImageData) {
-                    htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样">`;
+                    // 添加可点击的缩略图链接，点击在新窗口查看原图
+                    htmlContent += `<a href="${trademarkImageData}" target="_blank"><img src="${trademarkImageData}" width="40" height="40" style="object-fit: contain;" alt="商标图样"></a><br><span style="font-size:8pt;">(点击查看原图)</span>`;
                 } else {
                     htmlContent += `无图样`;
                 }
@@ -2602,7 +2603,7 @@
 
             htmlContent += `<h2>四、商标图样</h2>`;
             if (trademarkImageData) {
-                htmlContent += `<img src="${trademarkImageData}" style="width:40px; height:40px; object-fit: contain; border: 1px solid #ccc; border-radius: 2px;" /><br>`;
+                htmlContent += `<a href="${trademarkImageData}" target="_blank"><img src="${trademarkImageData}" width="40" height="40" style="object-fit: contain; border: 1px solid #ccc; border-radius: 2px;" /></a> (点击图片查看原图)<br>`;
                 htmlContent += `<div>📎 文件: 已上传图片</div>`;
             } else {
                 htmlContent += `<div>⚠️ 未上传商标图样</div>`;
@@ -2634,7 +2635,7 @@
 
         document.getElementById('exportWordBtn').addEventListener('click', exportWord);
 
-        // ==================== 生成合同（优化版，修正标题编号） ====================
+        // ==================== 生成合同（优化版，图片缩略图+点击查看原图） ====================
         function generateContract() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
@@ -2714,7 +2715,7 @@
 
             <h3>已选类别明细</h3>
             <table>
-                <tr><th>序号</th><th>商标名称</th><th>商标图样</th><th>已选大类</th><th>小类</th></tr>
+                <tr><th style="width:5%">序号</th><th style="width:15%">商标名称</th><th style="width:15%">商标图样</th><th style="width:10%">已选大类</th><th>小类</th></tr>
             `;
             let idx = 1;
             for (const major in selectedSubclasses) {
@@ -2725,7 +2726,8 @@
                     <td style="text-align: center;">${escapeHtml(tmName)}</td>
                     <td style="text-align: center;">`;
                 if (trademarkImageData) {
-                    htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样">`;
+                    // 添加可点击的缩略图链接，点击在新窗口查看原图
+                    htmlContent += `<a href="${trademarkImageData}" target="_blank"><img src="${trademarkImageData}" width="40" height="40" style="object-fit: contain;" alt="商标图样"></a><br><span style="font-size:8pt;">(点击查看原图)</span>`;
                 } else {
                     htmlContent += `无图样`;
                 }
