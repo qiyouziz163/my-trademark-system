@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <meta name="description" content="企优咨商标申请下单系统 - 专业商标代理服务">
     <meta name="keywords" content="商标申请,商标注册,企优咨,商标代理">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <!-- 使用“企优咨图标.ico”作为favicon -->
+    <link rel="icon" type="image/x-icon" href="企优咨图标.ico">
     <title>企优咨 · 商标申请下单系统</title>
     <style>
+        /* 样式与原来保持一致，无改动 */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -1721,7 +1723,7 @@
                         <input type="checkbox" id="invoiceCheckbox" aria-label="开具增值税专用发票">
                         <span class="invoice-label">开具增值税专用发票（加收5%）</span>
                     </label>
-                    <div class="invoice-hint">如需发票，总费用将增加5%的税点</div>
+                    <div class="invoice-hint">如需专票，总费用增加5%税点；否则默认开具增值税普通发票</div>
                 </div>
 
                 <div class="legal-notice" role="alert">
@@ -1766,7 +1768,8 @@
         <div class="flow-wrapper">
             <div class="start-box" id="flowStartBox" onclick="toggleFlowStart()" role="button" tabindex="0" aria-pressed="false" aria-label="开始服务流程">
                 <div class="qr-container">
-                    <img src="contact_qr.png" 
+                    <!-- 修正二维码文件名：使用“联系陈工-微信二维码.png” -->
+                    <img src="联系陈工-微信二维码.png" 
                          alt="联系陈工微信二维码" 
                          class="qr-code"
                          loading="lazy"
@@ -2000,7 +2003,7 @@
             };
         }
 
-        // 生成费用文本
+        // 生成费用文本（已去除“未税”字样，明确发票类型）
         function computeFeeText() {
             const d = computeFeeDetails();
             if (Object.keys(d.majorDetails).length === 0) {
@@ -2034,10 +2037,13 @@
             }
             
             if (d.withInvoice) {
-                html += `<div class="fee-row"><span>增值税专票（5%）</span><span>¥${d.invoiceAmount.toFixed(2)}</span></div>`;
+                html += `<div class="fee-row"><span>增值税专票（加收5%）</span><span>¥${d.invoiceAmount.toFixed(2)}</span></div>`;
             }
             
             html += `<div class="fee-row" style="font-size: 1.2rem; color: var(--primary); margin-top: 8px;"><span>应付总额</span><span>¥${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}</span></div>`;
+            
+            // 增加发票类型说明
+            html += `<div style="margin-top: 8px; font-size:0.9rem;"><span>📄 发票类型：${d.withInvoice ? '增值税专用发票（已加收5%）' : '增值税普通发票'}</span></div>`;
             
             html += '<div style="margin-top: 16px; padding-top: 16px; border-top: 2px solid var(--gray-200); font-size: 0.85rem; color: var(--gray-600);">';
             
@@ -2054,10 +2060,10 @@
                     serviceTotal = baseServiceTotal;
                 }
                 html += `<div style="margin-bottom: 8px;"><strong>付款计划：</strong></div>`;
-                html += `<div>① 首期款：¥${firstPay.toFixed(2)}（合同签订后支付，${d.withInvoice?'含税':'未税'}）</div>`;
+                html += `<div>① 首期款：¥${firstPay.toFixed(2)}（合同签订后支付，${d.withInvoice?'含专票':'普票'}）</div>`;
                 html += `<div>② 服务尾款：每大类下证后支付，总额 ¥${serviceTotal.toFixed(2)}，各大类尾款按该大类费用比例分摊。</div>`;
             } else {
-                html += `<div><strong>付款方式：</strong>合同签订后一次性支付</div>`;
+                html += `<div><strong>付款方式：</strong>合同签订后一次性支付（${d.withInvoice?'含专票':'普票'}）</div>`;
             }
             
             html += '</div></div>';
@@ -2443,7 +2449,7 @@
                     <h3 style="margin-top: 0; color: var(--primary);">订单预览</h3>
                     <p><strong>已选：</strong>${stats.majorCount}个大类，${stats.totalSubCount}个小类</p>
                     <p><strong>方案：</strong>${d.scheme}方案 · ${d.params.name}</p>
-                    <p><strong>费用：</strong>¥${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}元</p>
+                    <p><strong>费用：</strong>¥${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}元 ${d.withInvoice ? '(含专票)' : '(普票)'}</p>
                     <button type="button" onclick="this.closest('.modal').remove()" style="margin-top: 16px; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; width: 100%;">关闭</button>
                 </div>
             `;
@@ -2463,7 +2469,7 @@
             return map[n] || n + '.';
         }
 
-        // ==================== 导出Word（优化版） ====================
+        // ==================== 导出Word（优化版，去除“未税”字样，明确发票类型） ====================
         async function exportWord() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
@@ -2519,7 +2525,7 @@
                 <tr><td>下订单日期：</td><td>${today}</td></tr>
                 <tr><td>服务方案：</td><td>${escapeHtml(d.scheme)}方案 · ${escapeHtml(d.params.name)}</td></tr>
                 <tr><td>方案描述：</td><td>${d.scheme === 'A' ? '适合需求：您懂商标但事务繁忙？流程跟进帮您省心省力。服务内容：材料形式审核、官方文件代收代发、关键节点人工提醒、全流程进度同步。' : d.scheme === 'B' ? '适合需求：希望提升商标注册规范性？专业辅导为您保驾护航。服务内容：注册前风险评估、类别规划建议、申请材料优化、专业解读与指导。' : '适合需求：担心注册不下来，服务费白给？分期付费让您更从容。服务内容：启动成本更低，仅付首期款；下发商标注册证后再付服务费！'}</td></tr>
-                <tr><td>专票选项：</td><td>${d.withInvoice ? '✓ 是（加收5%）' : '✗ 否'}</td></tr>
+                <tr><td>发票选项：</td><td>${d.withInvoice ? '✓ 增值税专用发票（加收5%）' : '✗ 增值税普通发票'}</td></tr>
                 <tr><td>商标图样：</td><td>${trademarkImageData ? '✓ 已上传' : '✗ 未上传'}</td></tr>
                 <tr><td>已选大类数量：</td><td>${stats.majorCount}</td></tr>
                 <tr><td>已选小类总数：</td><td>${stats.totalSubCount}</td></tr>
@@ -2538,7 +2544,7 @@
                     <td style="text-align: center;">${escapeHtml(tmName)}</td>
                     <td style="text-align: center;">`;
                 if (trademarkImageData) {
-                    htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样">`;
+                    htmlContent += `<a href="${trademarkImageData}" target="_blank"><img src="${trademarkImageData}" class="word-img" alt="商标图样"></a><br><a href="${trademarkImageData}" target="_blank">点击查看原图</a>`;
                 } else {
                     htmlContent += `无图样`;
                 }
@@ -2571,7 +2577,7 @@
                 htmlContent += `<div>🧾 专票费用（加收5%）: ${d.invoiceAmount.toFixed(2)}元</div>`;
                 htmlContent += `<div class="total-red">💎 总合计（含专票）: ${d.totalWithInvoice.toFixed(2)}元</div>`;
             } else {
-                htmlContent += `<div>🧾 专票费用: 0元（未选择）</div>`;
+                htmlContent += `<div>🧾 发票类型: 增值税普通发票</div>`;
                 htmlContent += `<div class="total-red">💎 总合计: ${d.finalTotal.toFixed(2)}元</div>`;
             }
 
@@ -2588,7 +2594,7 @@
                     tailTotal = baseServiceTotal;
                 }
                 htmlContent += `<div class="bg-payment-plan">【C方案·分期付费计划】</div>`;
-                htmlContent += `<div>🔹 首期款（签合同后）: ${firstPay.toFixed(2)}元 ${d.withInvoice ? '(含税)' : '(未税)'}</div>`;
+                htmlContent += `<div>🔹 首期款（签合同后）: ${firstPay.toFixed(2)}元 ${d.withInvoice ? '(含专票)' : '(普票)'}</div>`;
                 htmlContent += `<div>🔹 服务尾款总额（下证后支付）: ${tailTotal.toFixed(2)}元，各大类尾款按该大类费用比例分摊。</div>`;
                 let subIdx = 1;
                 for (const major in d.majorDetails) {
@@ -2604,7 +2610,7 @@
             } else {
                 htmlContent += `<div class="bg-payment-plan">【${escapeHtml(d.scheme)}方案·付款计划】</div>`;
                 const payAmount = d.withInvoice ? d.totalWithInvoice : d.finalTotal;
-                htmlContent += `<div>📅 签合同后一次性付清: ${payAmount.toFixed(2)}元</div>`;
+                htmlContent += `<div>📅 签合同后一次性付清: ${payAmount.toFixed(2)}元 ${d.withInvoice ? '(含专票)' : '(普票)'}</div>`;
             }
 
             htmlContent += `<div class="bg-payment-info">=== 💳 付款信息 ===</div>`;
@@ -2618,7 +2624,7 @@
 
             htmlContent += `<h2>四、商标图样</h2>`;
             if (trademarkImageData) {
-                htmlContent += `<img src="${trademarkImageData}" style="width:40px; height:40px; object-fit: contain; border: 1px solid #ccc; border-radius: 2px;" /><br>`;
+                htmlContent += `<a href="${trademarkImageData}" target="_blank"><img src="${trademarkImageData}" style="width:40px; height:40px; object-fit: contain; border: 1px solid #ccc; border-radius: 2px;" /></a><br><a href="${trademarkImageData}" target="_blank">点击查看原图</a>`;
                 htmlContent += `<div>📎 文件: 已上传图片</div>`;
             } else {
                 htmlContent += `<div>⚠️ 未上传商标图样</div>`;
@@ -2650,7 +2656,7 @@
 
         document.getElementById('exportWordBtn').addEventListener('click', exportWord);
 
-        // ==================== 生成合同（优化版，修正标题编号） ====================
+        // ==================== 生成合同（优化版，去除“未税”，明确发票类型） ====================
         function generateContract() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
@@ -2741,7 +2747,7 @@
                     <td style="text-align: center;">${escapeHtml(tmName)}</td>
                     <td style="text-align: center;">`;
                 if (trademarkImageData) {
-                    htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样">`;
+                    htmlContent += `<a href="${trademarkImageData}" target="_blank"><img src="${trademarkImageData}" class="word-img" alt="商标图样"></a><br><a href="${trademarkImageData}" target="_blank">点击查看原图</a>`;
                 } else {
                     htmlContent += `无图样`;
                 }
@@ -2756,7 +2762,7 @@
             htmlContent += `
             <h2>第四条 服务方案及费用</h2>
             <p>4.1 甲方选择乙方提供的【${escapeHtml(d.scheme)}方案 · ${escapeHtml(d.params.name)}】服务。</p>
-            <p>    方案描述：${d.scheme === 'A' ? '适合需求：您懂商标但事务繁忙？流程跟进帮您省心省力。服务内容：材料形式审核、官方文件代收代发、关键节点人工提醒、全流程进度同步。' : d.scheme === 'B' ? '适合需求：希望提升商标注册规范性？专业辅导为您保驾护航。服务内容：注册前风险评估、类别规划建议、申请材料优化、专业解读与指导。' : '适合需求：担心注册不下来，服务费白给？分期付费让您更从容。服务内容：启动成本更低，仅付首期款；下发商标注册证后再付服务费！'}</p>
+            <p>    方案描述：${d.scheme === 'A' ? '适合需求：您懂商标但事务繁忙？流程跟进帮您省心省力。服务内容：材料形式审核、官方文件收转发、关键节点人工提醒、全流程进度同步。' : d.scheme === 'B' ? '适合需求：希望提升商标注册规范性？专业辅导为您保驾护航。服务内容：注册前风险评估、类别规划建议、申请材料优化、专业解读与指导。' : '适合需求：担心注册不下来，服务费白给？分期付费让您更从容。服务内容：启动成本更低，仅付首期款；下发商标注册证后再付服务费！'}</p>
             <p>4.2 服务费用计算标准表：</p>
 
             <table>
@@ -2796,7 +2802,7 @@
             htmlContent += `</table>`;
 
             const totalAmount = (d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2);
-            htmlContent += `<p style="font-weight: bold; color: #C00000; margin:2px 0;">合同总金额：${totalAmount} 元${d.withInvoice ? '（含专票）' : ''}</p>`;
+            htmlContent += `<p style="font-weight: bold; color: #C00000; margin:2px 0;">合同总金额：${totalAmount} 元 ${d.withInvoice ? '（含增值税专用发票）' : '（增值税普通发票）'}</p>`;
 
             htmlContent += `<h2>第五条 付款方式</h2>`;
             if (d.scheme === 'C') {
@@ -2811,8 +2817,8 @@
                     tailTotal = baseServiceTotal;
                 }
                 htmlContent += `<p>5.1 甲方选择C方案·分期付费服务，付款方式如下：</p>`;
-                htmlContent += `<p>   合同总金额：${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}元${d.withInvoice ? '（含专票）' : ''}</p>`;
-                htmlContent += `<p>   <strong>首期款</strong>（合同签订后3个工作日内）：${firstPay.toFixed(2)}元 ${d.withInvoice ? '(含税)' : '(未税)'}</p>`;
+                htmlContent += `<p>   合同总金额：${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}元${d.withInvoice ? '（含专票）' : '（普票）'}</p>`;
+                htmlContent += `<p>   <strong>首期款</strong>（合同签订后3个工作日内）：${firstPay.toFixed(2)}元 ${d.withInvoice ? '(含专票)' : '(普票)'}</p>`;
                 htmlContent += `<p>   <strong>服务尾款支付：</strong>每当有一个大类下发商标注册证后，甲方应在收到乙方通知之日起3个工作日内支付该大类的尾款。各大类尾款按费用比例分摊，具体金额如下：</p>`;
                 let subIdx = 1;
                 for (const major in d.majorDetails) {
@@ -2826,7 +2832,7 @@
                 }
             } else {
                 htmlContent += `<p>5.1 甲方选择${escapeHtml(d.scheme)}方案·${escapeHtml(d.params.name)}服务，付款方式如下：</p>`;
-                htmlContent += `<p>   合同总金额：${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}元</p>`;
+                htmlContent += `<p>   合同总金额：${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}元 ${d.withInvoice ? '(含专票)' : '(普票)'}</p>`;
                 htmlContent += `<p>   甲方应于本合同签订之日起3个工作日内，将合同总金额一次性支付至乙方指定账户。</p>`;
             }
 
