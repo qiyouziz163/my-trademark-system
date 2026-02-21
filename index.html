@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <meta name="description" content="企优咨商标申请下单系统 - 专业商标代理服务">
     <meta name="keywords" content="商标申请,商标注册,企优咨,商标代理">
-    <!-- 使用“企优咨图标.ico”作为favicon -->
+    <!-- 修正图标引用：使用“企优咨图标.ico”作为favicon -->
     <link rel="icon" type="image/x-icon" href="企优咨图标.ico">
     <title>企优咨 · 商标申请下单系统</title>
     <style>
@@ -2506,7 +2506,7 @@
                 .info-table td:first-child { font-weight: bold; background: #f5f5f5; width: 30%; }
                 .word-table { border-collapse: collapse; width: 100%; margin: 4px 0; font-size: 10pt; }
                 .word-table th { background: #e8e8e8; border: 1px solid #999; padding: 4px; text-align: center; font-weight: bold; }
-                .word-table td { border: 1px solid #999; padding: 4px; vertical-align: top; }
+                .word-table td { border: 1px solid #999; padding: 6px; vertical-align: top; }
                 .word-img { width: 40px; height: 40px; object-fit: contain; }
                 .bg-scheme, .bg-fee, .bg-payment-plan, .bg-payment-info, .bg-important { padding: 2px 4px; margin: 2px 0; }
                 .total-red { color: #C00000; font-weight: bold; }
@@ -2542,11 +2542,11 @@
                 htmlContent += `<tr>
                     <td style="text-align: center;">${idx}</td>
                     <td style="text-align: center;">${escapeHtml(tmName)}</td>
-                    <td style="text-align: center;">`;
+                    <td style="width:40px; height:40px; padding:0; text-align:center; vertical-align:middle;">`;
                 if (trademarkImageData) {
-                    htmlContent += `<a href="${trademarkImageData}" target="_blank"><img src="${trademarkImageData}" class="word-img" alt="商标图样"></a><br><a href="${trademarkImageData}" target="_blank">点击查看原图</a>`;
+                    htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样">`;
                 } else {
-                    htmlContent += `无图样`;
+                    htmlContent += `<span style="font-size:8pt;">无图样</span>`;
                 }
                 htmlContent += `</td>
                     <td style="text-align: center;">${escapeHtml(major)}</td>
@@ -2624,7 +2624,7 @@
 
             htmlContent += `<h2>四、商标图样</h2>`;
             if (trademarkImageData) {
-                htmlContent += `<a href="${trademarkImageData}" target="_blank"><img src="${trademarkImageData}" style="width:40px; height:40px; object-fit: contain; border: 1px solid #ccc; border-radius: 2px;" /></a><br><a href="${trademarkImageData}" target="_blank">点击查看原图</a>`;
+                htmlContent += `<img src="${trademarkImageData}" style="width:40px; height:40px; object-fit: contain; border: 1px solid #ccc; border-radius: 2px;" />`;
                 htmlContent += `<div>📎 文件: 已上传图片</div>`;
             } else {
                 htmlContent += `<div>⚠️ 未上传商标图样</div>`;
@@ -2745,11 +2745,11 @@
                 htmlContent += `<tr>
                     <td style="text-align: center;">${idx}</td>
                     <td style="text-align: center;">${escapeHtml(tmName)}</td>
-                    <td style="text-align: center;">`;
+                    <td style="width:40px; height:40px; padding:0; text-align:center; vertical-align:middle;">`;
                 if (trademarkImageData) {
-                    htmlContent += `<a href="${trademarkImageData}" target="_blank"><img src="${trademarkImageData}" class="word-img" alt="商标图样"></a><br><a href="${trademarkImageData}" target="_blank">点击查看原图</a>`;
+                    htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样">`;
                 } else {
-                    htmlContent += `无图样`;
+                    htmlContent += `<span style="font-size:8pt;">无图样</span>`;
                 }
                 htmlContent += `</td>
                     <td style="text-align: center;">${escapeHtml(major)}</td>
