@@ -7,8 +7,8 @@ const PRIMARY_EMAIL = {
   pass: process.env.QQ_MAIL_PASS
 };
 const BACKUP_EMAIL = {
-  user: process.env['163_MAIL_USER'],
-  pass: process.env['163_MAIL_PASS']
+  user: process.env.MAIL_163_USER,
+  pass: process.env.MAIL_163_PASS
 };
 
 // 创建邮件传输器
@@ -28,7 +28,7 @@ function createTransporter(primary = true) {
 
 // 设置 CORS 头（允许 GitHub Pages 访问）
 function setCorsHeaders(res) {
-  res.setHeader('Access-Control-Allow-Origin', 'https://qiyouziz163.github.io'); // 替换为您的 GitHub Pages 域名
+  res.setHeader('Access-Control-Allow-Origin', 'https://qiyouziz163.github.io/my-trademark-system'); // 替换为您的 GitHub Pages 域名
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
