@@ -5,14 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <meta name="description" content="企优咨商标申请下单系统 - 专业商标代理服务">
     <meta name="keywords" content="商标申请,商标注册,企优咨,商标代理">
+    <!-- 修正图标引用：使用“企优咨图标.ico”作为favicon -->
     <link rel="icon" type="image/x-icon" href="企优咨图标.ico">
     <title>企优咨 · 商标申请下单系统</title>
     <style>
+        /* 样式全部改为宋体 */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Roboto, 'Source Han Sans', 'Noto Sans CJK SC', '思源黑体', system-ui, -apple-system, sans-serif;
+            font-family: '宋体', SimSun, 'Times New Roman', serif;
         }
         
         :root {
@@ -1892,7 +1894,7 @@
         const schemeParams = {
             A: { base: 380, extra: 38, name: '流程跟进' },
             B: { base: 580, extra: 58, name: '专业辅导' },
-            C: { base: 1100, extra: 110, name: '分期付费' }  // 修改方案名称
+            C: { base: 1100, extra: 110, name: '分期付费' }
         };
 
         // 工具函数
@@ -1943,7 +1945,7 @@
             return { majorCount, totalSubCount };
         }
 
-        // 计算费用 - 修复C方案优惠逻辑
+        // 计算费用 - 重构C方案每个大类独立尾款
         function computeFeeDetails() {
             const schemeRadio = document.querySelector('input[name="scheme"]:checked');
             const scheme = schemeRadio ? schemeRadio.value : 'A';
@@ -1951,36 +1953,45 @@
             const withInvoice = document.getElementById('invoiceCheckbox').checked;
 
             let totalOriginal = 0;
-            const majorDetails = {};
+            const majorDetails = {}; // 每个大类: { count, originalCost, firstPay?, tail?, actualCost? }
             for (const major in selectedSubclasses) {
                 const subList = selectedSubclasses[major];
                 if (subList.length === 0) continue;
                 const count = subList.length;
-                const cost = (count <= 10) ? params.base : (params.base + (count - 10) * params.extra);
-                majorDetails[major] = { count, cost };
-                totalOriginal += cost;
+                const originalCost = (count <= 10) ? params.base : (params.base + (count - 10) * params.extra);
+                majorDetails[major] = { count, originalCost };
+                totalOriginal += originalCost;
             }
 
             const majorCount = Object.keys(majorDetails).length;
             let finalTotal = totalOriginal;
             let discountNote = '';
-            let tailPercent = 800/1100; // C方案默认尾款比例（服务费部分/总价）
 
             if (scheme === 'B' && majorCount > 6) {
                 finalTotal = totalOriginal * 0.85;
                 discountNote = 'B方案大客户优惠：立减15%';
             }
             
-            if (scheme === 'C' && majorCount > 6) {
-                // 优惠前：首付300/大类，尾款800/大类（尾款比例 800/1100 ≈ 72.73%）
-                // 优惠后：尾款减免15%，即尾款变为800*0.85 = 680/大类，首付不变，总价变为980/大类
-                // 尾款比例（相对于新总价） = 680/980 ≈ 0.6939，但为保持计算简便，我们使用尾款比例相对于原总价，即新尾款 = 原总价 * (800/1100) * 0.85
-                // 新总价 = 原总价 * (300/1100 + (800/1100)*0.85) = 原总价 * (0.2727 + 0.6182) = 原总价 * 0.8909
-                const discountFactor = 0.85; // 尾款折扣
-                const newTotalFactor = 300/1100 + (800/1100) * discountFactor; // 约0.8909
-                finalTotal = totalOriginal * newTotalFactor;
-                tailPercent = (800/1100) * discountFactor; // 新尾款比例（相对于原总价）
-                discountNote = 'C方案大客户优惠：尾款减免15%';
+            if (scheme === 'C') {
+                // 为每个大类计算首付和尾款（尾款折扣取决于是否>6个大类）
+                const discountFactor = (majorCount > 6) ? 0.85 : 1.0; // 尾款折扣因子
+                let totalActual = 0;
+                for (const major in majorDetails) {
+                    const orig = majorDetails[major].originalCost;
+                    const firstPay = 300; // 固定首付
+                    let tail = orig - firstPay;
+                    if (discountFactor < 1.0) {
+                        tail = tail * discountFactor;
+                    }
+                    majorDetails[major].firstPay = firstPay;
+                    majorDetails[major].tail = tail;
+                    majorDetails[major].actualCost = firstPay + tail; // 该大类实际总费用
+                    totalActual += majorDetails[major].actualCost;
+                }
+                finalTotal = totalActual;
+                if (majorCount > 6) {
+                    discountNote = 'C方案大客户优惠：尾款减免15%';
+                }
             }
 
             const invoiceAmount = withInvoice ? finalTotal * 0.05 : 0;
@@ -1996,7 +2007,6 @@
                 finalTotal,
                 invoiceAmount,
                 totalWithInvoice,
-                tailPercent,
                 discountNote
             };
         }
@@ -2020,18 +2030,21 @@
             html += '<div style="margin: 12px 0; border-top: 1px solid var(--gray-200);"></div>';
             
             for (const major in d.majorDetails) {
-                html += `<div class="fee-row"><span>【${escapeHtml(major)}】${d.majorDetails[major].count}个小类</span><span>¥${d.majorDetails[major].cost.toFixed(2)}</span></div>`;
+                const item = d.majorDetails[major];
+                html += `<div class="fee-row"><span>【${escapeHtml(major)}】${item.count}个小类</span><span>¥${item.originalCost.toFixed(2)}</span></div>`;
             }
             
             html += '<div style="margin: 12px 0; border-top: 1px solid var(--gray-200);"></div>';
             
-            html += `<div class="fee-row"><span>小计</span><span>¥${d.totalOriginal.toFixed(2)}</span></div>`;
+            html += `<div class="fee-row"><span>小计（原价）</span><span>¥${d.totalOriginal.toFixed(2)}</span></div>`;
             
             if (d.scheme === 'B' && d.majorCount > 6) {
                 html += `<div class="fee-row" style="color: var(--success);"><span>优惠后</span><span>¥${d.finalTotal.toFixed(2)}</span></div>`;
             }
-            if (d.scheme === 'C' && d.majorCount > 6) {
-                html += `<div class="fee-row" style="color: var(--success);"><span>优惠后总价</span><span>¥${d.finalTotal.toFixed(2)}</span></div>`;
+            
+            if (d.scheme === 'C') {
+                // 显示每个大类首付和尾款（不含专票）
+                html += `<div class="fee-row" style="color: var(--success);"><span>C方案总价（优惠后）</span><span>¥${d.finalTotal.toFixed(2)}</span></div>`;
             }
             
             if (d.withInvoice) {
@@ -2040,26 +2053,32 @@
             
             html += `<div class="fee-row" style="font-size: 1.2rem; color: var(--primary); margin-top: 8px;"><span>应付总额</span><span>¥${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}</span></div>`;
             
-            // 增加发票类型说明
             html += `<div style="margin-top: 8px; font-size:0.9rem;"><span>📄 发票类型：${d.withInvoice ? '增值税专用发票（已加收5%）' : '增值税普通发票'}</span></div>`;
             
             html += '<div style="margin-top: 16px; padding-top: 16px; border-top: 2px solid var(--gray-200); font-size: 0.85rem; color: var(--gray-600);">';
             
             if (d.scheme === 'C') {
-                // 重新计算含税首期款和尾款
-                const baseFirstPay = d.majorCount * 300; // 首期款总额（未税）
-                const baseServiceTotal = d.finalTotal - baseFirstPay; // 服务费总额（未税，已含优惠）
-                let firstPay, serviceTotal;
+                // 计算含税首付总额与尾款总额
+                let firstTotal = 0, tailTotal = 0;
+                for (const major in d.majorDetails) {
+                    firstTotal += d.majorDetails[major].firstPay;
+                    tailTotal += d.majorDetails[major].tail;
+                }
                 if (d.withInvoice) {
-                    firstPay = baseFirstPay * 1.05;
-                    serviceTotal = baseServiceTotal * 1.05;
-                } else {
-                    firstPay = baseFirstPay;
-                    serviceTotal = baseServiceTotal;
+                    firstTotal = firstTotal * 1.05;
+                    tailTotal = tailTotal * 1.05;
                 }
                 html += `<div style="margin-bottom: 8px;"><strong>付款计划：</strong></div>`;
-                html += `<div>① 首期款：¥${firstPay.toFixed(2)}（合同签订后支付，${d.withInvoice?'含专票':'普票'}）</div>`;
-                html += `<div>② 服务尾款：每大类下证后支付，总额 ¥${serviceTotal.toFixed(2)}，各大类尾款按该大类费用比例分摊。</div>`;
+                html += `<div>① 首期款总额：¥${firstTotal.toFixed(2)}（合同签订后支付，${d.withInvoice?'含专票':'普票'}）</div>`;
+                html += `<div>② 服务尾款：每个大类下发注册证后支付，具体金额如下：</div>`;
+                let subIdx = 1;
+                for (const major in d.majorDetails) {
+                    let tail = d.majorDetails[major].tail;
+                    if (d.withInvoice) tail = tail * 1.05;
+                    const circle = getCircledNumber(subIdx);
+                    html += `<div>   ${circle} ${escapeHtml(major)}大类<strong>尾款</strong>：¥${tail.toFixed(2)}</div>`;
+                    subIdx++;
+                }
             } else {
                 html += `<div><strong>付款方式：</strong>合同签订后一次性支付（${d.withInvoice?'含专票':'普票'}）</div>`;
             }
@@ -2067,6 +2086,15 @@
             html += '</div></div>';
             
             return html;
+        }
+
+        // 带圈数字函数
+        function getCircledNumber(n) {
+            const map = {
+                1:'①',2:'②',3:'③',4:'④',5:'⑤',6:'⑥',7:'⑦',8:'⑧',9:'⑨',10:'⑩',
+                11:'⑪',12:'⑫',13:'⑬',14:'⑭',15:'⑮',16:'⑯',17:'⑰',18:'⑱',19:'⑲',20:'⑳'
+            };
+            return map[n] || n + '.';
         }
 
         // 更新UI
@@ -2184,7 +2212,7 @@
             refreshUI();
         }
 
-        // 渲染树
+        // 渲染树（略，保持不变，仅字体已改为宋体）
         function renderTree(filterText = '') {
             const treeElem = document.getElementById('categoryTree');
             treeElem.innerHTML = '';
@@ -2258,7 +2286,6 @@
 
             document.getElementById('searchCount').textContent = hasFilter ? `匹配 ${matchCount} 项` : `共 ${getTotalSubCount()} 小类`;
 
-            // 绑定事件
             document.querySelectorAll('.subclass-checkbox').forEach(cb => {
                 cb.removeEventListener('change', handleCheckboxChange);
                 cb.addEventListener('change', handleCheckboxChange);
@@ -2334,7 +2361,6 @@
             }
         });
 
-        // 使用防抖处理搜索
         const debouncedSearch = debounce((value) => {
             renderTree(value);
         }, 300);
@@ -2370,7 +2396,6 @@
             if (files.length > 0) handleFile(files[0]);
         });
 
-        // 键盘支持
         uploadArea.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
@@ -2418,7 +2443,6 @@
                 refreshUI();
             });
 
-            // 键盘支持
             opt.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
@@ -2435,22 +2459,12 @@
 
         document.getElementById('invoiceCheckbox').addEventListener('change', refreshUI);
 
-        // 带圈数字函数 - 提前定义
-        function getCircledNumber(n) {
-            const map = {
-                1:'①',2:'②',3:'③',4:'④',5:'⑤',6:'⑥',7:'⑦',8:'⑧',9:'⑨',10:'⑩',
-                11:'⑪',12:'⑫',13:'⑬',14:'⑭',15:'⑮',16:'⑯',17:'⑰',18:'⑱',19:'⑲',20:'⑳'
-            };
-            return map[n] || n + '.';
-        }
-
-        // 生成订单预览 HTML 的函数（与 Word 订单内容一致）
+        // 生成订单预览 HTML 的函数（修改C方案尾款显示）
         function generateOrderPreviewHtml(applicant, tmName, phone, contact, stats, d, trademarkImageData) {
             const today = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
-            // 构建 HTML 字符串，参考 exportWord 中的主体部分
             let html = `
                 <style>
-                    /* 复制 Word 导出样式 */
+                    body { font-family: '宋体', SimSun, serif; }
                     .word-bg-scheme { background-color: #D4E6F1; padding: 4px 8px; font-weight: bold; }
                     .word-bg-fee { background-color: #D5E8D4; padding: 4px 8px; font-weight: bold; }
                     .word-bg-payment-plan { background-color: #FFF2CC; padding: 4px 8px; font-weight: bold; }
@@ -2461,6 +2475,7 @@
                     .word-table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 11pt; }
                     .word-table th { background: #f0f0f0; border: 1px solid #999; padding: 8px; text-align: center; font-weight: bold; }
                     .word-table td { border: 1px solid #999; padding: 6px; vertical-align: top; }
+                    .word-img { width: 40px; height: 40px; object-fit: contain; display: block; margin: 0 auto; }
                     .word-img-preview { max-width: 60px; max-height: 60px; object-fit: contain; }
                     .word-contract-table { border-collapse: collapse; width: 100%; margin: 10px 0; }
                     .word-contract-table td, .word-contract-table th { border: 1px solid #333; padding: 8px; }
@@ -2490,8 +2505,21 @@
                 </table>
 
                 <h2 style="color: #1f3a5f; margin: 6px 0 3px; font-size: 11pt; border-left: 3px solid #003d7c; padding-left: 4px;">二、已选类别明细</h2>
-                <table class="word-table">
-                    <tr><th>序号</th><th>商标名称</th><th>商标图样</th><th>已选大类</th><th>小类</th></tr>
+                <table class="word-table" style="table-layout: fixed;">
+                    <colgroup>
+                        <col style="width: 8%;">
+                        <col style="width: 15%;">
+                        <col style="width: 60px;">
+                        <col style="width: 10%;">
+                        <col style="width: auto;">
+                    </colgroup>
+                    <tr>
+                        <th style="width: 8%;">序号</th>
+                        <th style="width: 15%;">商标名称</th>
+                        <th style="width: 60px;">商标图样</th>
+                        <th style="width: 10%;">已选大类</th>
+                        <th>小类</th>
+                    </tr>
             `;
             let idx = 1;
             for (const major in selectedSubclasses) {
@@ -2500,11 +2528,11 @@
                 html += `<tr>
                     <td style="text-align: center;">${idx}</td>
                     <td style="text-align: center;">${escapeHtml(tmName)}</td>
-                    <td style="width:40px; height:40px; padding:0; text-align:center; vertical-align:middle;">`;
+                    <td style="width:60px; height:40px; padding:0; text-align:center; vertical-align:middle; font-size:0; line-height:0;">`;
                 if (trademarkImageData) {
-                    html += `<img src="${trademarkImageData}" class="word-img" alt="商标图样" style="width:40px; height:40px; object-fit: contain;">`;
+                    html += `<img src="${trademarkImageData}" class="word-img" alt="商标图样" style="width:40px; height:40px; object-fit: contain; display: block; margin: 0 auto;">`;
                 } else {
-                    html += `<span style="font-size:8pt;">无图样</span>`;
+                    html += `<span style="font-size:8pt; display: block; line-height: 1.2;">无图样</span>`;
                 }
                 html += `</td>
                     <td style="text-align: center;">${escapeHtml(major)}</td>
@@ -2524,7 +2552,8 @@
 
             html += `<div class="word-bg-fee">=== 💰 费用明细 ===</div>`;
             for (const major in d.majorDetails) {
-                html += `<div>📌 ${escapeHtml(major)}大类（${d.majorDetails[major].count}个小类） = ${d.majorDetails[major].cost.toFixed(2)}元</div>`;
+                const item = d.majorDetails[major];
+                html += `<div>📌 ${escapeHtml(major)}大类（${item.count}个小类） = ${item.originalCost.toFixed(2)}元</div>`;
             }
             html += `<div>📊 小计（原价）: ${d.totalOriginal.toFixed(2)}元</div>`;
             if (d.discountNote) {
@@ -2540,25 +2569,22 @@
             }
 
             if (d.scheme === 'C') {
-                const baseFirstPay = d.majorCount * 300;
-                const baseServiceTotal = d.finalTotal - baseFirstPay;
-                let firstPay, tailTotal;
+                let firstTotal = 0, tailTotal = 0;
+                for (const major in d.majorDetails) {
+                    firstTotal += d.majorDetails[major].firstPay;
+                    tailTotal += d.majorDetails[major].tail;
+                }
                 if (d.withInvoice) {
-                    firstPay = baseFirstPay * 1.05;
-                    tailTotal = baseServiceTotal * 1.05;
-                } else {
-                    firstPay = baseFirstPay;
-                    tailTotal = baseServiceTotal;
+                    firstTotal = firstTotal * 1.05;
+                    tailTotal = tailTotal * 1.05;
                 }
                 html += `<div class="word-bg-payment-plan">【C方案·分期付费计划】</div>`;
-                html += `<div>🔹 首期款（签合同后）: ${firstPay.toFixed(2)}元 ${d.withInvoice ? '(含专票)' : '(普票)'}</div>`;
-                html += `<div>🔹 服务尾款总额（下证后支付）: ${tailTotal.toFixed(2)}元，各大类尾款按该大类费用比例分摊。</div>`;
+                html += `<div>🔹 首期款（签合同后）: ${firstTotal.toFixed(2)}元 ${d.withInvoice ? '(含专票)' : '(普票)'}</div>`;
+                html += `<div>🔹 服务尾款（下证后支付）: 每个大类下发注册证后支付，具体金额如下：</div>`;
                 let subIdx = 1;
                 for (const major in d.majorDetails) {
-                    const majorCost = d.majorDetails[major].cost;
-                    const majorWithInvoice = d.withInvoice ? majorCost * 1.05 : majorCost;
-                    const ratio = majorWithInvoice / (d.withInvoice ? d.totalWithInvoice : d.finalTotal);
-                    const tail = tailTotal * ratio;
+                    let tail = d.majorDetails[major].tail;
+                    if (d.withInvoice) tail = tail * 1.05;
                     const circleNum = getCircledNumber(subIdx);
                     html += `<div>   ${circleNum} ${escapeHtml(major)}大类尾款：${tail.toFixed(2)}元</div>`;
                     subIdx++;
@@ -2598,7 +2624,7 @@
             return html;
         }
 
-        // 预览按钮 - 修改为显示完整订单内容
+        // 预览按钮
         document.getElementById('previewOrderBtn').addEventListener('click', function() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
@@ -2625,7 +2651,7 @@
             const modal = document.createElement('div');
             modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;';
             modal.innerHTML = `
-                <div style="background: white; padding: 24px; border-radius: 16px; max-width: 900px; width: 90%; max-height: 80vh; overflow-y: auto; position: relative;">
+                <div style="background: white; padding: 24px; border-radius: 16px; max-width: 900px; width: 90%; max-height: 80vh; overflow-y: auto; position: relative; font-family: '宋体', SimSun, serif;">
                     <button type="button" onclick="this.closest('.modal').remove()" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 20px; cursor: pointer; color: #666;">&times;</button>
                     ${previewHtml}
                 </div>
@@ -2637,7 +2663,7 @@
             document.body.appendChild(modal);
         });
 
-        // ==================== 导出Word（优化版，去除“未税”字样，明确发票类型，字体已替换为思源黑体） ====================
+        // 导出Word（修改C方案尾款显示，字体改为宋体）
         async function exportWord() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
@@ -2664,7 +2690,7 @@
             <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
             <head><meta charset='UTF-8'><title>商标申请订单 - ${escapeHtml(tmName)}</title>
             <style>
-                body { font-family: 'Source Han Sans', 'Noto Sans CJK SC', '思源黑体', sans-serif; margin: 0.6cm; font-size: 10.5pt; line-height: 1.2; color: #333; }
+                body { font-family: '宋体', SimSun, serif; margin: 0.6cm; font-size: 10.5pt; line-height: 1.2; color: #333; }
                 h1 { color: #003d7c; text-align: center; border-bottom: 2px solid #003d7c; padding-bottom: 3px; font-size: 14pt; margin: 0 0 4px; }
                 h2 { color: #1f3a5f; margin: 6px 0 3px; font-size: 11pt; border-left: 3px solid #003d7c; padding-left: 4px; }
                 p { margin: 0 0 2px; }
@@ -2675,7 +2701,7 @@
                 .word-table { border-collapse: collapse; width: 100%; margin: 4px 0; font-size: 10pt; }
                 .word-table th { background: #e8e8e8; border: 1px solid #999; padding: 4px; text-align: center; font-weight: bold; }
                 .word-table td { border: 1px solid #999; padding: 6px; vertical-align: top; }
-                .word-img { width: 40px; height: 40px; object-fit: contain; }
+                .word-img { width: 40px; height: 40px; object-fit: contain; display: block; margin: 0 auto; }
                 .bg-scheme, .bg-fee, .bg-payment-plan, .bg-payment-info, .bg-important { padding: 2px 4px; margin: 2px 0; }
                 .total-red { color: #C00000; font-weight: bold; }
                 .footer { margin-top: 8px; text-align: center; color: #999; font-size: 8pt; border-top: 1px solid #eee; padding-top: 3px; }
@@ -2700,8 +2726,21 @@
             </table>
 
             <h2>二、已选类别明细</h2>
-            <table class="word-table">
-                <tr><th>序号</th><th>商标名称</th><th>商标图样</th><th>已选大类</th><th>小类</th></tr>
+            <table class="word-table" style="table-layout: fixed;">
+                <colgroup>
+                    <col style="width: 8%;">
+                    <col style="width: 15%;">
+                    <col style="width: 60px;">
+                    <col style="width: 10%;">
+                    <col style="width: auto;">
+                </colgroup>
+                <tr>
+                    <th style="width: 8%;">序号</th>
+                    <th style="width: 15%;">商标名称</th>
+                    <th style="width: 60px;">商标图样</th>
+                    <th style="width: 10%;">已选大类</th>
+                    <th>小类</th>
+                </tr>
             `;
             let idx = 1;
             for (const major in selectedSubclasses) {
@@ -2710,11 +2749,11 @@
                 htmlContent += `<tr>
                     <td style="text-align: center;">${idx}</td>
                     <td style="text-align: center;">${escapeHtml(tmName)}</td>
-                    <td style="width:40px; height:40px; padding:0; text-align:center; vertical-align:middle;">`;
+                    <td style="width:60px; height:40px; padding:0; text-align:center; vertical-align:middle; font-size:0; line-height:0;">`;
                 if (trademarkImageData) {
-                    htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样">`;
+                    htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样" style="width:40px; height:40px; object-fit: contain; display: block; margin: 0 auto;">`;
                 } else {
-                    htmlContent += `<span style="font-size:8pt;">无图样</span>`;
+                    htmlContent += `<span style="font-size:8pt; display: block; line-height: 1.2;">无图样</span>`;
                 }
                 htmlContent += `</td>
                     <td style="text-align: center;">${escapeHtml(major)}</td>
@@ -2734,7 +2773,8 @@
 
             htmlContent += `<div class="bg-fee">=== 💰 费用明细 ===</div>`;
             for (const major in d.majorDetails) {
-                htmlContent += `<div>📌 ${escapeHtml(major)}大类（${d.majorDetails[major].count}个小类） = ${d.majorDetails[major].cost.toFixed(2)}元</div>`;
+                const item = d.majorDetails[major];
+                htmlContent += `<div>📌 ${escapeHtml(major)}大类（${item.count}个小类） = ${item.originalCost.toFixed(2)}元</div>`;
             }
             htmlContent += `<div>📊 小计（原价）: ${d.totalOriginal.toFixed(2)}元</div>`;
             if (d.discountNote) {
@@ -2750,27 +2790,22 @@
             }
 
             if (d.scheme === 'C') {
-                // 重新计算含税首期款和尾款
-                const baseFirstPay = d.majorCount * 300;
-                const baseServiceTotal = d.finalTotal - baseFirstPay;
-                let firstPay, tailTotal;
+                let firstTotal = 0, tailTotal = 0;
+                for (const major in d.majorDetails) {
+                    firstTotal += d.majorDetails[major].firstPay;
+                    tailTotal += d.majorDetails[major].tail;
+                }
                 if (d.withInvoice) {
-                    firstPay = baseFirstPay * 1.05;
-                    tailTotal = baseServiceTotal * 1.05;
-                } else {
-                    firstPay = baseFirstPay;
-                    tailTotal = baseServiceTotal;
+                    firstTotal = firstTotal * 1.05;
+                    tailTotal = tailTotal * 1.05;
                 }
                 htmlContent += `<div class="bg-payment-plan">【C方案·分期付费计划】</div>`;
-                htmlContent += `<div>🔹 首期款（签合同后）: ${firstPay.toFixed(2)}元 ${d.withInvoice ? '(含专票)' : '(普票)'}</div>`;
-                htmlContent += `<div>🔹 服务尾款总额（下证后支付）: ${tailTotal.toFixed(2)}元，各大类尾款按该大类费用比例分摊。</div>`;
+                htmlContent += `<div>🔹 首期款（签合同后）: ${firstTotal.toFixed(2)}元 ${d.withInvoice ? '(含专票)' : '(普票)'}</div>`;
+                htmlContent += `<div>🔹 服务尾款（下证后支付）: 每个大类下发注册证后支付，具体金额如下：</div>`;
                 let subIdx = 1;
                 for (const major in d.majorDetails) {
-                    const majorCost = d.majorDetails[major].cost;
-                    const majorWithInvoice = d.withInvoice ? majorCost * 1.05 : majorCost;
-                    // 优惠后该大类占总价的比例，用于分摊尾款
-                    const ratio = majorWithInvoice / (d.withInvoice ? d.totalWithInvoice : d.finalTotal);
-                    const tail = tailTotal * ratio;
+                    let tail = d.majorDetails[major].tail;
+                    if (d.withInvoice) tail = tail * 1.05;
                     const circleNum = getCircledNumber(subIdx);
                     htmlContent += `<div>   ${circleNum} ${escapeHtml(major)}大类尾款：${tail.toFixed(2)}元</div>`;
                     subIdx++;
@@ -2824,7 +2859,7 @@
 
         document.getElementById('exportWordBtn').addEventListener('click', exportWord);
 
-        // ==================== 生成合同（优化版，去除“未税”，明确发票类型，字体已替换为思源黑体） ====================
+        // 生成合同（修改C方案尾款显示，字体改为宋体）
         function generateContract() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
@@ -2850,7 +2885,7 @@
             <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
             <head><meta charset='UTF-8'><title>商标申请代理服务合同</title>
             <style>
-                body { font-family: 'Source Han Sans', 'Noto Sans CJK SC', '思源黑体', sans-serif; margin: 0.6cm; font-size: 10.5pt; line-height: 1.2; color: #333; }
+                body { font-family: '宋体', SimSun, serif; margin: 0.6cm; font-size: 10.5pt; line-height: 1.2; color: #333; }
                 h1 { text-align: center; color: #003d7c; font-size: 16pt; margin: 0 0 4px; }
                 .contract-no { text-align: center; color: #666; margin: 0 0 4px; font-size: 9pt; }
                 h2 { color: #1f3a5f; font-size: 11pt; margin: 6px 0 3px; border-bottom: 1px solid #003d7c; padding-bottom: 2px; }
@@ -2869,7 +2904,7 @@
                 .total-row { font-weight: bold; color: #C00000; background: #f0f0f0; }
                 .bg-payment-plan { background-color: #FFF2CC; padding: 2px 4px; }
                 .bg-payment-info { background-color: #E6E6FA; padding: 2px 4px; }
-                .word-img { width: 40px; height: 40px; object-fit: contain; }
+                .word-img { width: 40px; height: 40px; object-fit: contain; display: block; margin: 0 auto; }
             </style>
             </head>
             <body>
@@ -2903,8 +2938,21 @@
             <div><span class="party-title">商标注册地址：</span><span class="underline-red">（填写详细）</span></div>
 
             <h3>已选类别明细</h3>
-            <table>
-                <tr><th>序号</th><th>商标名称</th><th>商标图样</th><th>已选大类</th><th>小类</th></tr>
+            <table style="table-layout: fixed;">
+                <colgroup>
+                    <col style="width: 8%;">
+                    <col style="width: 15%;">
+                    <col style="width: 60px;">
+                    <col style="width: 10%;">
+                    <col style="width: auto;">
+                </colgroup>
+                <tr>
+                    <th style="width: 8%;">序号</th>
+                    <th style="width: 15%;">商标名称</th>
+                    <th style="width: 60px;">商标图样</th>
+                    <th style="width: 10%;">已选大类</th>
+                    <th>小类</th>
+                </tr>
             `;
             let idx = 1;
             for (const major in selectedSubclasses) {
@@ -2913,11 +2961,11 @@
                 htmlContent += `<tr>
                     <td style="text-align: center;">${idx}</td>
                     <td style="text-align: center;">${escapeHtml(tmName)}</td>
-                    <td style="width:40px; height:40px; padding:0; text-align:center; vertical-align:middle;">`;
+                    <td style="width:60px; height:40px; padding:0; text-align:center; vertical-align:middle; font-size:0; line-height:0;">`;
                 if (trademarkImageData) {
-                    htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样">`;
+                    htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样" style="width:40px; height:40px; object-fit: contain; display: block; margin: 0 auto;">`;
                 } else {
-                    htmlContent += `<span style="font-size:8pt;">无图样</span>`;
+                    htmlContent += `<span style="font-size:8pt; display: block; line-height: 1.2;">无图样</span>`;
                 }
                 htmlContent += `</td>
                     <td style="text-align: center;">${escapeHtml(major)}</td>
@@ -2938,11 +2986,12 @@
             `;
             let rowIdx = 1;
             for (const major in d.majorDetails) {
+                const item = d.majorDetails[major];
                 htmlContent += `<tr>
                     <td style="text-align: center;">${rowIdx}</td>
                     <td>${escapeHtml(major)}</td>
-                    <td style="text-align: center;">${d.majorDetails[major].count}</td>
-                    <td style="text-align: right;">${d.majorDetails[major].cost.toFixed(2)}</td>
+                    <td style="text-align: center;">${item.count}</td>
+                    <td style="text-align: right;">${item.originalCost.toFixed(2)}</td>
                 </tr>`;
                 rowIdx++;
             }
@@ -2974,26 +3023,23 @@
 
             htmlContent += `<h2>第五条 付款方式</h2>`;
             if (d.scheme === 'C') {
-                const baseFirstPay = d.majorCount * 300;
-                const baseServiceTotal = d.finalTotal - baseFirstPay;
-                let firstPay, tailTotal;
+                let firstTotal = 0, tailTotal = 0;
+                for (const major in d.majorDetails) {
+                    firstTotal += d.majorDetails[major].firstPay;
+                    tailTotal += d.majorDetails[major].tail;
+                }
                 if (d.withInvoice) {
-                    firstPay = baseFirstPay * 1.05;
-                    tailTotal = baseServiceTotal * 1.05;
-                } else {
-                    firstPay = baseFirstPay;
-                    tailTotal = baseServiceTotal;
+                    firstTotal = firstTotal * 1.05;
+                    tailTotal = tailTotal * 1.05;
                 }
                 htmlContent += `<p>5.1 甲方选择C方案·分期付费服务，付款方式如下：</p>`;
                 htmlContent += `<p>   合同总金额：${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}元${d.withInvoice ? '（含专票）' : '（普票）'}</p>`;
-                htmlContent += `<p>   <strong>首期款</strong>（合同签订后3个工作日内）：${firstPay.toFixed(2)}元 ${d.withInvoice ? '(含专票)' : '(普票)'}</p>`;
-                htmlContent += `<p>   <strong>服务尾款支付：</strong>每当有一个大类下发商标注册证后，甲方应在收到乙方通知之日起3个工作日内支付该大类的尾款。各大类尾款按费用比例分摊，具体金额如下：</p>`;
+                htmlContent += `<p>   <strong>首期款</strong>（合同签订后3个工作日内）：${firstTotal.toFixed(2)}元 ${d.withInvoice ? '(含专票)' : '(普票)'}</p>`;
+                htmlContent += `<p>   <strong>服务尾款支付：</strong>每当有一个大类下发商标注册证后，甲方应在收到乙方通知之日起3个工作日内支付该大类的尾款。各大类尾款金额如下：</p>`;
                 let subIdx = 1;
                 for (const major in d.majorDetails) {
-                    const majorCost = d.majorDetails[major].cost;
-                    const majorWithInvoice = d.withInvoice ? majorCost * 1.05 : majorCost;
-                    const ratio = majorWithInvoice / (d.withInvoice ? d.totalWithInvoice : d.finalTotal);
-                    const tail = tailTotal * ratio;
+                    let tail = d.majorDetails[major].tail;
+                    if (d.withInvoice) tail = tail * 1.05;
                     const circle = getCircledNumber(subIdx);
                     htmlContent += `<p>   ${circle} ${escapeHtml(major)}大类<strong>尾款</strong>：${tail.toFixed(2)}元</p>`;
                     subIdx++;
@@ -3073,7 +3119,7 @@
 
         document.getElementById('generateContractBtn').addEventListener('click', generateContract);
 
-        // 选项卡切换 - 优化可访问性
+        // 选项卡切换
         const tabOrder = document.getElementById('tabOrder');
         const tabFlow = document.getElementById('tabFlow');
         const orderPanel = document.getElementById('orderPanel');
@@ -3090,7 +3136,6 @@
             activePanel.style.display = activePanel.id === 'orderPanel' ? 'grid' : 'block';
             inactivePanel.style.display = 'none';
             
-            // 焦点管理
             activeTab.focus();
         }
 
@@ -3102,7 +3147,6 @@
             switchTab(tabFlow, tabOrder, flowPanel, orderPanel);
         });
 
-        // 键盘导航支持
         document.querySelector('.tab-bar').addEventListener('keydown', function(e) {
             const tabs = Array.from(this.querySelectorAll('.tab'));
             const currentIndex = tabs.findIndex(t => t.classList.contains('active'));
@@ -3208,7 +3252,6 @@
         }
     }
 
-    // 流程步骤键盘支持
     document.addEventListener('DOMContentLoaded', function() {
         restoreFlowState();
         
