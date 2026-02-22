@@ -7,6 +7,7 @@ const PRIMARY_EMAIL = {
   pass: process.env.QQ_MAIL_PASS
 };
 const BACKUP_EMAIL = {
+  // 修正环境变量名，与 Vercel 中设置的保持一致
   user: process.env.MAIL_163_USER,
   pass: process.env.MAIL_163_PASS
 };
@@ -28,19 +29,32 @@ function createTransporter(primary = true) {
 
 // 设置 CORS 头（允许 GitHub Pages 访问）
 function setCorsHeaders(res) {
-  res.setHeader('Access-Control-Allow-Origin', 'https://qiyouziz163.github.io/my-trademark-system'); // 替换为您的 GitHub Pages 域名
+  res.setHeader('Access-Control-Allow-Origin', 'https://qiyouziz163.github.io/my-trademark-system');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 }
 
+// 发送邮件并设置超时（10 秒）
+function sendWithTimeout(transporter, mailOptions, timeout = 10000) {
+  return Promise.race([
+    transporter.sendMail(mailOptions),
+    new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('邮件发送超时')), timeout)
+    )
+  ]);
+}
+
 module.exports = async (req, res) => {
+  console.log(`[${new Date().toISOString()}] 收到请求，方法：${req.method}`);
   setCorsHeaders(res);
 
   if (req.method === 'OPTIONS') {
+    console.log('处理 OPTIONS 预检请求');
     return res.status(200).end();
   }
 
   if (req.method !== 'POST') {
+    console.log('方法不允许：', req.method);
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
@@ -49,13 +63,16 @@ module.exports = async (req, res) => {
   const fields = {};
   const files = {};
 
+  console.log('开始解析 multipart 数据...');
   await new Promise((resolve, reject) => {
     busboy.on('field', (fieldname, val) => {
+      console.log(`解析字段：${fieldname} = ${val.substring(0, 50)}${val.length > 50 ? '...' : ''}`);
       fields[fieldname] = val;
     });
 
     busboy.on('file', (fieldname, file, info) => {
       const { filename, mimeType } = info;
+      console.log(`接收文件：${fieldname} -> ${filename} (${mimeType})`);
       const chunks = [];
       file.on('data', (data) => chunks.push(data));
       file.on('end', () => {
@@ -64,16 +81,24 @@ module.exports = async (req, res) => {
           mimeType,
           buffer: Buffer.concat(chunks)
         };
+        console.log(`文件接收完成：${filename}，大小：${files[fieldname].buffer.length} 字节`);
       });
     });
 
-    busboy.on('finish', resolve);
-    busboy.on('error', reject);
+    busboy.on('finish', () => {
+      console.log('multipart 数据解析完成');
+      resolve();
+    });
+    busboy.on('error', (err) => {
+      console.error('multipart 解析错误：', err);
+      reject(err);
+    });
 
     req.pipe(busboy);
   });
 
   const { type, applicant, tmName, phone, contact, scheme, schemeName, finalTotal, withInvoice } = fields;
+  console.log('字段提取：', { type, applicant, tmName, phone, contact, scheme, schemeName, finalTotal, withInvoice });
 
   try {
     // 准备附件
@@ -85,6 +110,7 @@ module.exports = async (req, res) => {
         content: files.pdf.buffer,
         contentType: files.pdf.mimeType
       });
+      console.log('添加 PDF 附件：', files.pdf.filename);
     }
 
     if (files.image) {
@@ -93,6 +119,7 @@ module.exports = async (req, res) => {
         content: files.image.buffer,
         contentType: files.image.mimeType
       });
+      console.log('添加图片附件：', files.image.filename);
     }
 
     // 邮件正文（简要信息）
@@ -117,21 +144,25 @@ module.exports = async (req, res) => {
       attachments
     };
 
-    // 尝试主邮箱，失败则用备用
+    console.log('开始尝试发送邮件（主邮箱）...');
     let transporter;
     try {
       transporter = createTransporter(true);
-      await transporter.sendMail(mailOptions);
+      await sendWithTimeout(transporter, mailOptions);
+      console.log('主邮箱发送成功');
     } catch (primaryErr) {
-      console.warn('主邮箱发送失败，尝试备用', primaryErr);
+      console.warn('主邮箱发送失败或超时：', primaryErr.message);
+      console.log('尝试使用备用邮箱...');
       transporter = createTransporter(false);
       mailOptions.from = `"企优咨系统" <${BACKUP_EMAIL.user}>`;
-      await transporter.sendMail(mailOptions);
+      await sendWithTimeout(transporter, mailOptions);
+      console.log('备用邮箱发送成功');
     }
 
+    console.log('邮件发送流程完成，返回成功响应');
     res.status(200).json({ success: true, message: '邮件已发送' });
   } catch (error) {
-    console.error('发送邮件失败:', error);
+    console.error('发送邮件最终失败：', error.message, error.stack);
     res.status(500).json({ error: error.message });
   }
 };
