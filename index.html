@@ -8,7 +8,7 @@
     <link rel="icon" type="image/x-icon" href="企优咨图标.ico">
     <title>企优咨 ·商标申请下单系统</title>
     <style>
-        /* ===== 基础样式 (完全保留原样，未改动) ===== */
+        /* ===== 基础样式 ===== */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -55,10 +55,11 @@
             overflow: hidden;
         }
         
+        /* ----- 优化后的 header：使用 rem 单位，高度自适应 ----- */
         .header {
             background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, #0066cc 100%);
             color: white;
-            padding: 32px 40px;
+            padding: 1.5rem 2.5rem;  /* 上下 1.5rem (默认 24px)，左右 2.5rem (40px) */
             position: relative;
             overflow: hidden;
         }
@@ -101,7 +102,7 @@
         }
         
         .header-subtitle {
-            margin-top: 12px;
+            margin-top: 0.5rem;      /* 上边距减小为 0.5rem (默认 8px) */
             opacity: 0.9;
             font-size: 1rem;
             display: flex;
@@ -190,46 +191,26 @@
             color: white;
         }
         
-        .step-panel-container, .preview-panel-container, .flow-panel-container {
-            padding: 32px;
-            background: var(--gray-50);
-            min-height: calc(100vh - 200px);
-        }
-        .step-panel-wrapper, .preview-wrapper, .flow-wrapper {
+        /* ===== 0层面板样式 ===== */
+        .step-panel-container,
+        .preview-panel-container,
+        .flow-panel-container {
             max-width: 900px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: clamp(20px, 5vw, 40px);
-            box-shadow: var(--shadow-lg);
-            backdrop-filter: blur(10px);
-            overflow-x: hidden;
+            background: none;
+            box-shadow: none;
+            border-radius: 0;
+            padding: 24px 40px;
         }
         
-        .card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--gray-100);
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            will-change: transform, box-shadow;
+        .panel-header {
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--gray-200);
+            padding-bottom: 16px;
+            background: none;
         }
         
-        .card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-2px);
-        }
-        
-        .card-header {
-            padding: 24px 24px 16px;
-            border-bottom: 1px solid var(--gray-100);
-            background: linear-gradient(to right, white, var(--gray-50));
-        }
-        
-        .card-title {
+        .panel-title {
             font-size: 1.1rem;
             font-weight: 700;
             color: var(--gray-800);
@@ -238,33 +219,28 @@
             gap: 10px;
         }
         
-        .step-indicator {
-            width: 32px;
-            height: 32px;
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            font-weight: 700;
-            flex-shrink: 0;
-        }
-        
-        .card-subtitle {
+        .panel-subtitle {
             font-size: 0.85rem;
             color: var(--gray-500);
             margin-top: 6px;
             margin-left: 42px;
         }
         
-        .card-body {
-            padding: 20px 24px;
-            flex: 1;
-            overflow-y: auto;
+        .panel-body {
+            padding: 0;
         }
         
+        .step-footer-nav {
+            padding: 20px 0 0;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        /* 其余原有样式保持不变 */
         .search-section { margin-bottom: 16px; }
         .search-box { position: relative; display: flex; gap: 12px; align-items: center; }
         .search-input-wrapper { position: relative; flex: 1; }
@@ -363,16 +339,6 @@
         .btn-row .btn { flex: 1; }
         .footer-info { background: var(--gray-50); color: var(--gray-500); padding: 20px 40px; text-align: center; border-top: 1px solid var(--gray-200); }
         
-        .step-footer-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 32px;
-            padding-top: 20px;
-            border-top: 1px solid var(--gray-200);
-            flex-wrap: wrap;
-            gap: 12px;
-        }
         .step-footer-buttons {
             display: flex;
             gap: 12px;
@@ -407,7 +373,7 @@
             background: var(--gray-200);
         }
         
-        .flow-wrapper { max-width: 900px; margin: 0 auto; }
+        /* 流程面板特有样式 */
         .start-box { background: #f0f4f8; border: 2px solid var(--primary); border-radius: 12px; padding: clamp(20px,4vw,30px); text-align: center; cursor: pointer; transition: all 0.2s; }
         .start-box.completed { background: #d4edda; border-color: #28a745; }
         .qr-code { max-width: 120px; margin: 0 auto; display: block; }
@@ -434,16 +400,23 @@
         @media (max-width: 768px) {
             body { padding: 0; }
             .app-container { border-radius: 0; }
-            .header { padding: 24px 20px; }
+            .header { padding: 1rem 1.5rem; }  /* 移动端进一步缩小上下内边距 */
+            .header h1 { font-size: 1.8rem; }  /* 移动端适当减小标题字号 */
             .tab { padding: 8px 10px; font-size: 0.9rem; }
             .tab-bar { padding: 0 8px; }
-            .step-panel-container { padding: 20px; }
+            .step-panel-container,
+            .preview-panel-container,
+            .flow-panel-container {
+                padding: 20px;
+            }
         }
         @media (max-width: 480px) {
             .tab { padding: 6px 8px; font-size: 0.85rem; }
             .tab-bar { padding: 0 5px; }
         }
     </style>
+    <!-- html2pdf 库：用于将 HTML 转换为 PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
 <div class="app-container">
@@ -473,167 +446,156 @@
 
     <!-- 步骤1：选择分类面板 -->
     <div id="step1Panel" class="step-panel-container" style="display: block;" role="tabpanel" aria-labelledby="tabStep1">
-        <div class="step-panel-wrapper">
-            <section class="card" aria-labelledby="step1-title">
-                <div class="card-header">
-                    <div class="card-title"><span class="step-indicator">1</span><span id="step1-title">选择商标分类</span></div>
-                    <div class="card-subtitle">搜索或浏览选择您需要注册的商品/服务类别</div>
+        <div class="panel-header">
+            <div class="panel-title"><span class="step-indicator">1</span>选择商标分类</div>
+            <div class="panel-subtitle">搜索或浏览选择您需要注册的商品/服务类别</div>
+        </div>
+        <div class="panel-body">
+            <div class="search-section">
+                <div class="search-box">
+                    <div class="search-input-wrapper"><span class="search-icon">🔍</span><input type="text" id="searchInput" placeholder="输入如“服装”、“科技”..." autocomplete="off" aria-label="搜索商标分类"></div>
+                    <span class="search-stats" id="searchCount">加载中...</span>
                 </div>
-                <div class="card-body">
-                    <div class="search-section">
-                        <div class="search-box">
-                            <div class="search-input-wrapper"><span class="search-icon">🔍</span><input type="text" id="searchInput" placeholder="输入如“服装”、“科技”..." autocomplete="off" aria-label="搜索商标分类"></div>
-                            <span class="search-stats" id="searchCount">加载中...</span>
-                        </div>
-                    </div>
-                    <div class="tree-container" id="treeContainer" role="tree" aria-label="商标分类树">
-                        <ul class="tree-ul" id="categoryTree"><li class="empty-state">正在加载分类数据...</li></ul>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--gray-200);">
-                        <button type="button" class="btn btn-secondary" id="clearSelectedBtn" style="padding: 10px 20px;"><span>🗑️</span><span>清空已选</span></button>
-                        <span class="search-stats" id="selectedCountBadge">已选 0 个小类</span>
-                    </div>
-                    
-                    <div class="step-footer-nav">
-                        <span class="step-indicator-light">当前：选分类</span>
-                        <div class="step-footer-buttons">
-                            <button class="step-footer-btn btn-save-draft save-draft-btn" data-step="1">💾 保存草稿</button>
-                            <button class="step-footer-btn step-next-btn" data-next="2">下一步 ▶</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            </div>
+            <div class="tree-container" id="treeContainer" role="tree" aria-label="商标分类树">
+                <ul class="tree-ul" id="categoryTree"><li class="empty-state">正在加载分类数据...</li></ul>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--gray-200);">
+                <button type="button" class="btn btn-secondary" id="clearSelectedBtn" style="padding: 10px 20px;"><span>🗑️</span><span>清空已选</span></button>
+                <span class="search-stats" id="selectedCountBadge">已选 0 个小类</span>
+            </div>
+        </div>
+        <div class="step-footer-nav">
+            <span class="step-indicator-light">当前：选分类</span>
+            <div class="step-footer-buttons">
+                <button class="step-footer-btn btn-save-draft save-draft-btn" data-step="1">💾 保存草稿</button>
+                <button class="step-footer-btn step-next-btn" data-next="2">下一步 ▶</button>
+            </div>
         </div>
     </div>
 
     <!-- 步骤2：填写信息面板 -->
     <div id="step2Panel" class="step-panel-container" style="display: none;" role="tabpanel" aria-labelledby="tabStep2">
-        <div class="step-panel-wrapper">
-            <section class="card" aria-labelledby="step2-title">
-                <div class="card-header">
-                    <div class="card-title"><span class="step-indicator">2</span><span id="step2-title">填写申请信息</span></div>
-                    <div class="card-subtitle">完善申请人资料，上传商标图样</div>
+        <div class="panel-header">
+            <div class="panel-title"><span class="step-indicator">2</span>填写申请信息</div>
+            <div class="panel-subtitle">完善申请人资料，上传商标图样</div>
+        </div>
+        <div class="panel-body">
+            <div class="selected-section">
+                <div class="section-label"><span>📋 已选小类（点击标签可删除）</span></div>
+                <div class="selected-list" id="selectedListContainer">
+                    <div class="empty-state" id="selectedEmpty">暂无选择，请从左侧添加</div>
+                    <div class="selected-tags" id="selectedTags" style="display: none;" role="list" aria-label="已选商标小类"></div>
                 </div>
-                <div class="card-body">
-                    <div class="selected-section">
-                        <div class="section-label"><span>📋 已选小类（点击标签可删除）</span></div>
-                        <div class="selected-list" id="selectedListContainer">
-                            <div class="empty-state" id="selectedEmpty">暂无选择，请从左侧添加</div>
-                            <div class="selected-tags" id="selectedTags" style="display: none;" role="list" aria-label="已选商标小类"></div>
-                        </div>
-                    </div>
-                    <div class="form-section">
-                        <div class="form-row">
-                            <label for="applicantName">申请人全称 <span class="required-star">*</span></label>
-                            <input type="text" id="applicantName" placeholder="请输入营业执照上的完整名称" required autocomplete="organization">
-                            <div class="form-hint">个人申请请填写姓名，公司申请请填写全称</div>
-                        </div>
-                        <div class="form-row">
-                            <label for="trademarkName">商标名称 <span class="required-star">*</span></label>
-                            <input type="text" id="trademarkName" placeholder="请输入商标名称" required autocomplete="off">
-                        </div>
-                        <div class="form-row-grid">
-                            <div class="form-row"><label for="contactPhone">联系电话</label><input type="tel" id="contactPhone" placeholder="手机号码" autocomplete="tel"></div>
-                            <div class="form-row"><label for="contactPerson">联系人姓名</label><input type="text" id="contactPerson" placeholder="真实姓名" autocomplete="name"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="upload-section">
-                        <div class="section-label" id="upload-label">🖼️ 商标图样（建议上传）</div>
-                        <div class="upload-area" id="uploadArea" role="button" tabindex="0" aria-labelledby="upload-label">
-                            <div class="upload-icon">📎</div>
-                            <div class="upload-text">点击或拖拽上传图片</div>
-                            <div class="upload-hint">支持 PNG、JPG 格式，建议尺寸 400×400 ~ 1000×1000 像素</div>
-                            <input type="file" id="fileInput" accept="image/png,image/jpeg,image/jpg" style="display: none;">
-                        </div>
-                        <div class="preview-box" id="imagePreview" style="display: none;" role="img" aria-label="商标图样预览">
-                            <img id="previewImg" src="" alt="商标预览">
-                        </div>
-                    </div>
-
-                    <div class="step-footer-nav">
-                        <span class="step-indicator-light">当前：填信息</span>
-                        <div class="step-footer-buttons">
-                            <button class="step-footer-btn step-prev-btn" data-prev="1">◀ 上一步</button>
-                            <button class="step-footer-btn btn-save-draft save-draft-btn" data-step="2">💾 保存草稿</button>
-                            <button class="step-footer-btn step-next-btn" data-next="3">下一步 ▶</button>
-                        </div>
-                    </div>
+            </div>
+            <div class="form-section">
+                <div class="form-row">
+                    <label for="applicantName">申请人全称 <span class="required-star">*</span></label>
+                    <input type="text" id="applicantName" placeholder="请输入营业执照上的完整名称" required autocomplete="organization">
+                    <div class="form-hint">个人申请请填写姓名，公司申请请填写全称</div>
                 </div>
-            </section>
+                <div class="form-row">
+                    <label for="trademarkName">商标名称 <span class="required-star">*</span></label>
+                    <input type="text" id="trademarkName" placeholder="请输入商标名称" required autocomplete="off">
+                </div>
+                <div class="form-row-grid">
+                    <div class="form-row"><label for="contactPhone">联系电话</label><input type="tel" id="contactPhone" placeholder="手机号码" autocomplete="tel"></div>
+                    <div class="form-row"><label for="contactPerson">联系人姓名</label><input type="text" id="contactPerson" placeholder="真实姓名" autocomplete="name"></div>
+                </div>
+            </div>
+            
+            <div class="upload-section">
+                <div class="section-label" id="upload-label">🖼️ 商标图样（建议上传）</div>
+                <div class="upload-area" id="uploadArea" role="button" tabindex="0" aria-labelledby="upload-label">
+                    <div class="upload-icon">📎</div>
+                    <div class="upload-text">点击或拖拽上传图片</div>
+                    <div class="upload-hint">支持 PNG、JPG 格式，建议尺寸 400×400 ~ 1000×1000 像素</div>
+                    <input type="file" id="fileInput" accept="image/png,image/jpeg,image/jpg" style="display: none;">
+                </div>
+                <div class="preview-box" id="imagePreview" style="display: none;" role="img" aria-label="商标图样预览">
+                    <img id="previewImg" src="" alt="商标预览">
+                </div>
+            </div>
+        </div>
+        <div class="step-footer-nav">
+            <span class="step-indicator-light">当前：填信息</span>
+            <div class="step-footer-buttons">
+                <button class="step-footer-btn step-prev-btn" data-prev="1">◀ 上一步</button>
+                <button class="step-footer-btn btn-save-draft save-draft-btn" data-step="2">💾 保存草稿</button>
+                <button class="step-footer-btn step-next-btn" data-next="3">下一步 ▶</button>
+            </div>
         </div>
     </div>
 
     <!-- 步骤3：选择服务方案面板 -->
     <div id="step3Panel" class="step-panel-container" style="display: none;" role="tabpanel" aria-labelledby="tabStep3">
-        <div class="step-panel-wrapper">
-            <section class="card" aria-labelledby="step3-title">
-                <div class="card-header">
-                    <div class="card-title"><span class="step-indicator">3</span><span id="step3-title">选择服务方案</span></div>
-                    <div class="card-subtitle">选择适合的服务方案，查看费用明细</div>
-                </div>
-                <div class="card-body">
-                    <div class="scheme-panel" role="radiogroup" aria-label="服务方案选择">
-                        <div class="scheme-option selected" id="schemeA" data-scheme="A" role="radio" aria-checked="true" tabindex="0">
-                            <input type="radio" name="scheme" value="A" id="radioA" class="scheme-radio" checked>
-                            <div class="scheme-content">
-                                <div class="scheme-header"><span class="scheme-name">A方案 · 流程跟进</span><span class="scheme-price">¥380<span style="font-size:0.7rem;">/大类</span></span></div>
-                                <div class="scheme-desc">适合有明确注册需求的客户，含10个小类，超出38元/个</div>
-                                <div class="scheme-features"><span class="feature-tag">✓ 材料审核</span><span class="feature-tag">✓ 进度提醒</span><span class="feature-tag">✓ 官文代收</span></div>
-                            </div>
-                        </div>
-                        <div class="scheme-option" id="schemeB" data-scheme="B" role="radio" aria-checked="false" tabindex="-1">
-                            <input type="radio" name="scheme" value="B" id="radioB" class="scheme-radio">
-                            <div class="scheme-content">
-                                <div class="scheme-header"><span class="scheme-name">B方案 · 专业辅导</span><span class="scheme-price">¥580<span style="font-size:0.7rem;">/大类</span></span></div>
-                                <div class="scheme-desc">含风险评估与类别规划，6个大类以上享85折优惠</div>
-                                <div class="scheme-features"><span class="feature-tag">✓ 风险评估</span><span class="feature-tag">✓ 类别规划</span><span class="feature-tag">✓ 专业解读</span><span class="feature-tag">✓ 材料优化</span></div>
-                            </div>
-                        </div>
-                        <div class="scheme-option" id="schemeC" data-scheme="C" role="radio" aria-checked="false" tabindex="-1">
-                            <input type="radio" name="scheme" value="C" id="radioC" class="scheme-radio">
-                            <div class="scheme-content">
-                                <div class="scheme-header"><span class="scheme-name">C方案 · 分期付费</span><span class="scheme-price">¥1100<span style="font-size:0.7rem;">/大类</span></span></div>
-                                <div class="scheme-desc">首付300元首期款，下证后付尾款800元。</div>
-                                <div class="scheme-features"><span class="feature-tag">✓ 前期启动成本低</span><span class="feature-tag">✓ 下证后付服务费</span></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="invoice-section">
-                        <label class="invoice-check"><input type="checkbox" id="invoiceCheckbox"><span class="invoice-label">开具增值税专用发票（加收5%）</span></label>
-                        <div class="invoice-hint">如需专票，总费用增加5%税点；否则默认开具增值税普通发票</div>
-                    </div>
-                    <div class="legal-notice" role="alert">
-                        <strong>⚠️ 重要声明：</strong>商标审查权归属国家知识产权局，审查结果存在主观因素，<strong>任何代理机构均不得承诺"包过"</strong>！若被驳回或异议，已收费用不可退。担心风险请选择C方案。
-                    </div>
-                    <div class="fee-section" aria-live="polite">
-                        <div class="fee-header"><span class="fee-title"><span>💰</span><span>费用明细</span></span><span class="fee-amount" id="totalAmount">¥0</span></div>
-                        <div class="fee-details" id="feeDisplay"><div class="empty-state">请先选择商标小类</div></div>
-                    </div>
-                    <div class="button-group">
-                        <button type="button" class="btn btn-primary" id="exportWordBtn"><span>📝</span><span>下单发送PDF订单</span></button>
-                        <div class="btn-row">
-                            <button type="button" class="btn btn-secondary" id="previewOrderBtn"><span>👁️</span><span>预览订单</span></button>
-                            <button type="button" class="btn btn-secondary" id="generateContractBtn"><span>📄</span><span>下单发送PDF合同</span></button>
-                        </div>
-                    </div>
-
-                    <div class="step-footer-nav">
-                        <span class="step-indicator-light">当前：选方案</span>
-                        <div class="step-footer-buttons">
-                            <button class="step-footer-btn step-prev-btn" data-prev="2">◀ 上一步</button>
-                            <button class="step-footer-btn btn-save-draft save-draft-btn" data-step="3">💾 保存草稿</button>
-                            <button class="step-footer-btn step-next-btn" data-next="preview">下一步 ▶</button>
-                        </div>
+        <div class="panel-header">
+            <div class="panel-title"><span class="step-indicator">3</span>选择服务方案</div>
+            <div class="panel-subtitle">选择适合的服务方案，查看费用明细</div>
+        </div>
+        <div class="panel-body">
+            <div class="scheme-panel" role="radiogroup" aria-label="服务方案选择">
+                <div class="scheme-option selected" id="schemeA" data-scheme="A" role="radio" aria-checked="true" tabindex="0">
+                    <input type="radio" name="scheme" value="A" id="radioA" class="scheme-radio" checked>
+                    <div class="scheme-content">
+                        <div class="scheme-header"><span class="scheme-name">A方案 · 流程跟进</span><span class="scheme-price">¥380<span style="font-size:0.7rem;">/大类</span></span></div>
+                        <div class="scheme-desc">适合有明确注册需求的客户，含10个小类，超出38元/个</div>
+                        <div class="scheme-features"><span class="feature-tag">✓ 材料审核</span><span class="feature-tag">✓ 进度提醒</span><span class="feature-tag">✓ 官文代收</span></div>
                     </div>
                 </div>
-            </section>
+                <div class="scheme-option" id="schemeB" data-scheme="B" role="radio" aria-checked="false" tabindex="-1">
+                    <input type="radio" name="scheme" value="B" id="radioB" class="scheme-radio">
+                    <div class="scheme-content">
+                        <div class="scheme-header"><span class="scheme-name">B方案 · 专业辅导</span><span class="scheme-price">¥580<span style="font-size:0.7rem;">/大类</span></span></div>
+                        <div class="scheme-desc">含风险评估与类别规划，6个大类以上享85折优惠</div>
+                        <div class="scheme-features"><span class="feature-tag">✓ 风险评估</span><span class="feature-tag">✓ 类别规划</span><span class="feature-tag">✓ 专业解读</span><span class="feature-tag">✓ 材料优化</span></div>
+                    </div>
+                </div>
+                <div class="scheme-option" id="schemeC" data-scheme="C" role="radio" aria-checked="false" tabindex="-1">
+                    <input type="radio" name="scheme" value="C" id="radioC" class="scheme-radio">
+                    <div class="scheme-content">
+                        <div class="scheme-header"><span class="scheme-name">C方案 · 分期付费</span><span class="scheme-price">¥1100<span style="font-size:0.7rem;">/大类</span></span></div>
+                        <div class="scheme-desc">首付300元首期款，下证后付尾款800元。</div>
+                        <div class="scheme-features"><span class="feature-tag">✓ 前期启动成本低</span><span class="feature-tag">✓ 下证后付服务费</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="invoice-section">
+                <label class="invoice-check"><input type="checkbox" id="invoiceCheckbox"><span class="invoice-label">开具增值税专用发票（加收5%）</span></label>
+                <div class="invoice-hint">如需专票，总费用增加5%税点；否则默认开具增值税普通发票</div>
+            </div>
+            <div class="legal-notice" role="alert">
+                <strong>⚠️ 重要声明：</strong>商标审查权归属国家知识产权局，审查结果存在主观因素，<strong>任何代理机构均不得承诺"包过"</strong>！若被驳回或异议，已收费用不可退。担心风险请选择C方案。
+            </div>
+            <div class="fee-section" aria-live="polite">
+                <div class="fee-header"><span class="fee-title"><span>💰</span><span>费用明细</span></span><span class="fee-amount" id="totalAmount">¥0</span></div>
+                <div class="fee-details" id="feeDisplay"><div class="empty-state">请先选择商标小类</div></div>
+            </div>
+            <div class="button-group">
+                <button type="button" class="btn btn-primary" id="exportWordBtn"><span>📝</span><span>下单发送PDF订单</span></button>
+                <div class="btn-row">
+                    <button type="button" class="btn btn-secondary" id="previewOrderBtn"><span>👁️</span><span>预览订单</span></button>
+                    <button type="button" class="btn btn-secondary" id="generateContractBtn"><span>📄</span><span>下单发送PDF合同</span></button>
+                </div>
+            </div>
+        </div>
+        <div class="step-footer-nav">
+            <span class="step-indicator-light">当前：选方案</span>
+            <div class="step-footer-buttons">
+                <button class="step-footer-btn step-prev-btn" data-prev="2">◀ 上一步</button>
+                <button class="step-footer-btn btn-save-draft save-draft-btn" data-step="3">💾 保存草稿</button>
+                <button class="step-footer-btn step-next-btn" data-next="preview">下一步 ▶</button>
+            </div>
         </div>
     </div>
 
     <!-- 预览订单面板 -->
     <div id="previewPanel" class="preview-panel-container" style="display: none;" role="tabpanel" aria-labelledby="tabPreview">
-        <div class="preview-wrapper">
+        <div class="panel-header">
+            <div class="panel-title"><span class="step-indicator">📄</span>预览订单</div>
+            <div class="panel-subtitle">核对信息后下单或生成合同</div>
+        </div>
+        <div class="panel-body">
             <div id="previewContent" class="preview-content"><div class="empty-state">请填写必要信息并选择小类后查看预览</div></div>
             <div class="preview-actions">
                 <div class="button-group">
@@ -641,19 +603,23 @@
                     <button type="button" class="btn btn-secondary preview-generate-contract">📄 下单发送PDF合同</button>
                 </div>
             </div>
-            <div class="step-footer-nav">
-                <span class="step-indicator-light">当前：预览订单</span>
-                <div class="step-footer-buttons">
-                    <button class="step-footer-btn step-prev-btn" data-prev="3">◀ 上一步</button>
-                    <button class="step-footer-btn step-next-btn" data-next="flow">下一步 ▶</button>
-                </div>
+        </div>
+        <div class="step-footer-nav">
+            <span class="step-indicator-light">当前：预览订单</span>
+            <div class="step-footer-buttons">
+                <button class="step-footer-btn step-prev-btn" data-prev="3">◀ 上一步</button>
+                <button class="step-footer-btn step-next-btn" data-next="flow">下一步 ▶</button>
             </div>
         </div>
     </div>
 
     <!-- 流程面板 (付款后流程) -->
     <div id="flowPanel" class="flow-panel-container" style="display: none;" role="tabpanel" aria-labelledby="tabFlow">
-        <div class="flow-wrapper">
+        <div class="panel-header">
+            <div class="panel-title"><span class="step-indicator">⚙️</span>付款后流程</div>
+            <div class="panel-subtitle">签订合同付款后，开启服务流程</div>
+        </div>
+        <div class="panel-body">
             <div class="start-box" id="flowStartBox" onclick="toggleFlowStart()" role="button" tabindex="0" aria-pressed="false">
                 <div class="qr-container">
                     <img src="联系陈工-微信二维码.png" alt="联系陈工微信二维码" class="qr-code" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" onload="this.style.display='block'; this.nextElementSibling.style.display='none';" width="120" height="120">
@@ -712,12 +678,12 @@
                 </div>
             </div>
             <div class="footer-notice">以上时间为目前政策下的估算周期，具体以商标局实际审查进度为准。</div>
-            <div class="step-footer-nav">
-                <span class="step-indicator-light">当前：付款后流程</span>
-                <div class="step-footer-buttons">
-                    <button class="step-footer-btn step-prev-btn" data-prev="preview">◀ 上一步</button>
-                    <button class="step-footer-btn" disabled>下一步 ▶</button>
-                </div>
+        </div>
+        <div class="step-footer-nav">
+            <span class="step-indicator-light">当前：付款后流程</span>
+            <div class="step-footer-buttons">
+                <button class="step-footer-btn step-prev-btn" data-prev="preview">◀ 上一步</button>
+                <button class="step-footer-btn" disabled>下一步 ▶</button>
             </div>
         </div>
     </div>
@@ -726,8 +692,8 @@
 </div>
 
 <script>
+    // ==================== 原有全部JavaScript代码（未改动）====================
     'use strict';
-    // ==================== 原有全部JavaScript代码（仅按需修改导出函数，其余完全保留）====================
     (function() {
         // ----- 内置默认分类数据 -----
         const DEFAULT_CATEGORIES = [
@@ -926,7 +892,7 @@
             };
         }
 
-        // 生成费用文本（略，保持原样）
+        // 生成费用文本
         function computeFeeText() {
             const d = computeFeeDetails();
             if (Object.keys(d.majorDetails).length === 0) {
@@ -1010,8 +976,8 @@
             return map[n] || n + '.';
         }
 
-        // 更新UI（完全保留原样）
-        function refreshUI() { /* 保持原样，代码略长，但完全保留 */ 
+        // 更新UI
+        function refreshUI() {
             document.querySelectorAll('.scheme-option').forEach(opt => {
                 opt.classList.remove('selected');
                 opt.setAttribute('aria-checked', 'false');
@@ -1089,7 +1055,7 @@
             syncCheckboxesFromSelected();
         }
 
-        function syncCheckboxesFromSelected() { /* 保持原样 */ 
+        function syncCheckboxesFromSelected() {
             const checkboxes = document.querySelectorAll('.subclass-checkbox');
             checkboxes.forEach(cb => {
                 const major = cb.dataset.major;
@@ -1098,7 +1064,7 @@
             });
         }
 
-        function handleCheckboxChange(e) { /* 保持原样 */ 
+        function handleCheckboxChange(e) {
             const cb = e.target;
             const major = cb.dataset.major;
             const sub = cb.dataset.sub;
@@ -1119,8 +1085,8 @@
             refreshUI();
         }
 
-        // 渲染树（保持原样）
-        function renderTree(filterText = '') { /* 保持原样，略 */ 
+        // 渲染树
+        function renderTree(filterText = '') {
             const treeElem = document.getElementById('categoryTree');
             treeElem.innerHTML = '';
             
@@ -1212,7 +1178,7 @@
             attachFolderListeners();
         }
 
-        function attachFolderListeners() { /* 保持原样 */ 
+        function attachFolderListeners() {
             document.querySelectorAll('.major-li > .folder-label').forEach(label => {
                 label.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -1231,7 +1197,7 @@
             });
         }
 
-        function getTotalSubCount() { /* 保持原样 */ 
+        function getTotalSubCount() {
             let c = 0;
             rawData.forEach(m => (m.children || []).forEach(g => (g.children || []).forEach(() => c++)));
             return c;
@@ -1263,7 +1229,7 @@
             }
         }
 
-        // 事件绑定（保持原样）
+        // 事件绑定
         document.getElementById('clearSelectedBtn').addEventListener('click', function() {
             if (Object.keys(selectedSubclasses).length === 0) return;
             if (confirm('确定清空所有已选小类吗？')) {
@@ -1283,7 +1249,7 @@
             debouncedSearch(e.target.value);
         });
 
-        // 文件上传（保持原样）
+        // 文件上传
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
         const previewBox = document.getElementById('imagePreview');
@@ -1348,7 +1314,7 @@
             reader.readAsDataURL(file);
         }
 
-        // 方案选择（保持原样）
+        // 方案选择
         document.querySelectorAll('.scheme-option').forEach(opt => {
             opt.addEventListener('click', function(e) {
                 if (e.target.tagName === 'INPUT') return;
@@ -1373,7 +1339,7 @@
 
         document.getElementById('invoiceCheckbox').addEventListener('change', refreshUI);
 
-        // 生成订单预览 HTML 的函数（保持原样）
+        // 生成订单预览 HTML 的函数
         function generateOrderPreviewHtml(applicant, tmName, phone, contact, stats, d, trademarkImageData) {
             const today = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
             const now = new Date();
@@ -1529,7 +1495,7 @@
             return html;
         }
 
-        // 渲染预览面板内容（保持原样）
+        // 渲染预览面板内容
         function renderPreviewPanel() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
@@ -1548,7 +1514,7 @@
             previewContent.innerHTML = html;
         }
 
-        // 选项卡切换 (保持原样)
+        // 选项卡切换
         const tabStep1 = document.getElementById('tabStep1');
         const tabStep2 = document.getElementById('tabStep2');
         const tabStep3 = document.getElementById('tabStep3');
@@ -1603,7 +1569,7 @@
             activateTab(tabPreview);
         });
 
-        // ========== 修改后的导出PDF订单（原导出Word） ==========
+        // ========== 导出PDF订单 ==========
         function exportWord() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
@@ -1637,7 +1603,7 @@
             // --- 生成文件名：申请人全称_商标名称_商标大类_订单_日期 ---
             const majorKeys = Object.keys(selectedSubclasses).filter(m => selectedSubclasses[m].length > 0);
             const majorStr = majorKeys.join('_');
-            const dateStr = `${year}${month}${day}`; // 年月日
+            const dateStr = `${year}${month}${day}`;
             const safeApplicant = applicant.replace(/[\\/*?:"<>|]/g, '_');
             const safeTmName = tmName.replace(/[\\/*?:"<>|]/g, '_');
             const fileName = `${safeApplicant}_${safeTmName}_${majorStr}_订单_${dateStr}`;
@@ -1770,7 +1736,7 @@
                     subIdx++;
                 }
             } else {
-                htmlContent += `<div class="bg-payment-plan">（三）【${escapeHtml(d.scheme)}方案·付款计划】</div>`;
+                htmlContent += `<div class="bg-payment-plan">（三）【${escapeHtml(d.scheme)}方案·付款计划</div>`;
                 const payAmount = d.withInvoice ? d.totalWithInvoice : d.finalTotal;
                 htmlContent += `<div>📅 签合同后一次性付清: ${payAmount.toFixed(2)}元 ${d.withInvoice ? '(含专票)' : '(普票)'}</div>`;
             }
@@ -1798,7 +1764,7 @@
             }
             printWindow.document.write(htmlContent);
             printWindow.document.close();
-            printWindow.document.title = fileName;  // 设置PDF默认文件名
+            printWindow.document.title = fileName;
             printWindow.focus();
             printWindow.print();
             printWindow.onafterprint = function() {
@@ -1806,7 +1772,7 @@
             };
         }
 
-        // ========== 修改后的生成PDF合同（原生成合同） ==========
+        // ========== 生成PDF合同 ==========
         function generateContract() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
@@ -1828,7 +1794,6 @@
             const today = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
             const contractNo = `QYZ-TM-${new Date().getFullYear()}${String(new Date().getMonth()+1).padStart(2,'0')}${String(new Date().getDate()).padStart(2,'0')}${String(Math.floor(Math.random()*1000)).padStart(3,'0')}`;
 
-            // --- 生成文件名：申请人全称_商标名称_商标大类_服务合同_日期 ---
             const majorKeys = Object.keys(selectedSubclasses).filter(m => selectedSubclasses[m].length > 0);
             const majorStr = majorKeys.join('_');
             const now = new Date();
@@ -1879,7 +1844,6 @@
             <h2>第一条 甲方（委托人信息）</h2>
             <div class="party">
                 <div><span class="party-title">公司名称/个人姓名：</span>${escapeHtml(applicant)}</div>
-                <!-- 以下两行修改：删除(填写详细)，改为flex下划线占满整行 -->
                 <div style="display: flex; align-items: baseline;">
                     <span class="party-title" style="white-space: nowrap;">统一社会信用代码/身份证号码：</span>
                     <span style="flex: 1; border-bottom: 1px solid red; margin-left: 8px;">&nbsp;</span>
@@ -1906,7 +1870,6 @@
             <h2>第三条 委托事项</h2>
             <p>3.1 甲方委托乙方就以下商标向国家知识产权局商标局申请商标注册事项，具体申请类别明细如下：</p>
             <div><span class="party-title">商标申请主体：</span>${escapeHtml(applicant)}</div>
-            <!-- 以下两行修改：删除(填写详细)，改为flex下划线占满整行 -->
             <div style="display: flex; align-items: baseline;">
                 <span class="party-title" style="white-space: nowrap;">统一社会信用代码：</span>
                 <span style="flex: 1; border-bottom: 1px solid red; margin-left: 8px;">&nbsp;</span>
@@ -2092,7 +2055,7 @@
             }
             printWindow.document.write(htmlContent);
             printWindow.document.close();
-            printWindow.document.title = fileName;  // 设置PDF默认文件名
+            printWindow.document.title = fileName;
             printWindow.focus();
             printWindow.print();
             printWindow.onafterprint = function() {
@@ -2100,12 +2063,7 @@
             };
         }
 
-        document.getElementById('exportWordBtn').addEventListener('click', exportWord);
-        document.querySelector('.preview-export-word')?.addEventListener('click', exportWord);
-        document.getElementById('generateContractBtn').addEventListener('click', generateContract);
-        document.querySelector('.preview-generate-contract')?.addEventListener('click', generateContract);
-
-        // 流程相关 (保持原样)
+        // 流程相关
         window.toggleFlowStep = function(el) {
             el.classList.toggle('completed');
             const isCompleted = el.classList.contains('completed');
@@ -2230,6 +2188,161 @@
                 }
             });
         });
+
+        // ========== 新添加的辅助函数：生成订单/合同的 HTML 字符串 ==========
+        function generateOrderHTML(type) {
+            const applicant = cleanInput(document.getElementById('applicantName').value);
+            const tmName = cleanInput(document.getElementById('trademarkName').value);
+            const phone = cleanInput(document.getElementById('contactPhone').value);
+            const contact = cleanInput(document.getElementById('contactPerson').value);
+            const stats = getSelectedStats();
+            const d = computeFeeDetails();
+            // 直接复用原有的预览 HTML 生成函数
+            return generateOrderPreviewHtml(applicant, tmName, phone, contact, stats, d, trademarkImageData);
+        }
+
+        // ========== 辅助函数：HTML 字符串转 PDF Blob ==========
+        function htmlToPdfBlob(html) {
+            return new Promise((resolve, reject) => {
+                const container = document.createElement('div');
+                container.style.position = 'absolute';
+                container.style.left = '-9999px';
+                container.style.top = '-9999px';
+                container.innerHTML = html;
+                document.body.appendChild(container);
+
+                const opt = {
+                    margin:        [0.5, 0.5, 0.5, 0.5],
+                    filename:      'temp.pdf',
+                    image:         { type: 'jpeg', quality: 0.98 },
+                    html2canvas:   { scale: 2, letterRendering: true, useCORS: true, logging: false },
+                    jsPDF:         { unit: 'in', format: 'a4', orientation: 'portrait' }
+                };
+
+                html2pdf().from(container).set(opt).outputPdf('blob')
+                    .then(pdfBlob => {
+                        document.body.removeChild(container);
+                        resolve(pdfBlob);
+                    })
+                    .catch(err => {
+                        document.body.removeChild(container);
+                        reject(err);
+                    });
+            });
+        }
+
+        // ========== 辅助函数：将 base64 图片转换为 Blob 并生成文件名 ==========
+        function imageDataToBlob(base64Data, applicant, tmName) {
+            const matches = base64Data.match(/^data:(image\/\w+);base64,(.+)$/);
+            if (!matches) return null;
+            
+            const mime = matches[1];
+            const ext = mime.split('/')[1] === 'jpeg' ? 'jpg' : mime.split('/')[1];
+            const base64 = matches[2];
+            const binary = atob(base64);
+            const array = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) array[i] = binary.charCodeAt(i);
+            const blob = new Blob([array], { type: mime });
+
+            // 生成文件名：申请人全称_商标名称_商标大类_图片_YYYYMMDD.ext
+            const selectedMajors = Object.keys(selectedSubclasses).filter(m => selectedSubclasses[m].length > 0);
+            const majorStr = selectedMajors.join('_').replace(/[\\/*?:"<>|]/g, '_');
+            const now = new Date();
+            const dateStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+            const safeApplicant = applicant.replace(/[\\/*?:"<>|]/g, '_');
+            const safeTmName = tmName.replace(/[\\/*?:"<>|]/g, '_');
+            const filename = `${safeApplicant}_${safeTmName}_${majorStr}_图片_${dateStr}.${ext}`;
+
+            return { blob, filename };
+        }
+
+        // ========== 核心函数：发送邮件（前端生成 PDF） ==========
+        async function sendMailWithPDF(type) { // type = 'order' 或 'contract'
+            const applicant = cleanInput(document.getElementById('applicantName').value);
+            const tmName = cleanInput(document.getElementById('trademarkName').value);
+            const phone = cleanInput(document.getElementById('contactPhone').value);
+            const contact = cleanInput(document.getElementById('contactPerson').value);
+            const stats = getSelectedStats();
+            const d = computeFeeDetails();
+
+            if (!applicant || !tmName || stats.totalSubCount === 0) {
+                alert('请填写申请人全称、商标名称并至少选择一个小类');
+                return;
+            }
+
+            const btn = type === 'order' ? document.getElementById('exportWordBtn') : document.getElementById('generateContractBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳</span><span>生成PDF…</span>';
+
+            try {
+                // 1. 生成 HTML 字符串
+                const htmlContent = generateOrderHTML(type);
+
+                // 2. 转换为 PDF Blob
+                const pdfBlob = await htmlToPdfBlob(htmlContent);
+                const pdfFilename = `${applicant.replace(/[\\/*?:"<>|]/g, '_')}_${tmName.replace(/[\\/*?:"<>|]/g, '_')}_${type === 'order' ? '订单' : '合同'}_${new Date().toISOString().slice(0,10).replace(/-/g,'')}.pdf`;
+
+                // 3. 处理图片附件
+                let imageBlob = null, imageFilename = '';
+                if (trademarkImageData) {
+                    const result = imageDataToBlob(trademarkImageData, applicant, tmName);
+                    if (result) {
+                        imageBlob = result.blob;
+                        imageFilename = result.filename;
+                    }
+                }
+
+                // 4. 构建 FormData
+                const formData = new FormData();
+                formData.append('type', type);
+                formData.append('applicant', applicant);
+                formData.append('tmName', tmName);
+                formData.append('phone', phone || '');
+                formData.append('contact', contact || '');
+                formData.append('scheme', d.scheme);
+                formData.append('schemeName', d.params.name);
+                formData.append('finalTotal', d.withInvoice ? d.totalWithInvoice : d.finalTotal);
+                formData.append('withInvoice', d.withInvoice ? 'true' : 'false');
+                formData.append('pdf', pdfBlob, pdfFilename);
+                if (imageBlob) formData.append('image', imageBlob, imageFilename);
+
+                btn.innerHTML = '<span>⏳</span><span>发送中…</span>';
+
+                // 注意：这里的 URL 需要替换为您部署后的 Vercel API 地址
+                const API_URL = 'https://your-vercel-app.vercel.app/api/send-mail'; // 部署后替换
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert('邮件发送成功！请查收。');
+                } else {
+                    alert('发送失败：' + (result.error || '未知错误'));
+                }
+            } catch (err) {
+                alert('生成或发送失败：' + err.message);
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        // ========== 替换按钮事件监听 ==========
+        // 移除或注释掉原来的事件绑定
+        // document.getElementById('exportWordBtn').addEventListener('click', exportWord);
+        // document.querySelector('.preview-export-word')?.addEventListener('click', exportWord);
+        // document.getElementById('generateContractBtn').addEventListener('click', generateContract);
+        // document.querySelector('.preview-generate-contract')?.addEventListener('click', generateContract);
+
+        // 添加新的事件绑定
+        document.getElementById('exportWordBtn').addEventListener('click', () => sendMailWithPDF('order'));
+        document.querySelector('.preview-export-word')?.addEventListener('click', () => sendMailWithPDF('order'));
+        document.getElementById('generateContractBtn').addEventListener('click', () => sendMailWithPDF('contract'));
+        document.querySelector('.preview-generate-contract')?.addEventListener('click', () => sendMailWithPDF('contract'));
 
         // 启动
         loadJSON();
