@@ -1,25 +1,9 @@
 // 文件路径：/api/send-mail.js （在 Vercel 项目中）
 const nodemailer = require('nodemailer');
 
-// 允许的域名列表（可自行修改）
-const allowedOrigins = [
-  'https://qiyouziz163.github.io',  // 您的 GitHub Pages 域名
-  'https://qiyouziz163.github.io/my-trademark-system/',  // 您的 GitHub Pages 域名
-  'http://localhost:3000',           // 本地开发调试用
-  // 如有其他前端域名，继续添加
-];
-
 module.exports = async (req, res) => {
-  // 获取请求来源
-  const origin = req.headers.origin;
-
-  // 设置 CORS 头
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else {
-    // 如果来源不在列表中，默认允许所有（可根据需求调整）
-    res.setHeader('Access-Control-Allow-Origin', '*');
-  }
+  // 设置 CORS 头（允许所有来源，生产环境建议替换为具体域名）
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
