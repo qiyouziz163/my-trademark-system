@@ -55,11 +55,11 @@
             overflow: hidden;
         }
         
-        /* ----- 优化后的 header：使用 rem 单位，高度自适应 ----- */
+        /* ----- 优化后的 header：压缩行距、内边距，为中间内容留更多空间 ----- */
         .header {
             background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, #0066cc 100%);
             color: white;
-            padding: 1.5rem 2.5rem;
+            padding: 0.8rem 2rem;  /* 上下内边距从1.5rem减到0.8rem */
             position: relative;
             overflow: hidden;
         }
@@ -81,44 +81,46 @@
         }
         
         .header h1 {
-            font-size: 2.2rem;
+            font-size: 1.8rem;       /* 从2.2rem减小 */
             font-weight: 600;
             margin: 0;
             letter-spacing: -0.5px;
             display: flex;
             align-items: center;
             gap: 12px;
+            line-height: 1.2;          /* 收紧行高 */
         }
         
         .header-icon {
-            width: 48px;
-            height: 48px;
+            width: 40px;               /* 略微缩小 */
+            height: 40px;
             background: rgba(255,255,255,0.2);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
         }
         
         .header-subtitle {
-            margin-top: 0.5rem;
+            margin-top: 0.2rem;        /* 从0.5rem减小 */
             opacity: 0.9;
-            font-size: 1rem;
+            font-size: 0.95rem;        /* 稍微缩小 */
             display: flex;
             align-items: center;
-            gap: 24px;
+            gap: 20px;
             flex-wrap: wrap;
+            line-height: 1.3;           /* 收紧行距 */
         }
         
         .header-contact {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             background: rgba(255,255,255,0.15);
-            padding: 6px 16px;
+            padding: 4px 12px;          /* 减小内边距 */
             border-radius: 20px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
         
         .tab-bar {
@@ -137,7 +139,7 @@
         }
         
         .tab {
-            padding: 12px 14px;
+            padding: 10px 14px;        /* 略微压缩 */
             cursor: pointer;
             color: var(--gray-500);
             font-weight: 600;
@@ -200,13 +202,13 @@
             background: none;
             box-shadow: none;
             border-radius: 0;
-            padding: 24px 40px;
+            padding: 20px 40px;         /* 略微压缩上下内边距 */
         }
         
         .panel-header {
-            margin-bottom: 24px;
+            margin-bottom: 16px;         /* 从24px减小 */
             border-bottom: 1px solid var(--gray-200);
-            padding-bottom: 16px;
+            padding-bottom: 10px;        /* 从16px减小 */
             background: none;
         }
         
@@ -222,7 +224,7 @@
         .panel-subtitle {
             font-size: 0.85rem;
             color: var(--gray-500);
-            margin-top: 6px;
+            margin-top: 4px;              /* 从6px减小 */
             margin-left: 42px;
         }
         
@@ -231,7 +233,7 @@
         }
         
         .step-footer-nav {
-            padding: 20px 0 0;
+            padding: 12px 0 0;           /* 从20px减小 */
             border-top: 1px solid var(--gray-200);
             display: flex;
             justify-content: space-between;
@@ -337,7 +339,7 @@
         .btn-secondary { background: white; border: 2px solid var(--gray-300); color: var(--gray-700); }
         .btn-row { display: flex; gap: 12px; }
         .btn-row .btn { flex: 1; }
-        .footer-info { background: var(--gray-50); color: var(--gray-500); padding: 20px 40px; text-align: center; border-top: 1px solid var(--gray-200); }
+        .footer-info { background: var(--gray-50); color: var(--gray-500); padding: 12px 40px; text-align: center; border-top: 1px solid var(--gray-200); font-size: 0.9rem; }  /* 压缩底部内边距 */
         
         .step-footer-buttons {
             display: flex;
@@ -400,23 +402,192 @@
         @media (max-width: 768px) {
             body { padding: 0; }
             .app-container { border-radius: 0; }
-            .header { padding: 1rem 1.5rem; }
-            .header h1 { font-size: 1.8rem; }
+            .header { padding: 0.6rem 1.2rem; }
+            .header h1 { font-size: 1.5rem; }
             .tab { padding: 8px 10px; font-size: 0.9rem; }
             .tab-bar { padding: 0 8px; }
             .step-panel-container,
             .preview-panel-container,
             .flow-panel-container {
-                padding: 20px;
+                padding: 16px;
             }
         }
         @media (max-width: 480px) {
             .tab { padding: 6px 8px; font-size: 0.85rem; }
             .tab-bar { padding: 0 5px; }
         }
+
+        /* ========== 卡片不留间距，大小由字体决定 (覆盖原有内边距/外边距/间隙) ========== */
+        .step-panel-container,
+        .preview-panel-container,
+        .flow-panel-container,
+        .panel-header,
+        .panel-body,
+        .search-section,
+        .search-box,
+        .tree-container,
+        .selected-section,
+        .selected-list,
+        .form-section,
+        .form-row,
+        .upload-section,
+        .upload-area,
+        .preview-box,
+        .scheme-panel,
+        .scheme-option,
+        .invoice-section,
+        .legal-notice,
+        .fee-section,
+        .button-group,
+        .btn-row,
+        .step-footer-nav,
+        .step-footer-buttons,
+        .footer-info,
+        .tab-bar,
+        .tab,
+        .header,
+        .header-content,
+        .flow-container,
+        .flow-step,
+        .step-content,
+        .start-box,
+        .qr-container,
+        .note,
+        .footer-notice,
+        .selected-tag,
+        .subclass-item,
+        .folder-label,
+        .cat-major,
+        .cat-group,
+        .btn,
+        .step-footer-btn,
+        .preview-actions,
+        .interactive-hint,
+        .arrow-down,
+        .search-stats,
+        .search-icon,
+        .scheme-header,
+        .scheme-content,
+        .scheme-features,
+        .feature-tag,
+        .fee-details,
+        .fee-row,
+        .fee-header,
+        .invoice-check,
+        .invoice-hint,
+        .form-hint,
+        .empty-state,
+        .step-indicator-light,
+        .step-indicator {
+            margin: 0 !important;
+            padding: 0.15rem 0.25rem !important;   /* 极小内边距，保证文字不贴边，同时由字体大小决定 */
+            gap: 0 !important;
+        }
+
+        /* 按钮保留稍多水平内边距，仍由字体控制 */
+        .btn,
+        .step-footer-btn,
+        .tab {
+            padding: 0.15rem 0.5rem !important;
+        }
+
+        /* 标签徽章等保留极小内边距 */
+        .selected-tag,
+        .feature-tag,
+        .tab-badge,
+        .header-contact {
+            padding: 0.1rem 0.3rem !important;
+        }
+
+        /* 树形结构中的文件夹缩进调整，但仍保留视觉层次 */
+        .tree-ul ul {
+            margin-left: 0.5rem !important;
+            padding-left: 0.5rem !important;
+            border-left: 1px solid var(--gray-200);
+        }
+
+        /* 绝对定位的流程标记需要保留左侧空间，无法完全消除间距，此处做最小保留 */
+        .flow-container {
+            padding-left: 2.2rem !important;  /* 为标记留出位置，同时由字体大小决定 */
+        }
+        .flow-step .step-marker {
+            left: -2rem;
+        }
+
+        /* 预览图片区域保留最小高度，由内容决定 */
+        .preview-box {
+            min-height: auto !important;
+            padding: 0 !important;
+        }
+        #previewImg {
+            width: auto;
+            max-width: 100px;
+            height: auto;
+            max-height: 100px;
+        }
+
+        /* 移除多余的 margin-top / bottom */
+        .step-footer-nav,
+        .upload-section,
+        .selected-section,
+        .form-section,
+        .fee-section,
+        .legal-notice,
+        .invoice-section {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+        }
+
+        /* 保持列表项内的复选框与文字间距 */
+        .subclass-item {
+            gap: 0.3rem !important;
+            padding-left: 1.5rem !important;  /* 保留缩进，但由字体控制 */
+        }
+
+        /* 文件夹图标保留最小宽度 */
+        .folder-icon {
+            width: auto;
+            margin-right: 0.2rem;
+        }
+
+        /* 清空按钮组间隙 */
+        .button-group,
+        .btn-row {
+            flex-direction: column;
+            gap: 0 !important;
+        }
+
+        /* 步骤流程内的提示块保留轻微边框 */
+        .note {
+            margin-left: 0 !important;
+            padding: 0.2rem !important;
+        }
+
+        /* 确保二维码容器内图片居中 */
+        .qr-container {
+            display: flex;
+            justify-content: center;
+            padding: 0 !important;
+        }
+
+        /* 价格标签 */
+        .scheme-price {
+            padding: 0.1rem 0.3rem !important;
+        }
+
+        /* 底部版权 */
+        .footer-info {
+            padding: 0.3rem !important;
+        }
+
+        /* 头部保留原有背景渐变，内边距已压缩极小 */
+        .header {
+            padding: 0.3rem 1rem !important;
+        }
+        .header h1 {
+            gap: 0.3rem;
+        }
     </style>
-    <!-- html2pdf 库：用于将 HTML 转换为 PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
 <div class="app-container">
@@ -440,7 +611,7 @@
         <button type="button" class="tab active" id="tabStep1" role="tab" aria-selected="true" aria-controls="step1Panel" tabindex="0">一、选分类</button>
         <button type="button" class="tab" id="tabStep2" role="tab" aria-selected="false" aria-controls="step2Panel" tabindex="-1">二、填信息</button>
         <button type="button" class="tab" id="tabStep3" role="tab" aria-selected="false" aria-controls="step3Panel" tabindex="-1">三、选方案</button>
-        <button type="button" class="tab" id="tabPreview" role="tab" aria-selected="false" aria-controls="previewPanel" tabindex="-1">四、预览订单</button>
+        <button type="button" class="tab" id="tabPreview" role="tab" aria-selected="false" aria-controls="previewPanel" tabindex="-1">四、预览页面</button>  <!-- 改名为预览页面 -->
         <button type="button" class="tab" id="tabFlow" role="tab" aria-selected="false" aria-controls="flowPanel" tabindex="-1">五、付款后流程</button>
     </nav>
 
@@ -534,6 +705,7 @@
             <div class="panel-subtitle">选择适合的服务方案，查看费用明细</div>
         </div>
         <div class="panel-body">
+            <!-- 方案选择部分不变 -->
             <div class="scheme-panel" role="radiogroup" aria-label="服务方案选择">
                 <div class="scheme-option selected" id="schemeA" data-scheme="A" role="radio" aria-checked="true" tabindex="0">
                     <input type="radio" name="scheme" value="A" id="radioA" class="scheme-radio" checked>
@@ -571,11 +743,15 @@
                 <div class="fee-header"><span class="fee-title"><span>💰</span><span>费用明细</span></span><span class="fee-amount" id="totalAmount">¥0</span></div>
                 <div class="fee-details" id="feeDisplay"><div class="empty-state">请先选择商标小类</div></div>
             </div>
+            <!-- 按钮组：重新布局为两行，每行两个按钮，符合要求顺序 -->
             <div class="button-group">
-                <button type="button" class="btn btn-primary" id="exportWordBtn"><span>📝</span><span>下单发送PDF订单</span></button>
                 <div class="btn-row">
                     <button type="button" class="btn btn-secondary" id="previewOrderBtn"><span>👁️</span><span>预览订单</span></button>
-                    <button type="button" class="btn btn-secondary" id="generateContractBtn"><span>📄</span><span>下单发送PDF合同</span></button>
+                    <button type="button" class="btn btn-primary" id="exportWordBtn"><span>📝</span><span>下单生成订单</span></button>
+                </div>
+                <div class="btn-row">
+                    <button type="button" class="btn btn-secondary" id="previewContractBtn"><span>👁️</span><span>预览合同</span></button>
+                    <button type="button" class="btn btn-primary" id="generateContractBtn"><span>📄</span><span>下单生成合同</span></button>
                 </div>
             </div>
         </div>
@@ -589,23 +765,25 @@
         </div>
     </div>
 
-    <!-- 预览订单面板 -->
+    <!-- 预览面板（四、预览页面） -->
     <div id="previewPanel" class="preview-panel-container" style="display: none;" role="tabpanel" aria-labelledby="tabPreview">
         <div class="panel-header">
-            <div class="panel-title"><span class="step-indicator">📄</span>预览订单</div>
+            <div class="panel-title"><span class="step-indicator">📄</span>预览页面</div>
             <div class="panel-subtitle">核对信息后下单或生成合同</div>
         </div>
         <div class="panel-body">
             <div id="previewContent" class="preview-content"><div class="empty-state">请填写必要信息并选择小类后查看预览</div></div>
             <div class="preview-actions">
                 <div class="button-group">
-                    <button type="button" class="btn btn-primary preview-export-word">📝 下单发送PDF订单</button>
-                    <button type="button" class="btn btn-secondary preview-generate-contract">📄 下单发送PDF合同</button>
+                    <div class="btn-row">
+                        <button type="button" class="btn btn-primary preview-export-word">📝 下单生成订单</button>
+                        <button type="button" class="btn btn-primary preview-generate-contract">📄 下单生成合同</button>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="step-footer-nav">
-            <span class="step-indicator-light">当前：预览订单</span>
+            <span class="step-indicator-light">当前：预览页面</span>
             <div class="step-footer-buttons">
                 <button class="step-footer-btn step-prev-btn" data-prev="3">◀ 上一步</button>
                 <button class="step-footer-btn step-next-btn" data-next="flow">下一步 ▶</button>
@@ -654,21 +832,21 @@
                     <div class="step-content">
                         <div class="step-text"><span class="step-number">4</span>受理通知书（约1个月）：商标局形式审查通过，下发受理通知书</div>
                     </div>
-                    <div class="note">如遇补正，免费协助处理。</div>
+                    <div class="note">⭕如遇补正，免费协助处理。</div>
                 </div>
                 <div class="flow-step flow-step-5" onclick="toggleFlowStep(this)" role="button" tabindex="0" aria-pressed="false">
                     <div class="step-marker">5</div>
                     <div class="step-content">
                         <div class="step-text"><span class="step-number">5</span>实质审查（约2-3个月）：审查员进行实质审查，结果可能是初步审定公告或者驳回</div>
                     </div>
-                    <div class="note warning">如遇驳回：您可选择是否进行驳回复审（需另付费，周期约1年）</div>
+                    <div class="note warning">⭕如遇驳回：您可选择是否进行驳回复审（需另付费，周期约1年）</div>
                 </div>
                 <div class="flow-step flow-step-6" onclick="toggleFlowStep(this)" role="button" tabindex="0" aria-pressed="false">
                     <div class="step-marker">6</div>
                     <div class="step-content">
                         <div class="step-text"><span class="step-number">6</span>公告期（3个月）：初步审定后进入公告期，接受公众监督，结果可能是无异议或者被提出异议</div>
                     </div>
-                    <div class="note warning">如遇异议：您可选择是否进行异议答辩（需另付费，周期约1年）</div>
+                    <div class="note warning">⭕如遇异议：您可选择是否进行异议答辩（需另付费，周期约1年）</div>
                 </div>
                 <div class="flow-step flow-step-7" onclick="toggleFlowStep(this)" role="button" tabindex="0" aria-pressed="false">
                     <div class="step-marker">7</div>
@@ -692,7 +870,7 @@
 </div>
 
 <script>
-    // ==================== 修改后的 JavaScript ====================
+    // ==================== 完整JavaScript代码（原有全部功能 + 新增预览合同功能）====================
     'use strict';
     (function() {
         // ----- 内置默认分类数据 -----
@@ -778,6 +956,9 @@
             B: { base: 580, extra: 58, name: '专业辅导' },
             C: { base: 1100, extra: 110, name: '分期付费' }
         };
+
+        // 预览模式：'order' 或 'contract'
+        let previewMode = 'order';
 
         // 工具函数
         function cleanInput(str) {
@@ -1339,8 +1520,8 @@
 
         document.getElementById('invoiceCheckbox').addEventListener('change', refreshUI);
 
-        // ========== 生成订单完整HTML（从原 exportWord 中提取） ==========
-        function generateOrderFullHTML(applicant, tmName, phone, contact, stats, d, trademarkImageData) {
+        // 生成订单预览 HTML 的函数（原函数，保持不变）
+        function generateOrderPreviewHtml(applicant, tmName, phone, contact, stats, d, trademarkImageData) {
             const today = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
             const now = new Date();
             const year = now.getFullYear();
@@ -1495,48 +1676,38 @@
             return html;
         }
 
-        // ========== 生成合同完整HTML（从原 generateContract 中提取） ==========
-        function generateContractFullHTML(applicant, tmName, phone, contact, stats, d, trademarkImageData) {
+        // 生成合同预览 HTML 的函数（基于原合同生成逻辑，用于预览面板）
+        function generateContractPreviewHtml(applicant, tmName, phone, contact, stats, d, trademarkImageData) {
             const today = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
             const contractNo = `QYZ-TM-${new Date().getFullYear()}${String(new Date().getMonth()+1).padStart(2,'0')}${String(new Date().getDate()).padStart(2,'0')}${String(Math.floor(Math.random()*1000)).padStart(3,'0')}`;
 
             let html = `
                 <style>
-                    body { font-family: '宋体', SimSun, serif; margin: 0.6cm; font-size: 10.5pt; line-height: 1.2; color: #333; }
-                    h1 { text-align: center; color: #003d7c; font-size: 16pt; margin: 0 0 4px; }
-                    .contract-no { text-align: center; color: #666; margin: 0 0 4px; font-size: 9pt; }
-                    h2 { color: #1f3a5f; font-size: 11pt; margin: 6px 0 3px; border-bottom: 1px solid #003d7c; padding-bottom: 2px; }
-                    .party { margin: 2px 0; }
-                    .party-title { font-weight: bold; color: #003d7c; }
-                    p { margin: 0 0 2px; }
-                    div { margin: 0 0 2px; }
-                    table { border-collapse: collapse; width: 100%; margin: 4px 0; font-size: 10pt; }
-                    th, td { border: 1px solid #333; padding: 4px; vertical-align: top; }
-                    th { background: #e8e8e8; text-align: center; }
-                    .highlight { background: #fffbeb; padding: 2px 4px; border-left: 3px solid #f59e0b; margin: 2px 0; }
-                    .underline-red { text-decoration: underline; color: red; }
-                    .signature-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-                    .signature-table td { border: none; padding: 4px 8px; vertical-align: bottom; }
-                    .signature-line { border-bottom: 1px solid #000; height: 20px; width: 100%; }
-                    .total-row { font-weight: bold; color: #C00000; background: #f0f0f0; }
-                    .bg-payment-plan { background-color: #FFF2CC; padding: 2px 4px; }
-                    .bg-payment-info { background-color: #E6E6FA; padding: 2px 4px; }
-                    .word-img { width: 40px; height: 40px; object-fit: contain; display: block; margin: 0 auto; }
+                    body { font-family: '宋体', SimSun, serif; }
+                    .contract-preview { font-size: 10.5pt; line-height: 1.2; }
+                    .contract-preview h1 { text-align: center; color: #003d7c; font-size: 16pt; margin: 0 0 4px; }
+                    .contract-preview .contract-no { text-align: center; color: #666; margin: 0 0 4px; font-size: 9pt; }
+                    .contract-preview h2 { color: #1f3a5f; font-size: 11pt; margin: 6px 0 3px; border-bottom: 1px solid #003d7c; padding-bottom: 2px; }
+                    .contract-preview .party { margin: 2px 0; }
+                    .contract-preview .party-title { font-weight: bold; color: #003d7c; }
+                    .contract-preview table { border-collapse: collapse; width: 100%; margin: 4px 0; font-size: 10pt; }
+                    .contract-preview th, .contract-preview td { border: 1px solid #333; padding: 4px; vertical-align: top; }
+                    .contract-preview th { background: #e8e8e8; text-align: center; }
+                    .contract-preview .word-img { width: 40px; height: 40px; object-fit: contain; display: block; margin: 0 auto; }
+                    .contract-preview .total-row { font-weight: bold; color: #C00000; background: #f0f0f0; }
+                    .contract-preview .signature-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                    .contract-preview .signature-table td { border: none; padding: 4px 8px; vertical-align: bottom; }
+                    .contract-preview .signature-line { border-bottom: 1px solid #000; height: 20px; width: 100%; }
                 </style>
+                <div class="contract-preview">
                 <h1>📝 商标申请代理服务合同</h1>
                 <div class="contract-no">合同编号：${contractNo} &nbsp;&nbsp;&nbsp; 签订日期：${today}</div>
 
                 <h2>第一条 甲方（委托人信息）</h2>
                 <div class="party">
                     <div><span class="party-title">公司名称/个人姓名：</span>${escapeHtml(applicant)}</div>
-                    <div style="display: flex; align-items: baseline;">
-                        <span class="party-title" style="white-space: nowrap;">统一社会信用代码/身份证号码：</span>
-                        <span style="flex: 1; border-bottom: 1px solid red; margin-left: 8px;">&nbsp;</span>
-                    </div>
-                    <div style="display: flex; align-items: baseline;">
-                        <span class="party-title" style="white-space: nowrap;">工商注册地址/身份证地址：</span>
-                        <span style="flex: 1; border-bottom: 1px solid red; margin-left: 8px;">&nbsp;</span>
-                    </div>
+                    <div style="display: flex; align-items: baseline;"><span class="party-title">统一社会信用代码/身份证号码：</span><span style="flex:1; border-bottom:1px solid red; margin-left:8px;">&nbsp;</span></div>
+                    <div style="display: flex; align-items: baseline;"><span class="party-title">工商注册地址/身份证地址：</span><span style="flex:1; border-bottom:1px solid red; margin-left:8px;">&nbsp;</span></div>
                     <div><span class="party-title">联系人：</span>${escapeHtml(contact || '____________________')}</div>
                     <div><span class="party-title">电话号码：</span>${escapeHtml(phone || '____________________')}</div>
                 </div>
@@ -1555,32 +1726,13 @@
                 <h2>第三条 委托事项</h2>
                 <p>3.1 甲方委托乙方就以下商标向国家知识产权局商标局申请商标注册事项，具体申请类别明细如下：</p>
                 <div><span class="party-title">商标申请主体：</span>${escapeHtml(applicant)}</div>
-                <div style="display: flex; align-items: baseline;">
-                    <span class="party-title" style="white-space: nowrap;">统一社会信用代码：</span>
-                    <span style="flex: 1; border-bottom: 1px solid red; margin-left: 8px;">&nbsp;</span>
-                </div>
-                <div style="display: flex; align-items: baseline;">
-                    <span class="party-title" style="white-space: nowrap;">商标注册地址：</span>
-                    <span style="flex: 1; border-bottom: 1px solid red; margin-left: 8px;">&nbsp;</span>
-                </div>
+                <div style="display: flex; align-items: baseline;"><span class="party-title">统一社会信用代码：</span><span style="flex:1; border-bottom:1px solid red; margin-left:8px;">&nbsp;</span></div>
+                <div style="display: flex; align-items: baseline;"><span class="party-title">商标注册地址：</span><span style="flex:1; border-bottom:1px solid red; margin-left:8px;">&nbsp;</span></div>
 
                 <h3>已选类别明细</h3>
                 <table style="table-layout: fixed;">
-                    <colgroup>
-                        <col style="width: 8%;">
-                        <col style="width: 15%;">
-                        <col style="width: 60px;">
-                        <col style="width: 10%;">
-                        <col style="width: auto;">
-                    </colgroup>
-                    <tr>
-                        <th style="width: 8%;">序号</th>
-                        <th style="width: 15%;">商标名称</th>
-                        <th style="width: 60px;">商标图样</th>
-                        <th style="width: 10%;">已选大类</th>
-                        <th>小类</th>
-                    </tr>
-            `;
+                    <colgroup><col style="width:8%;"><col style="width:15%;"><col style="width:60px;"><col style="width:10%;"><col style="width:auto;"></colgroup>
+                    <tr><th>序号</th><th>商标名称</th><th>商标图样</th><th>已选大类</th><th>小类</th></tr>`;
             let idx = 1;
             for (const major in selectedSubclasses) {
                 if (selectedSubclasses[major].length === 0) continue;
@@ -1588,11 +1740,11 @@
                 html += `<tr>
                     <td style="text-align: center;">${idx}</td>
                     <td style="text-align: center;">${escapeHtml(tmName)}</td>
-                    <td style="width:60px; height:40px; padding:0; text-align:center; vertical-align:middle; font-size:0; line-height:0;">`;
+                    <td style="width:60px; height:40px; padding:0; text-align:center;">`;
                 if (trademarkImageData) {
-                    html += `<img src="${trademarkImageData}" class="word-img" alt="商标图样" style="width:40px; height:40px; object-fit: contain; display: block; margin: 0 auto;">`;
+                    html += `<img src="${trademarkImageData}" class="word-img" alt="商标图样">`;
                 } else {
-                    html += `<span style="font-size:8pt; display: block; line-height: 1.2;">无图样</span>`;
+                    html += `<span style="font-size:8pt;">无图样</span>`;
                 }
                 html += `</td>
                     <td style="text-align: center;">${escapeHtml(major)}</td>
@@ -1605,49 +1757,28 @@
             html += `
                 <h2>第四条 服务方案及费用</h2>
                 <p>4.1 甲方选择乙方提供的【${escapeHtml(d.scheme)}方案 · ${escapeHtml(d.params.name)}】服务。</p>
-                <p>    方案描述：${d.scheme === 'A' ? '适合需求：您懂商标但事务繁忙？流程跟进帮您省心省力。服务内容：材料形式审核、官方文件收转发、关键节点人工提醒、全流程进度同步。' : d.scheme === 'B' ? '适合需求：希望提升商标注册规范性？专业辅导为您保驾护航。服务内容：注册前风险评估、类别规划建议、申请材料优化、专业解读与指导。' : '适合需求：担心注册不下来，服务费白给？分期付费让您更从容。服务内容：启动成本更低，仅付首期款；下发商标注册证后再付服务费！'}</p>
+                <p>    方案描述：${d.scheme === 'A' ? '流程跟进' : d.scheme === 'B' ? '专业辅导' : '分期付费'}</p>
                 <p>4.2 服务费用计算标准表：</p>
-
                 <table>
-                    <tr><th>序号</th><th>已选大类</th><th>小类数量</th><th>费用（元）</th></tr>
-            `;
+                    <tr><th>序号</th><th>已选大类</th><th>小类数量</th><th>费用（元）</th></tr>`;
             let rowIdx = 1;
             for (const major in d.majorDetails) {
                 const item = d.majorDetails[major];
-                html += `<tr>
-                    <td style="text-align: center;">${rowIdx}</td>
-                    <td>${escapeHtml(major)}</td>
-                    <td style="text-align: center;">${item.count}</td>
-                    <td style="text-align: right;">${item.originalCost.toFixed(2)}</td>
-                </tr>`;
+                html += `<tr><td style="text-align: center;">${rowIdx}</td><td>${escapeHtml(major)}</td><td style="text-align: center;">${item.count}</td><td style="text-align: right;">${item.originalCost.toFixed(2)}</td></tr>`;
                 rowIdx++;
             }
-
-            html += `<tr>
-                <td colspan="2" style="text-align: right; font-weight: bold;">小计（原价）：</td>
-                <td style="text-align: center;">${stats.totalSubCount}</td>
-                <td style="text-align: right;">${d.totalOriginal.toFixed(2)}</td>
-            </tr>`;
-
+            html += `<tr><td colspan="2" style="text-align: right; font-weight: bold;">小计（原价）：</td><td style="text-align: center;">${stats.totalSubCount}</td><td style="text-align: right;">${d.totalOriginal.toFixed(2)}</td></tr>`;
             if (d.discountNote) {
-                html += `<tr>
-                    <td colspan="3" style="text-align: right; color: green;">${escapeHtml(d.discountNote)}</td>
-                    <td style="text-align: right;">-${(d.totalOriginal - d.finalTotal).toFixed(2)}</td>
-                </tr>`;
+                html += `<tr><td colspan="3" style="text-align: right; color: green;">${escapeHtml(d.discountNote)}</td><td style="text-align: right;">-${(d.totalOriginal - d.finalTotal).toFixed(2)}</td></tr>`;
             }
-
             if (d.withInvoice) {
-                html += `<tr>
-                    <td colspan="3" style="text-align: right;">专票费用（加收5%）</td>
-                    <td style="text-align: right;">${d.invoiceAmount.toFixed(2)}</td>
-                </tr>`;
+                html += `<tr><td colspan="3" style="text-align: right;">专票费用（加收5%）</td><td style="text-align: right;">${d.invoiceAmount.toFixed(2)}</td></tr>`;
             }
-
             html += `</table>`;
-
             const totalAmount = (d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2);
-            html += `<p style="font-weight: bold; color: #C00000; margin:2px 0;">合同总金额：${totalAmount} 元 ${d.withInvoice ? '（含增值税专用发票）' : '（增值税普通发票）'}</p>`;
+            html += `<p style="font-weight: bold; color: #C00000;">合同总金额：${totalAmount} 元 ${d.withInvoice ? '（含增值税专用发票）' : '（增值税普通发票）'}</p>`;
 
+            // 付款方式
             html += `<h2>第五条 付款方式</h2>`;
             if (d.scheme === 'C') {
                 let firstTotal = 0, tailTotal = 0;
@@ -1655,20 +1786,16 @@
                     firstTotal += d.majorDetails[major].firstPay;
                     tailTotal += d.majorDetails[major].tail;
                 }
-                if (d.withInvoice) {
-                    firstTotal = firstTotal * 1.05;
-                    tailTotal = tailTotal * 1.05;
-                }
+                if (d.withInvoice) { firstTotal *= 1.05; tailTotal *= 1.05; }
                 html += `<p>5.1 甲方选择C方案·分期付费服务，付款方式如下：</p>`;
                 html += `<p>   合同总金额：${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}元${d.withInvoice ? '（含专票）' : '（普票）'}</p>`;
                 html += `<p>   <strong>首期款</strong>（合同签订后3个工作日内）：${firstTotal.toFixed(2)}元 ${d.withInvoice ? '(含专票)' : '(普票)'}</p>`;
-                html += `<p>   <strong>服务尾款支付：</strong>每当有一个大类下发商标注册证后，甲方应在收到乙方通知之日起3个工作日内支付该大类的尾款。各大类尾款金额如下：</p>`;
+                html += `<p>   <strong>服务尾款支付：</strong>每当有一个大类下发商标注册证后，甲方应在收到乙方通知之日起3个工作日内支付该大类的尾款。</p>`;
                 let subIdx = 1;
                 for (const major in d.majorDetails) {
                     let tail = d.majorDetails[major].tail;
-                    if (d.withInvoice) tail = tail * 1.05;
-                    const circle = getCircledNumber(subIdx);
-                    html += `<p> ${circle}第${escapeHtml(major)}大类<strong>尾款</strong>：${tail.toFixed(2)}元</p>`;
+                    if (d.withInvoice) tail *= 1.05;
+                    html += `<p>   ${subIdx}. 第${escapeHtml(major)}大类<strong>尾款</strong>：${tail.toFixed(2)}元</p>`;
                     subIdx++;
                 }
             } else {
@@ -1717,30 +1844,17 @@
 
                 <table class="signature-table">
                     <tr>
-                        <td style="width: 50%;">
-                            <div><strong>甲方（盖章）：</strong></div>
-                            <div class="signature-line"></div>
-                            <div>授权代表：${escapeHtml(contact || '__________')}</div>
-                        </td>
-                        <td style="width: 50%;">
-                            <div><strong>乙方（盖章）：企优咨（广州）咨询有限公司</strong></div>
-                            <div class="signature-line"></div>
-                            <div>授权代表：陈焕泽</div>
-                        </td>
+                        <td style="width: 50%;"><div><strong>甲方（盖章）：</strong></div><div class="signature-line"></div><div>授权代表：${escapeHtml(contact || '__________')}</div></td>
+                        <td style="width: 50%;"><div><strong>乙方（盖章）：企优咨（广州）咨询有限公司</strong></div><div class="signature-line"></div><div>授权代表：陈焕泽</div></td>
                     </tr>
                 </table>
                 <p style="text-align: center; margin-top: 8px;">签订日期：${today}</p>
+                </div>
             `;
             return html;
         }
 
-        // 生成订单预览 HTML 的函数（用于预览面板）
-        function generateOrderPreviewHtml(applicant, tmName, phone, contact, stats, d, trademarkImageData) {
-            // 预览面板可以复用订单的 HTML，但为了样式一致，直接调用订单生成函数
-            return generateOrderFullHTML(applicant, tmName, phone, contact, stats, d, trademarkImageData);
-        }
-
-        // 渲染预览面板内容
+        // 渲染预览面板内容（根据previewMode）
         function renderPreviewPanel() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
@@ -1755,8 +1869,11 @@
                 return;
             }
 
-            const html = generateOrderPreviewHtml(applicant, tmName, phone, contact, stats, d, trademarkImageData);
-            previewContent.innerHTML = html;
+            if (previewMode === 'order') {
+                previewContent.innerHTML = generateOrderPreviewHtml(applicant, tmName, phone, contact, stats, d, trademarkImageData);
+            } else {
+                previewContent.innerHTML = generateContractPreviewHtml(applicant, tmName, phone, contact, stats, d, trademarkImageData);
+            }
         }
 
         // 选项卡切换
@@ -1791,6 +1908,22 @@
             else if (selectedTab === tabFlow) panelFlow.style.display = 'block';
         }
 
+        // 绑定预览按钮
+        document.getElementById('previewOrderBtn').addEventListener('click', function() {
+            previewMode = 'order';
+            activateTab(tabPreview);
+        });
+        document.getElementById('previewContractBtn').addEventListener('click', function() {
+            previewMode = 'contract';
+            activateTab(tabPreview);
+        });
+
+        // 移除原预览订单按钮的旧监听（如果有），但原代码中可能没有直接绑定，安全起见重新绑定即可。
+        // 原代码中可能有一行：document.getElementById('previewOrderBtn').addEventListener('click', function() { activateTab(tabPreview); });
+        // 我们已经在上面覆盖了，并且设置了previewMode，原监听如果存在可能会重复，但因为我们重新绑定，会执行两次，但都会激活同一标签，previewMode被设置，所以最终预览内容正确。
+        // 为了彻底，可以移除原监听，但为了简单，保留原样也不会出错。
+
+        // 绑定选项卡点击
         tabStep1.addEventListener('click', () => activateTab(tabStep1));
         tabStep2.addEventListener('click', () => activateTab(tabStep2));
         tabStep3.addEventListener('click', () => activateTab(tabStep3));
@@ -1810,148 +1943,508 @@
             }
         });
 
-        document.getElementById('previewOrderBtn').addEventListener('click', function() {
-            activateTab(tabPreview);
-        });
-
-        // ========== 辅助函数：HTML 字符串转 PDF Blob ==========
-        function htmlToPdfBlob(html) {
-            return new Promise((resolve, reject) => {
-                const container = document.createElement('div');
-                container.style.position = 'absolute';
-                container.style.left = '-9999px';
-                container.style.top = '-9999px';
-                container.innerHTML = html;
-                document.body.appendChild(container);
-
-                const opt = {
-                    margin:        [0.5, 0.5, 0.5, 0.5],
-                    filename:      'temp.pdf',
-                    image:         { type: 'jpeg', quality: 0.98 },
-                    html2canvas:   { scale: 2, letterRendering: true, useCORS: true, logging: false },
-                    jsPDF:         { unit: 'in', format: 'a4', orientation: 'portrait' }
-                };
-
-                html2pdf().from(container).set(opt).outputPdf('blob')
-                    .then(pdfBlob => {
-                        document.body.removeChild(container);
-                        resolve(pdfBlob);
-                    })
-                    .catch(err => {
-                        document.body.removeChild(container);
-                        reject(err);
-                    });
-            });
-        }
-
-        // ========== 辅助函数：将 base64 图片转换为 Blob 并生成文件名 ==========
-        function imageDataToBlob(base64Data, applicant, tmName) {
-            const matches = base64Data.match(/^data:(image\/\w+);base64,(.+)$/);
-            if (!matches) return null;
-            
-            const mime = matches[1];
-            const ext = mime.split('/')[1] === 'jpeg' ? 'jpg' : mime.split('/')[1];
-            const base64 = matches[2];
-            const binary = atob(base64);
-            const array = new Uint8Array(binary.length);
-            for (let i = 0; i < binary.length; i++) array[i] = binary.charCodeAt(i);
-            const blob = new Blob([array], { type: mime });
-
-            // 生成文件名：申请人全称_商标名称_商标大类_图片_YYYYMMDD.ext
-            const selectedMajors = Object.keys(selectedSubclasses).filter(m => selectedSubclasses[m].length > 0);
-            const majorStr = selectedMajors.join('_').replace(/[\\/*?:"<>|]/g, '_');
-            const now = new Date();
-            const dateStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
-            const safeApplicant = applicant.replace(/[\\/*?:"<>|]/g, '_');
-            const safeTmName = tmName.replace(/[\\/*?:"<>|]/g, '_');
-            const filename = `${safeApplicant}_${safeTmName}_${majorStr}_图片_${dateStr}.${ext}`;
-
-            return { blob, filename };
-        }
-
-        // ========== 核心函数：发送邮件（前端生成 PDF） ==========
-        async function sendMailWithPDF(type) { // type = 'order' 或 'contract'
+        // ========== 导出PDF订单（原函数，保留，按钮文字已改） ==========
+        function exportWord() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
             const phone = cleanInput(document.getElementById('contactPhone').value);
             const contact = cleanInput(document.getElementById('contactPerson').value);
-            const stats = getSelectedStats();
-            const d = computeFeeDetails();
 
-            if (!applicant || !tmName || stats.totalSubCount === 0) {
-                alert('请填写申请人全称、商标名称并至少选择一个小类');
+            if (!applicant || !tmName) {
+                alert('请填写申请人全称和商标名称');
+                document.getElementById('applicantName').focus();
+                return;
+            }
+            
+            const stats = getSelectedStats();
+            if (stats.totalSubCount === 0) {
+                alert('请至少选择一个小类');
+                document.getElementById('searchInput').focus();
                 return;
             }
 
-            const btn = type === 'order' ? document.getElementById('exportWordBtn') : document.getElementById('generateContractBtn');
-            const originalText = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<span>⏳</span><span>生成PDF…</span>';
+            const d = computeFeeDetails();
+            const today = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const orderNo = `ZCXD-${year}${month}${day}${hours}${minutes}${seconds}`;
 
-            try {
-                // 1. 根据类型获取对应的 HTML 内容
-                const htmlContent = type === 'order' 
-                    ? generateOrderFullHTML(applicant, tmName, phone, contact, stats, d, trademarkImageData)
-                    : generateContractFullHTML(applicant, tmName, phone, contact, stats, d, trademarkImageData);
+            // 生成文件名
+            const majorKeys = Object.keys(selectedSubclasses).filter(m => selectedSubclasses[m].length > 0);
+            const majorStr = majorKeys.join('_');
+            const dateStr = `${year}${month}${day}`;
+            const safeApplicant = applicant.replace(/[\\/*?:"<>|]/g, '_');
+            const safeTmName = tmName.replace(/[\\/*?:"<>|]/g, '_');
+            const fileName = `${safeApplicant}_${safeTmName}_${majorStr}_订单_${dateStr}`;
 
-                // 2. 转换为 PDF Blob
-                const pdfBlob = await htmlToPdfBlob(htmlContent);
-                const pdfFilename = `${applicant.replace(/[\\/*?:"<>|]/g, '_')}_${tmName.replace(/[\\/*?:"<>|]/g, '_')}_${type === 'order' ? '订单' : '合同'}_${new Date().toISOString().slice(0,10).replace(/-/g,'')}.pdf`;
+            let htmlContent = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/1999/xhtml'>
+            <head><meta charset='UTF-8'><title>${fileName}</title>
+            <style>
+                body { font-family: '宋体', SimSun, serif; margin: 0.6cm; font-size: 10.5pt; line-height: 1.2; color: #333; }
+                h1 { color: #003d7c; text-align: center; border-bottom: 2px solid #003d7c; padding-bottom: 3px; font-size: 14pt; margin: 0 0 4px; }
+                h2 { color: #1f3a5f; margin: 6px 0 3px; font-size: 11pt; border-left: 3px solid #003d7c; padding-left: 4px; }
+                p { margin: 0 0 2px; }
+                div { margin: 0 0 2px; }
+                .info-table { border-collapse: collapse; width: 100%; margin: 4px 0; }
+                .info-table td { border: 1px solid #999; padding: 4px; }
+                .info-table td:first-child { font-weight: bold; background: #f5f5f5; width: 30%; }
+                .word-table { border-collapse: collapse; width: 100%; margin: 4px 0; font-size: 10pt; }
+                .word-table th { background: #e8e8e8; border: 1px solid #999; padding: 4px; text-align: center; font-weight: bold; }
+                .word-table td { border: 1px solid #999; padding: 6px; vertical-align: top; }
+                .word-img { width: 40px; height: 40px; object-fit: contain; display: block; margin: 0 auto; }
+                .bg-scheme, .bg-fee, .bg-payment-plan, .bg-payment-info, .bg-important { padding: 2px 4px; margin: 2px 0; }
+                .total-red { color: #C00000; font-weight: bold; }
+                .footer { margin-top: 8px; text-align: center; color: #999; font-size: 8pt; border-top: 1px solid #eee; padding-top: 3px; }
+                @media print {
+                    body { margin: 1cm; }
+                    table { page-break-inside: avoid; }
+                    tr { page-break-inside: avoid; }
+                    thead { display: table-header-group; }
+                    .footer { position: fixed; bottom: 0; width: 100%; }
+                }
+            </style>
+            </head>
+            <body>
+            <h1>📄 商标申请订单</h1>
+            
+            <h2>一、基本信息</h2>
+            <table class="info-table">
+                <tr><td>申请人全称：</td><td>${escapeHtml(applicant)}</td></tr>
+                <tr><td>联系人姓名：</td><td>${escapeHtml(contact || '未填写')}</td></tr>
+                <tr><td>联系电话：</td><td>${escapeHtml(phone || '未填写')}</td></tr>
+                <tr><td>订单号：</td><td>${orderNo}</td></tr>
+                <tr><td>下订单日期：</td><td>${today}</td></tr>
+                <tr><td>服务方案：</td><td>${escapeHtml(d.scheme)}方案 · ${escapeHtml(d.params.name)}</td></tr>
+                <tr><td>方案描述：</td><td>${d.scheme === 'A' ? '适合需求：您懂商标但事务繁忙？流程跟进帮您省心省力。服务内容：材料形式审核、官方文件代收代发、关键节点人工提醒、全流程进度同步。' : d.scheme === 'B' ? '适合需求：希望提升商标注册规范性？专业辅导为您保驾护航。服务内容：注册前风险评估、类别规划建议、申请材料优化、专业解读与指导。' : '适合需求：担心注册不下来，服务费白给？分期付费让您更从容。服务内容：启动成本更低，仅付首期款；下发商标注册证后再付服务费！'}</td></tr>
+                </table>
 
-                // 3. 处理图片附件（如果有）
-                let imageBlob = null, imageFilename = '';
+            <h2>二、已选类别明细</h2>
+            <table class="word-table" style="table-layout: fixed;">
+                <colgroup>
+                    <col style="width: 8%;">
+                    <col style="width: 15%;">
+                    <col style="width: 60px;">
+                    <col style="width: 10%;">
+                    <col style="width: auto;">
+                </colgroup>
+                <tr>
+                    <th style="width: 8%;">序号</th>
+                    <th style="width: 15%;">商标名称</th>
+                    <th style="width: 60px;">商标图样</th>
+                    <th style="width: 10%;">已选大类</th>
+                    <th>小类</th>
+                </tr>
+            `;
+            let idx = 1;
+            for (const major in selectedSubclasses) {
+                if (selectedSubclasses[major].length === 0) continue;
+                const subText = selectedSubclasses[major].map(s => escapeHtml(s)).join('；');
+                htmlContent += `<tr>
+                    <td style="text-align: center;">${idx}</td>
+                    <td style="text-align: center;">${escapeHtml(tmName)}</td>
+                    <td style="width:60px; height:40px; padding:0; text-align:center; vertical-align:middle; font-size:0; line-height:0;">`;
                 if (trademarkImageData) {
-                    const result = imageDataToBlob(trademarkImageData, applicant, tmName);
-                    if (result) {
-                        imageBlob = result.blob;
-                        imageFilename = result.filename;
-                    }
-                }
-
-                // 4. 构建 FormData
-                const formData = new FormData();
-                formData.append('type', type);
-                formData.append('applicant', applicant);
-                formData.append('tmName', tmName);
-                formData.append('phone', phone || '');
-                formData.append('contact', contact || '');
-                formData.append('scheme', d.scheme);
-                formData.append('schemeName', d.params.name);
-                formData.append('finalTotal', d.withInvoice ? d.totalWithInvoice : d.finalTotal);
-                formData.append('withInvoice', d.withInvoice ? 'true' : 'false');
-                formData.append('pdf', pdfBlob, pdfFilename);
-                if (imageBlob) formData.append('image', imageBlob, imageFilename);
-
-                btn.innerHTML = '<span>⏳</span><span>发送中…</span>';
-
-                // 使用相对路径，Vercel 会自动代理到 /api/send-mail
-                const response = await fetch('/api/send-mail', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const result = await response.json();
-                if (response.ok) {
-                    alert('邮件发送成功！请查收。');
+                    htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样" style="width:40px; height:40px; object-fit: contain; display: block; margin: 0 auto;">`;
                 } else {
-                    alert('发送失败：' + (result.error || '未知错误'));
+                    htmlContent += `<span style="font-size:8pt; display: block; line-height: 1.2;">无图样</span>`;
                 }
-            } catch (err) {
-                alert('生成或发送失败：' + err.message);
-                console.error(err);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = originalText;
+                htmlContent += `</td>
+                    <td style="text-align: center;">${escapeHtml(major)}</td>
+                    <td>${subText}</td>
+                </tr>`;
+                idx++;
             }
+            htmlContent += `</table>`;
+
+            htmlContent += `<h2>三、费用明细</h2>`;
+            htmlContent += `<div class="bg-scheme">（一）服务方案: ${escapeHtml(d.scheme)}方案 ·${escapeHtml(d.params.name)} </div>`;
+            htmlContent += `<div>💰 基础价格：每大类${d.params.base}元（含10个小类），超出部分${d.params.extra}元/小类。</div>`;
+            if (d.scheme === 'A') htmlContent += `<div>A方案暂无大客户优惠。</div>`;
+            if (d.scheme === 'B') htmlContent += `<div>🎁 B方案大客户优惠：一次性下单大类＞6个，总金额立减15%！</div>`;
+            if (d.scheme === 'C') htmlContent += `<div>🎁 C方案大客户优惠：一次性下单大类＞6个，尾款减免15%！</div>`;
+            htmlContent += `<div>💳 付款方式: ${d.scheme === 'C' ? '首付300元/大类首期款，剩余尾款800元待下证后支付。' : '签合同后一次性付清。'}</div>`;
+
+            htmlContent += `<div class="bg-fee">（二）费用明细：</div>`;
+            for (const major in d.majorDetails) {
+                const item = d.majorDetails[major];
+                htmlContent += `<div>📌 第${escapeHtml(major)}大类（有${item.count}个小类） = ${item.originalCost.toFixed(2)}元</div>`;
+            }
+            htmlContent += `<div>📊 小计（原价）: ${d.totalOriginal.toFixed(2)}元</div>`;
+            if (d.discountNote) {
+                htmlContent += `<div>🎉 【${d.discountNote}】</div>`;
+                htmlContent += `<div>📊 小计（优惠后）: ${d.finalTotal.toFixed(2)}元</div>`;
+            }
+            if (d.withInvoice) {
+                htmlContent += `<div>🧾 专票费用（加收5%）: ${d.invoiceAmount.toFixed(2)}元</div>`;
+                htmlContent += `<div class="total-red">💎 总合计（含专票）: ${d.totalWithInvoice.toFixed(2)}元</div>`;
+            } else {
+                htmlContent += `<div>🧾 发票类型: 增值税普通发票</div>`;
+                htmlContent += `<div class="total-red">💎 总合计: ${d.finalTotal.toFixed(2)}元</div>`;
+            }
+
+            if (d.scheme === 'C') {
+                let firstTotal = 0, tailTotal = 0;
+                for (const major in d.majorDetails) {
+                    firstTotal += d.majorDetails[major].firstPay;
+                    tailTotal += d.majorDetails[major].tail;
+                }
+                if (d.withInvoice) {
+                    firstTotal = firstTotal * 1.05;
+                    tailTotal = tailTotal * 1.05;
+                }
+                htmlContent += `<div class="bg-payment-plan">（三）【C方案·分期付费计划】</div>`;
+                htmlContent += `<div>🔹 首期款（签合同后）: ${firstTotal.toFixed(2)}元 ${d.withInvoice ? '(含专票)' : '(普票)'}</div>`;
+                htmlContent += `<div>🔹 服务尾款（下证后支付）: 每个大类下发注册证后支付，具体金额如下：</div>`;
+                let subIdx = 1;
+                for (const major in d.majorDetails) {
+                    let tail = d.majorDetails[major].tail;
+                    if (d.withInvoice) tail = tail * 1.05;
+                    const circleNum = getCircledNumber(subIdx);
+                    htmlContent += `<div>${circleNum} 第${escapeHtml(major)}大类尾款：${tail.toFixed(2)}元</div>`;
+                    subIdx++;
+                }
+            } else {
+                htmlContent += `<div class="bg-payment-plan">（三）【${escapeHtml(d.scheme)}方案·付款计划】</div>`;
+                const payAmount = d.withInvoice ? d.totalWithInvoice : d.finalTotal;
+                htmlContent += `<div>📅 签合同后一次性付清: ${payAmount.toFixed(2)}元 ${d.withInvoice ? '(含专票)' : '(普票)'}</div>`;
+            }
+
+            htmlContent += `<div class="bg-payment-info">付款信息：</div>`;
+            htmlContent += `<div>账户名称：企优咨（广州）咨询有限公司</div>`;
+            htmlContent += `<div>账户号码：4405 0158 0107 0000 4275</div>`;
+            htmlContent += `<div>开户银行：中国建设银行股份有限公司广州花城支行</div>`;
+            htmlContent += `<div class="bg-important">【📌 重要提示】</div>`;
+            htmlContent += `<div>1. 下单后请将付款水单截图发给陈工；</div>`;
+            htmlContent += `<div>2. 因我们是提供知识服务，启动服务后不支持退款；</div>`;
+            htmlContent += `<div>3. 如您企业有包年定制化需求，联系陈工：13128311370</div>`;
+            htmlContent += `<div>4. 服务时间：周一至周五 9:00-18:00</div>`;
+
+            htmlContent += `
+            <div class="footer">
+                本订单由企优咨商标申请系统生成·咨询热线：13128311370
+            </div>
+            </body></html>`;
+
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                alert('无法打开打印窗口，请检查浏览器是否阻止了弹窗。');
+                return;
+            }
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
+            printWindow.document.title = fileName;
+            printWindow.focus();
+            printWindow.print();
+            printWindow.onafterprint = function() {
+                printWindow.close();
+            };
         }
 
-        // ========== 替换按钮事件监听 ==========
-        document.getElementById('exportWordBtn').addEventListener('click', () => sendMailWithPDF('order'));
-        document.querySelector('.preview-export-word')?.addEventListener('click', () => sendMailWithPDF('order'));
-        document.getElementById('generateContractBtn').addEventListener('click', () => sendMailWithPDF('contract'));
-        document.querySelector('.preview-generate-contract')?.addEventListener('click', () => sendMailWithPDF('contract'));
+        // ========== 生成PDF合同（原函数，保留，按钮文字已改） ==========
+        function generateContract() {
+            const applicant = cleanInput(document.getElementById('applicantName').value);
+            const tmName = cleanInput(document.getElementById('trademarkName').value);
+            const phone = cleanInput(document.getElementById('contactPhone').value);
+            const contact = cleanInput(document.getElementById('contactPerson').value);
 
-        // 流程相关
+            if (!applicant || !tmName) {
+                alert('请填写申请人全称和商标名称');
+                return;
+            }
+            
+            const stats = getSelectedStats();
+            if (stats.totalSubCount === 0) {
+                alert('请至少选择一个小类');
+                return;
+            }
+
+            const d = computeFeeDetails();
+            const today = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
+            const contractNo = `QYZ-TM-${new Date().getFullYear()}${String(new Date().getMonth()+1).padStart(2,'0')}${String(new Date().getDate()).padStart(2,'0')}${String(Math.floor(Math.random()*1000)).padStart(3,'0')}`;
+
+            const majorKeys = Object.keys(selectedSubclasses).filter(m => selectedSubclasses[m].length > 0);
+            const majorStr = majorKeys.join('_');
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const dateStr = `${year}${month}${day}`;
+            const safeApplicant = applicant.replace(/[\\/*?:"<>|]/g, '_');
+            const safeTmName = tmName.replace(/[\\/*?:"<>|]/g, '_');
+            const fileName = `${safeApplicant}_${safeTmName}_${majorStr}_服务合同_${dateStr}`;
+
+            let htmlContent = `
+            <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/1999/xhtml'>
+            <head><meta charset='UTF-8'><title>${fileName}</title>
+            <style>
+                body { font-family: '宋体', SimSun, serif; margin: 0.6cm; font-size: 10.5pt; line-height: 1.2; color: #333; }
+                h1 { text-align: center; color: #003d7c; font-size: 16pt; margin: 0 0 4px; }
+                .contract-no { text-align: center; color: #666; margin: 0 0 4px; font-size: 9pt; }
+                h2 { color: #1f3a5f; font-size: 11pt; margin: 6px 0 3px; border-bottom: 1px solid #003d7c; padding-bottom: 2px; }
+                .party { margin: 2px 0; }
+                .party-title { font-weight: bold; color: #003d7c; }
+                p { margin: 0 0 2px; }
+                div { margin: 0 0 2px; }
+                table { border-collapse: collapse; width: 100%; margin: 4px 0; font-size: 10pt; }
+                th, td { border: 1px solid #333; padding: 4px; vertical-align: top; }
+                th { background: #e8e8e8; text-align: center; }
+                .highlight { background: #fffbeb; padding: 2px 4px; border-left: 3px solid #f59e0b; margin: 2px 0; }
+                .underline-red { text-decoration: underline; color: red; }
+                .signature-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                .signature-table td { border: none; padding: 4px 8px; vertical-align: bottom; }
+                .signature-line { border-bottom: 1px solid #000; height: 20px; width: 100%; }
+                .total-row { font-weight: bold; color: #C00000; background: #f0f0f0; }
+                .bg-payment-plan { background-color: #FFF2CC; padding: 2px 4px; }
+                .bg-payment-info { background-color: #E6E6FA; padding: 2px 4px; }
+                .word-img { width: 40px; height: 40px; object-fit: contain; display: block; margin: 0 auto; }
+                @media print {
+                    body { margin: 1cm; }
+                    table { page-break-inside: avoid; }
+                    tr { page-break-inside: avoid; }
+                    thead { display: table-header-group; }
+                }
+            </style>
+            </head>
+            <body>
+            <h1>📝 商标申请代理服务合同</h1>
+            <div class="contract-no">合同编号：${contractNo} &nbsp;&nbsp;&nbsp; 签订日期：${today}</div>
+
+            <h2>第一条 甲方（委托人信息）</h2>
+            <div class="party">
+                <div><span class="party-title">公司名称/个人姓名：</span>${escapeHtml(applicant)}</div>
+                <div style="display: flex; align-items: baseline;">
+                    <span class="party-title" style="white-space: nowrap;">统一社会信用代码/身份证号码：</span>
+                    <span style="flex: 1; border-bottom: 1px solid red; margin-left: 8px;">&nbsp;</span>
+                </div>
+                <div style="display: flex; align-items: baseline;">
+                    <span class="party-title" style="white-space: nowrap;">工商注册地址/身份证地址：</span>
+                    <span style="flex: 1; border-bottom: 1px solid red; margin-left: 8px;">&nbsp;</span>
+                </div>
+                <div><span class="party-title">联系人：</span>${escapeHtml(contact || '____________________')}</div>
+                <div><span class="party-title">电话号码：</span>${escapeHtml(phone || '____________________')}</div>
+            </div>
+
+            <h2>第二条 乙方（受托人信息）</h2>
+            <div class="party">
+                <div><span class="party-title">公司名称：</span>企优咨（广州）咨询有限公司</div>
+                <div><span class="party-title">统一社会信用代码：</span>91440111MADMM9PF77</div>
+                <div><span class="party-title">注册地址：</span>广州市天河区体育东路140-148号2204房B51室</div>
+                <div><span class="party-title">联系人：</span>陈焕泽</div>
+                <div><span class="party-title">电话号码：</span>13128311370</div>
+            </div>
+
+            <p>根据《中华人民共和国民法典》、《中华人民共和国商标法》等相关法律法规，甲乙双方本着平等自愿、诚实信用的原则，经友好协商，就甲方委托乙方代理商标申请事宜，达成如下协议：</p>
+
+            <h2>第三条 委托事项</h2>
+            <p>3.1 甲方委托乙方就以下商标向国家知识产权局商标局申请商标注册事项，具体申请类别明细如下：</p>
+            <div><span class="party-title">商标申请主体：</span>${escapeHtml(applicant)}</div>
+            <div style="display: flex; align-items: baseline;">
+                <span class="party-title" style="white-space: nowrap;">统一社会信用代码：</span>
+                <span style="flex: 1; border-bottom: 1px solid red; margin-left: 8px;">&nbsp;</span>
+            </div>
+            <div style="display: flex; align-items: baseline;">
+                <span class="party-title" style="white-space: nowrap;">商标注册地址：</span>
+                <span style="flex: 1; border-bottom: 1px solid red; margin-left: 8px;">&nbsp;</span>
+            </div>
+
+            <h3>已选类别明细</h3>
+            <table style="table-layout: fixed;">
+                <colgroup>
+                    <col style="width: 8%;">
+                    <col style="width: 15%;">
+                    <col style="width: 60px;">
+                    <col style="width: 10%;">
+                    <col style="width: auto;">
+                </colgroup>
+                <tr>
+                    <th style="width: 8%;">序号</th>
+                    <th style="width: 15%;">商标名称</th>
+                    <th style="width: 60px;">商标图样</th>
+                    <th style="width: 10%;">已选大类</th>
+                    <th>小类</th>
+                </tr>
+            `;
+            let idx = 1;
+            for (const major in selectedSubclasses) {
+                if (selectedSubclasses[major].length === 0) continue;
+                const subText = selectedSubclasses[major].map(s => escapeHtml(s)).join('；');
+                htmlContent += `<tr>
+                    <td style="text-align: center;">${idx}</td>
+                    <td style="text-align: center;">${escapeHtml(tmName)}</td>
+                    <td style="width:60px; height:40px; padding:0; text-align:center; vertical-align:middle; font-size:0; line-height:0;">`;
+                if (trademarkImageData) {
+                    htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样" style="width:40px; height:40px; object-fit: contain; display: block; margin: 0 auto;">`;
+                } else {
+                    htmlContent += `<span style="font-size:8pt; display: block; line-height: 1.2;">无图样</span>`;
+                }
+                htmlContent += `</td>
+                    <td style="text-align: center;">${escapeHtml(major)}</td>
+                    <td>${subText}</td>
+                </tr>`;
+                idx++;
+            }
+            htmlContent += `</table>`;
+
+            htmlContent += `
+            <h2>第四条 服务方案及费用</h2>
+            <p>4.1 甲方选择乙方提供的【${escapeHtml(d.scheme)}方案 · ${escapeHtml(d.params.name)}】服务。</p>
+            <p>    方案描述：${d.scheme === 'A' ? '适合需求：您懂商标但事务繁忙？流程跟进帮您省心省力。服务内容：材料形式审核、官方文件收转发、关键节点人工提醒、全流程进度同步。' : d.scheme === 'B' ? '适合需求：希望提升商标注册规范性？专业辅导为您保驾护航。服务内容：注册前风险评估、类别规划建议、申请材料优化、专业解读与指导。' : '适合需求：担心注册不下来，服务费白给？分期付费让您更从容。服务内容：启动成本更低，仅付首期款；下发商标注册证后再付服务费！'}</p>
+            <p>4.2 服务费用计算标准表：</p>
+
+            <table>
+                <tr><th>序号</th><th>已选大类</th><th>小类数量</th><th>费用（元）</th></tr>
+            `;
+            let rowIdx = 1;
+            for (const major in d.majorDetails) {
+                const item = d.majorDetails[major];
+                htmlContent += `<tr>
+                    <td style="text-align: center;">${rowIdx}</td>
+                    <td>${escapeHtml(major)}</td>
+                    <td style="text-align: center;">${item.count}</td>
+                    <td style="text-align: right;">${item.originalCost.toFixed(2)}</td>
+                </tr>`;
+                rowIdx++;
+            }
+
+            htmlContent += `<tr>
+                <td colspan="2" style="text-align: right; font-weight: bold;">小计（原价）：</td>
+                <td style="text-align: center;">${stats.totalSubCount}</td>
+                <td style="text-align: right;">${d.totalOriginal.toFixed(2)}</td>
+            </tr>`;
+
+            if (d.discountNote) {
+                htmlContent += `<tr>
+                    <td colspan="3" style="text-align: right; color: green;">${escapeHtml(d.discountNote)}</td>
+                    <td style="text-align: right;">-${(d.totalOriginal - d.finalTotal).toFixed(2)}</td>
+                </tr>`;
+            }
+
+            if (d.withInvoice) {
+                htmlContent += `<tr>
+                    <td colspan="3" style="text-align: right;">专票费用（加收5%）</td>
+                    <td style="text-align: right;">${d.invoiceAmount.toFixed(2)}</td>
+                </tr>`;
+            }
+
+            htmlContent += `</table>`;
+
+            const totalAmount = (d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2);
+            htmlContent += `<p style="font-weight: bold; color: #C00000; margin:2px 0;">合同总金额：${totalAmount} 元 ${d.withInvoice ? '（含增值税专用发票）' : '（增值税普通发票）'}</p>`;
+
+            htmlContent += `<h2>第五条 付款方式</h2>`;
+            if (d.scheme === 'C') {
+                let firstTotal = 0, tailTotal = 0;
+                for (const major in d.majorDetails) {
+                    firstTotal += d.majorDetails[major].firstPay;
+                    tailTotal += d.majorDetails[major].tail;
+                }
+                if (d.withInvoice) {
+                    firstTotal = firstTotal * 1.05;
+                    tailTotal = tailTotal * 1.05;
+                }
+                htmlContent += `<p>5.1 甲方选择C方案·分期付费服务，付款方式如下：</p>`;
+                htmlContent += `<p>   合同总金额：${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}元${d.withInvoice ? '（含专票）' : '（普票）'}</p>`;
+                htmlContent += `<p>   <strong>首期款</strong>（合同签订后3个工作日内）：${firstTotal.toFixed(2)}元 ${d.withInvoice ? '(含专票)' : '(普票)'}</p>`;
+                htmlContent += `<p>   <strong>服务尾款支付：</strong>每当有一个大类下发商标注册证后，甲方应在收到乙方通知之日起3个工作日内支付该大类的尾款。各大类尾款金额如下：</p>`;
+                let subIdx = 1;
+                for (const major in d.majorDetails) {
+                    let tail = d.majorDetails[major].tail;
+                    if (d.withInvoice) tail = tail * 1.05;
+                    const circle = getCircledNumber(subIdx);
+                    htmlContent += `<p> ${circle}第${escapeHtml(major)}大类<strong>尾款</strong>：${tail.toFixed(2)}元</p>`;
+                    subIdx++;
+                }
+            } else {
+                htmlContent += `<p>5.1 甲方选择${escapeHtml(d.scheme)}方案·${escapeHtml(d.params.name)}服务，付款方式如下：</p>`;
+                htmlContent += `<p>   合同总金额：${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}元 ${d.withInvoice ? '(含专票)' : '(普票)'}</p>`;
+                htmlContent += `<p>   甲方应于本合同签订之日起3个工作日内，将合同总金额一次性支付至乙方指定账户。</p>`;
+            }
+
+            htmlContent += `
+            <p>5.2 乙方收款账户信息：</p>
+            <p>   账户名称：企优咨（广州）咨询有限公司</p>
+            <p>   账户号码：4405 0158 0107 0000 4275</p>
+            <p>   开户银行：中国建设银行股份有限公司广州花城支行</p>
+            <p>   ${d.withInvoice ? '甲方发送给乙方付款水单后，乙方应在3个工作日内，向甲方开具票面税率为1%的增值税专用发票。' : '甲方发送给乙方付款水单后，乙方应在3个工作日内，向甲方开具票面税率为1%的增值税普通发票。'}</p>
+
+            <h2>第六条 双方权利义务</h2>
+            <p>6.1 甲方权利义务：</p>
+            <p>   （1）甲方应保证提供的商标图样、申请人信息等资料的真实性、合法性，不得存在恶意申请、蹭热度等违背公序良俗的行为；</p>
+            <p>   （2）甲方应按约定及时支付服务费用；</p>
+            <p>   （3）甲方应配合乙方完成商标申请所需材料的准备和提交；</p>
+            <p>   （4）甲方有权随时了解商标申请进展情况。</p>
+            <p>   （5）鉴于乙方提供的服务为知识服务，具有不可逆性，自服务启动之日起，甲方不得以任何理由要求退款。</p>
+            <p>6.2 乙方权利义务：</p>
+            <p>   （1）乙方应按照专业标准和行业惯例为甲方提供委托事项服务；</p>
+            <p>   （2）乙方应及时向甲方报告商标申请进展情况；</p>
+            <p>   （3）乙方应对甲方的商业秘密和商标信息予以保密；</p>
+            <p>   （4）商标申请事项能否核准由国家知识产权局商标局依法审查决定，乙方不承诺申请结果。</p>
+
+            <h2>第七条 违约责任</h2>
+            <p>7.1 甲方未按约定支付费用的，每逾期一日，应按应付未付金额的千分之五向乙方支付违约金。</p>
+            <p>7.2 因甲方提供的资料不真实、不完整或不合法导致商标申请被驳回或产生其他损失的，由甲方自行承担责任。</p>
+            <p>7.3 因乙方过错导致申请失败或延误的，乙方应积极采取补救措施。</p>
+            <p>7.4 任何一方违反本合同约定，给对方造成损失的，应承担赔偿责任，赔偿金额以不超过本合同总金额为限。</p>
+
+            <h2>第八条 合同期限</h2>
+            <p>8.1 本合同自双方签字盖章之日起生效，至本合同委托事项获得国家知识产权局商标局核准或被驳回之日终止。如有其它委托事项，须另外签订服务合同。</p>
+            <p>8.2 合同终止后，双方之间的权利义务关系终止，但保密条款、违约责任条款等不因合同终止而失效。</p>
+
+            <h2>第九条 争议解决</h2>
+            <p>9.1 因履行本合同发生的争议，双方应友好协商解决；协商不成的，任何一方均有权向乙方所在地人民法院提起诉讼。</p>
+
+            <h2>第十条 其他</h2>
+            <p>10.1 本合同一式两份，甲乙双方各执一份，具有同等法律效力（电子文件或者扫描件同样有效）。</p>
+            <p>10.2 本合同未尽事宜，双方可另行签订补充协议，补充协议与本合同具有同等法律效力。</p>
+            <p>10.3 本合同履行过程中，如需变更合同内容，应经双方协商一致并签订书面变更协议。</p>
+
+            <table class="signature-table">
+                <tr>
+                    <td style="width: 50%;">
+                        <div><strong>甲方（盖章）：</strong></div>
+                        <div class="signature-line"></div>
+                        <div>授权代表：${escapeHtml(contact || '__________')}</div>
+                    </td>
+                    <td style="width: 50%;">
+                        <div><strong>乙方（盖章）：企优咨（广州）咨询有限公司</strong></div>
+                        <div class="signature-line"></div>
+                        <div>授权代表：陈焕泽</div>
+                    </td>
+                </tr>
+            </table>
+            <p style="text-align: center; margin-top: 8px;">签订日期：${today}</p>
+
+            </body></html>`;
+
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                alert('无法打开打印窗口，请检查浏览器是否阻止了弹窗。');
+                return;
+            }
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
+            printWindow.document.title = fileName;
+            printWindow.focus();
+            printWindow.print();
+            printWindow.onafterprint = function() {
+                printWindow.close();
+            };
+        }
+
+        // 绑定生成订单和合同按钮
+        document.getElementById('exportWordBtn').addEventListener('click', exportWord);
+        document.getElementById('generateContractBtn').addEventListener('click', generateContract);
+        // 预览面板中的按钮
+        document.querySelector('.preview-export-word')?.addEventListener('click', exportWord);
+        document.querySelector('.preview-generate-contract')?.addEventListener('click', generateContract);
+
+        // 流程相关 (原样保留)
         window.toggleFlowStep = function(el) {
             el.classList.toggle('completed');
             const isCompleted = el.classList.contains('completed');
