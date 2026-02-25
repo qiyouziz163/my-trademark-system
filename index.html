@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
     <meta name="description" content="企优咨商标申请下单系统 - 专业商标代理服务">
     <meta name="keywords" content="商标申请,商标注册,企优咨,商标代理">
     <link rel="icon" type="image/x-icon" href="企优咨图标.ico">
@@ -17,35 +17,29 @@
         }
         
         :root {
-            /* 主色调 — 明亮科技蓝 */
-            --primary: #2563EB;          /* 原 #003d7c */
-            --primary-dark: #1E40AF;      /* 原 #002856 */
-            --primary-light: #DBEAFE;     /* 原 #e8f0fe */
-            /* 强调色 — 活力橙 */
-            --accent: #F97316;            /* 原 #00c6ff */
-            --accent-light: #FFEDD5;       /* 新增柔和橙 */
+            --primary: #2563EB;          /* 活力亮蓝 */
+            --primary-dark: #1E40AF;      /* 深邃蓝 */
+            --primary-light: #DBEAFE;      /* 浅蓝背景 */
+            --accent: #F97316;             /* 暖橙点缀 */
             --success: #10b981;
-            --warning: #F9C74F;            /* 暖黄 */
+            --warning: #f59e0b;
             --danger: #ef4444;
-            /* 灰色系微调，提升对比 */
-            --gray-50: #F8FAFC;
-            --gray-100: #F1F5F9;
-            --gray-200: #E2E8F0;
-            --gray-300: #CBD5E1;
-            --gray-400: #94A3B8;
-            --gray-500: #64748B;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
             --gray-600: #475569;
-            --gray-700: #1E293B;           /* 主要文字更深 */
-            /* 阴影增强 */
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
-            --shadow: 0 4px 8px -2px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.02);
-            --shadow-lg: 0 10px 20px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.02);
-            --shadow-xl: 0 20px 30px -10px rgba(0,0,0,0.15);
+            --gray-700: #1e293b;           /* 加深主文字 */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
         }
         
         body {
-            /* 更轻盈的背景渐变 */
-            background: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
+            background: linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%);
             min-height: 100vh;
             padding: 20px;
             color: var(--gray-700);
@@ -61,11 +55,11 @@
             overflow: hidden;
         }
         
-        /* ===== 头部 ===== */
+        /* ===== 头部（略微压缩） ===== */
         .header {
-            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, #60A5FA 100%);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, #3b82f6 100%);
             color: white;
-            padding: 0.8rem 2rem;
+            padding: 0.8rem 1.5rem;        /* 比正常稍小，但保持舒适 */
             position: relative;
             overflow: hidden;
         }
@@ -93,7 +87,7 @@
             letter-spacing: -0.5px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
             line-height: 1.2;
         }
         
@@ -101,43 +95,41 @@
             width: 40px;
             height: 40px;
             background: rgba(255,255,255,0.2);
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.3rem;
-            /* 微光效果 */
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         
         .header-subtitle {
-            margin-top: 0.2rem;
-            opacity: 0.9;
-            font-size: 0.95rem;
+            margin-top: 0.3rem;
+            opacity: 0.95;
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 16px;
             flex-wrap: wrap;
             line-height: 1.3;
         }
         
+        /* ----- 头部联系电话 活力橙底白字 0.85rem ----- */
         .header-contact {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            background: var(--accent);            /* 橙色点缀 */
+            background: var(--accent);        /* #F97316 */
+            color: white;                      /* 白色文字 */
             padding: 4px 12px;
-            border-radius: 20px;
+            border-radius: 40px;
             font-size: 0.85rem;
-            color: white;
-            font-weight: 500;
-            box-shadow: 0 2px 6px rgba(249,115,22,0.3);
         }
         
+        /* ===== 选项卡 ===== */
         .tab-bar {
             display: flex;
             background: white;
-            padding: 0 12px;
+            padding: 0 10px;
             gap: 0;
             border-bottom: 2px solid var(--gray-100);
             overflow-x: auto;
@@ -150,17 +142,17 @@
         }
         
         .tab {
-            padding: 10px 14px;
+            padding: 8px 16px;              /* 适中，不过大 */
             cursor: pointer;
             color: var(--gray-500);
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.95rem;
             border-bottom: 3px solid transparent;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             user-select: none;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             position: relative;
             white-space: nowrap;
             background: none;
@@ -175,7 +167,7 @@
         
         .tab.active {
             color: var(--primary);
-            border-bottom-color: var(--primary);
+            border-bottom-color: var(--accent);
         }
         
         .tab.active::after {
@@ -184,16 +176,16 @@
             bottom: -3px;
             left: 50%;
             transform: translateX(-50%);
-            width: 30px;
+            width: 24px;
             height: 3px;
-            background: var(--primary);
+            background: var(--accent);
             border-radius: 3px 3px 0 0;
         }
         
         .tab-badge {
             background: var(--gray-200);
             color: var(--gray-600);
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             padding: 2px 6px;
             border-radius: 10px;
             font-weight: 600;
@@ -204,7 +196,7 @@
             color: white;
         }
         
-        /* ===== 面板容器 ===== */
+        /* ===== 面板容器（紧凑但留一点空间） ===== */
         .step-panel-container,
         .preview-panel-container,
         .flow-panel-container {
@@ -213,13 +205,13 @@
             background: none;
             box-shadow: none;
             border-radius: 0;
-            padding: 20px 40px;
+            padding: 16px 24px;            /* 比极简版本增加水平内边距 */
         }
         
         .panel-header {
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             border-bottom: 1px solid var(--gray-200);
-            padding-bottom: 10px;
+            padding-bottom: 8px;
             background: none;
         }
         
@@ -229,14 +221,14 @@
             color: var(--gray-800);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
         
         .panel-subtitle {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--gray-500);
             margin-top: 4px;
-            margin-left: 42px;
+            margin-left: 34px;
         }
         
         .panel-body {
@@ -250,237 +242,263 @@
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 8px;
         }
         
-        /* 搜索、树形、已选等区块 */
-        .search-section { margin-bottom: 16px; }
-        .search-box { position: relative; display: flex; gap: 12px; align-items: center; }
+        /* 搜索区域 */
+        .search-section { margin-bottom: 12px; }
+        .search-box { position: relative; display: flex; gap: 8px; align-items: center; }
         .search-input-wrapper { position: relative; flex: 1; }
-        .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--gray-400); }
+        .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--gray-400); font-size: 0.9rem; }
         .search-box input { 
-            width: 100%; padding: 14px 16px 14px 44px; border: 2px solid var(--gray-200); 
-            border-radius: 12px; transition: border 0.2s, box-shadow 0.2s;
+            width: 100%; 
+            padding: 8px 12px 8px 40px; 
+            border: 2px solid var(--gray-200); 
+            border-radius: 10px; 
+            font-size: 0.9rem;
+            transition: border-color 0.2s; 
         }
-        .search-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); outline: none; }
-        .search-stats { background: var(--primary-light); color: var(--primary); padding: 8px 16px; border-radius: 20px; font-weight: 500; }
+        .search-box input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px var(--primary-light); }
+        .search-stats { background: var(--primary-light); color: var(--primary-dark); padding: 4px 12px; border-radius: 40px; font-size: 0.8rem; font-weight: 500; white-space: nowrap; }
         
-        /* 树形容器添加阴影 */
+        /* 树形分类 */
         .tree-container { 
-            max-height: 480px; overflow-y: auto; border: 1px solid var(--gray-200); 
-            border-radius: 16px; padding: 12px; background: white;
-            box-shadow: var(--shadow);
+            max-height: 400px; 
+            overflow-y: auto; 
+            border: 1px solid var(--gray-200); 
+            border-radius: 12px; 
+            padding: 8px; 
+            background: white; 
+            box-shadow: var(--shadow-sm); 
         }
         .tree-ul { list-style: none; padding-left: 0; }
-        .tree-ul ul { display: none; margin-left: 12px; padding-left: 12px; border-left: 2px solid var(--gray-200); }
+        .tree-ul ul { display: none; margin-left: 16px; padding-left: 10px; border-left: 2px solid var(--gray-200); }
         .tree-ul li.expanded > ul { display: block; }
         .folder-label { 
-            cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 10px 12px; 
-            width: 100%; font-weight: 600; border-radius: 10px; background: none; border: none; 
-            text-align: left; transition: background 0.2s, box-shadow 0.2s;
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            padding: 6px 10px; 
+            width: 100%; 
+            font-weight: 600; 
+            border-radius: 8px; 
+            background: none; 
+            border: none; 
+            text-align: left; 
+            font-size: 0.9rem;
         }
-        .folder-label:hover { background: var(--gray-50); box-shadow: var(--shadow-sm); }
-        .folder-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; color: var(--primary); transition: transform 0.2s; }
+        .folder-label:hover { background: var(--primary-light); }
+        .folder-icon { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; color: var(--primary); transition: transform 0.2s; font-size: 0.8rem; }
         li.expanded > .folder-label .folder-icon { transform: rotate(90deg); }
-        
-        .cat-major { 
-            background: linear-gradient(135deg, var(--primary-light) 0%, #ffffff 100%); 
-            color: var(--primary-dark); padding: 12px 16px; border-radius: 12px; 
-            border: 1px solid rgba(37,99,235,0.2); box-shadow: var(--shadow-sm);
+        .cat-major { background: linear-gradient(135deg, var(--primary-light) 0%, #dbeafe 100%); color: var(--primary-dark); padding: 8px 12px; border-radius: 10px; }
+        .cat-group { color: var(--gray-700); padding: 6px 0 6px 8px; font-weight: 500; }
+        .subclass-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            padding: 4px 8px 4px 24px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 0.9rem;
         }
-        .cat-group { 
-            color: var(--gray-700); padding: 8px 0 8px 8px; font-weight: 500; 
-            border-radius: 8px; transition: background 0.2s;
-        }
-        .cat-group:hover { background: var(--gray-50); }
-        
-        .subclass-item { display: flex; align-items: center; gap: 12px; padding: 8px 12px 8px 32px; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
         .subclass-item:hover { background: var(--primary-light); }
-        .subclass-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); }
-        .subclass-name { font-size: 0.9rem; color: var(--gray-600); }
+        .subclass-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--primary); }
+        .subclass-name { color: var(--gray-600); }
         
-        .selected-section { margin-bottom: 24px; }
-        .section-label { font-size: 0.9rem; font-weight: 600; color: var(--gray-700); margin-bottom: 12px; display: flex; justify-content: space-between; }
+        /* 已选区域 */
+        .selected-section { margin-bottom: 16px; }
+        .section-label { font-size: 0.9rem; font-weight: 600; color: var(--gray-700); margin-bottom: 8px; display: flex; justify-content: space-between; }
         .selected-list { 
-            min-height: 120px;
-            max-height: 300px;
+            min-height: 100px;
+            max-height: 240px;
             overflow-y: auto; 
             background: var(--gray-50); 
-            border-radius: 16px; 
-            padding: 16px; 
+            border-radius: 12px; 
+            padding: 12px; 
             border: 2px dashed var(--gray-300); 
-            transition: border 0.2s, box-shadow 0.2s;
-            box-shadow: var(--shadow-sm);
         }
-        .selected-list.has-items { border-style: solid; border-color: var(--primary-light); background: white; box-shadow: var(--shadow); }
-        .selected-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .selected-list.has-items { border-style: solid; border-color: var(--primary-light); background: white; box-shadow: var(--shadow-sm); }
+        .selected-tags { display: flex; flex-wrap: wrap; gap: 6px; }
         .selected-tag { 
-            background: white; border: 1px solid var(--primary-light); border-radius: 20px; 
-            padding: 6px 14px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: all 0.2s;
+            background: white; 
+            border: 1px solid var(--primary-light); 
+            border-radius: 40px; 
+            padding: 4px 10px; 
+            font-size: 0.8rem; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+            box-shadow: var(--shadow-sm); 
         }
-        .selected-tag:hover { border-color: var(--accent); box-shadow: 0 4px 8px rgba(249,115,22,0.1); }
         .tag-major { font-weight: 700; color: var(--primary); }
-        .tag-remove { cursor: pointer; color: var(--gray-400); background: none; border: none; font-size: 1.1rem; transition: color 0.2s; }
-        .tag-remove:hover { color: var(--accent); transform: scale(1.1); }
-        .empty-state { text-align: center; color: var(--gray-400); padding: 20px; font-style: italic; }
+        .tag-remove { cursor: pointer; color: var(--gray-400); background: none; border: none; font-size: 1.1rem; line-height: 1; }
+        .empty-state { text-align: center; color: var(--gray-400); padding: 16px; font-style: italic; font-size: 0.9rem; }
         
-        .form-section { margin-bottom: 20px; }
-        .form-row { margin-bottom: 16px; }
-        .form-row label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--gray-700); }
+        /* 表单 */
+        .form-section { margin-bottom: 16px; }
+        .form-row { margin-bottom: 12px; }
+        .form-row label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 0.9rem; }
         .required-star { color: var(--danger); }
         .form-row input { 
-            width: 100%; padding: 12px 16px; border: 2px solid var(--gray-200); border-radius: 12px; 
-            transition: border 0.2s, box-shadow 0.2s;
+            width: 100%; 
+            padding: 8px 12px; 
+            border: 2px solid var(--gray-200); 
+            border-radius: 10px; 
+            font-size: 0.9rem;
+            transition: 0.2s; 
         }
-        .form-row input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); outline: none; }
-        .form-row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .form-hint { font-size: 0.8rem; color: var(--gray-500); margin-top: 4px; }
+        .form-row input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 2px var(--primary-light); }
+        .form-row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-hint { font-size: 0.75rem; color: var(--gray-500); margin-top: 2px; }
         
-        .upload-section { margin-top: 24px; }
+        /* 上传 */
+        .upload-section { margin-top: 16px; }
         .upload-area { 
             border: 2px dashed var(--gray-300); 
-            border-radius: 16px; 
-            padding: 16px 20px;
+            border-radius: 12px; 
+            padding: 16px 16px;
             text-align: center; 
             background: var(--gray-50); 
             cursor: pointer; 
             transition: all 0.2s;
-            box-shadow: var(--shadow-sm);
         }
-        .upload-area:hover { border-color: var(--accent); background: var(--accent-light); box-shadow: var(--shadow); }
-        .upload-icon { font-size: 1.8rem; margin-bottom: 4px; color: var(--primary); }
-        .upload-text { font-weight: 600; margin-bottom: 4px; }
-        .upload-hint { font-size: 0.8rem; color: var(--gray-500); }
+        .upload-area:hover { border-color: var(--primary); background: var(--primary-light); }
+        .upload-icon { font-size: 1.8rem; margin-bottom: 4px; }
+        .upload-text { font-weight: 600; margin-bottom: 2px; font-size: 0.9rem; }
+        .upload-hint { font-size: 0.75rem; color: var(--gray-500); }
         
         .preview-box { 
-            margin-top: 16px; 
-            border-radius: 16px; 
+            margin-top: 12px; 
+            border-radius: 12px; 
             overflow: hidden; 
             background: var(--gray-100); 
-            min-height: 200px;
+            padding: 12px;
             display: flex; 
             align-items: center; 
-            justify-content: center;
-            box-shadow: var(--shadow);
+            justify-content: center; 
         }
         #previewImg {
-            width: 200px;
-            height: 200px;
+            max-width: 160px;
+            max-height: 160px;
             object-fit: contain;
             display: block;
             margin: 0 auto;
         }
         
         /* 方案卡片 */
-        .scheme-panel { display: flex; flex-direction: column; gap: 12px; }
+        .scheme-panel { display: flex; flex-direction: column; gap: 8px; }
         .scheme-option { 
-            display: flex; align-items: flex-start; gap: 16px; padding: 20px; background: white; 
-            border-radius: 16px; border: 2px solid var(--gray-200); cursor: pointer; 
-            transition: all 0.2s; box-shadow: var(--shadow-sm);
+            display: flex; 
+            align-items: flex-start; 
+            gap: 12px; 
+            padding: 16px; 
+            background: white; 
+            border-radius: 12px; 
+            border: 2px solid var(--gray-200); 
+            cursor: pointer; 
+            transition: all 0.2s; 
         }
-        .scheme-option:hover { 
-            border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-lg); 
-            background: linear-gradient(135deg, #ffffff 0%, var(--primary-light) 100%);
-        }
-        .scheme-option.selected { 
-            border-color: var(--primary); 
-            background: linear-gradient(135deg, #eff6ff 0%, var(--primary-light) 100%);
-            box-shadow: var(--shadow);
-        }
-        .scheme-radio { width: 22px; height: 22px; accent-color: var(--primary); }
-        .scheme-name { font-weight: 700; color: var(--gray-800); }
+        .scheme-option:hover { border-color: var(--primary); box-shadow: var(--shadow); }
+        .scheme-option.selected { border-color: var(--primary); background: linear-gradient(135deg, var(--primary-light) 0%, #bfdbfe 100%); }
+        .scheme-radio { width: 20px; height: 20px; accent-color: var(--primary); margin-top: 2px; }
+        .scheme-name { font-weight: 700; font-size: 1rem; }
+        /* ----- 修改区域2：价格标签 活力橙底白字，主价约1rem，/大类0.7rem(内联已控制) ----- */
         .scheme-price { 
-            background: var(--accent); color: white; padding: 4px 12px; border-radius: 20px; 
-            font-weight: 700; box-shadow: 0 2px 6px rgba(249,115,22,0.3);
-        }
-        .feature-tag { 
-            background: var(--accent-light); color: var(--gray-700); padding: 4px 10px; 
-            border-radius: 12px; font-size: 0.8rem; border: 1px solid rgba(249,115,22,0.2);
-        }
-        .invoice-section { margin: 20px 0; padding: 16px; background: var(--gray-50); border-radius: 12px; box-shadow: var(--shadow-sm); }
-        .legal-notice { 
-            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); 
-            border-left: 4px solid var(--warning); border-radius: 12px; padding: 16px; 
-            box-shadow: var(--shadow-sm);
-        }
-        .fee-section { 
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); 
-            border-radius: 16px; padding: 20px; margin: 20px 0; box-shadow: var(--shadow);
-        }
-        .fee-amount { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
-        .fee-details { font-size: 0.9rem; max-height: 300px; overflow-y: auto; }
-        .button-group { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
-        
-        .btn { 
-            padding: 14px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; 
-            display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s;
-            box-shadow: var(--shadow-sm);
-        }
-        .btn-primary { 
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); 
+            background: var(--accent);        /* #F97316 */
             color: white; 
+            padding: 2px 10px; 
+            border-radius: 40px; 
+            font-size: 1rem;                  /* 主价部分默认1rem */
+            margin-left: 8px; 
         }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); filter: brightness(1.05); }
-        .btn-secondary { background: white; border: 2px solid var(--gray-300); color: var(--gray-700); }
-        .btn-secondary:hover { border-color: var(--primary); background: var(--primary-light); transform: translateY(-1px); box-shadow: var(--shadow); }
-        .btn-row { display: flex; gap: 12px; }
-        .btn-row .btn { flex: 1; }
-        .footer-info { background: var(--gray-50); color: var(--gray-500); padding: 12px 40px; text-align: center; border-top: 1px solid var(--gray-200); font-size: 0.9rem; }
-        
-        .step-footer-buttons {
-            display: flex;
-            gap: 12px;
+        .scheme-desc { font-size: 0.85rem; color: var(--gray-600); margin: 2px 0 4px; }
+        /* ----- 修改区域1：方案特性标签 柔浅橙#FFEDD5，深灰#1E293B，0.8rem ----- */
+        .scheme-features { display: flex; flex-wrap: wrap; gap: 4px; }
+        .feature-tag { 
+            background: #FFEDD5;              /* 柔浅橙 */
+            color: var(--gray-700);            /* #1E293B */
+            padding: 2px 8px; 
+            border-radius: 10px; 
+            font-size: 0.8rem; 
         }
-        .step-footer-btn {
-            padding: 10px 24px;
-            border-radius: 40px;
+        /* 新增：选中方案时，对勾标记变为绿色 */
+        .scheme-option.selected .feature-tag .check-mark {
+            color: #2ecc71;  /* 鲜绿色 */
             font-weight: 600;
-            border: 1px solid var(--gray-300);
-            background: white;
-            color: var(--gray-700);
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            box-shadow: var(--shadow-sm);
-        }
-        .step-footer-btn:hover:not(:disabled) {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-        .step-footer-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-        .btn-save-draft {
-            background: var(--gray-100);
-            border: 1px dashed var(--gray-400);
-        }
-        .btn-save-draft:hover {
-            background: var(--gray-200);
         }
         
-        /* 流程面板 */
-        .start-box { 
-            background: #f0f4f8; border: 2px solid var(--primary); border-radius: 12px; 
-            padding: clamp(20px,4vw,30px); text-align: center; cursor: pointer; 
-            transition: all 0.2s; box-shadow: var(--shadow);
+        /* 发票 */
+        .invoice-section { margin: 16px 0; padding: 12px; background: var(--gray-50); border-radius: 10px; }
+        .invoice-check { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.9rem; }
+        .invoice-hint { font-size: 0.75rem; color: var(--gray-500); margin-left: 24px; margin-top: 2px; }
+        
+        /* 法律声明 */
+        .legal-notice { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-left: 4px solid var(--warning); border-radius: 10px; padding: 12px; font-size: 0.85rem; }
+        
+        /* 费用明细 */
+        .fee-section { background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 12px; padding: 16px; margin: 16px 0; }
+        .fee-amount { font-size: 1.6rem; font-weight: 700; color: var(--primary); }
+        .fee-details { font-size: 0.85rem; max-height: 260px; overflow-y: auto; }
+        .fee-row { display: flex; justify-content: space-between; margin: 4px 0; }
+        
+        /* 按钮组 */
+        .button-group { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+        .btn { 
+            padding: 8px 16px; 
+            border-radius: 10px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            border: none; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 6px; 
+            transition: 0.2s; 
+            font-size: 0.9rem;
         }
+        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; box-shadow: var(--shadow); }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: var(--shadow-lg); }
+        .btn-secondary { background: white; border: 2px solid var(--gray-300); color: var(--gray-700); }
+        .btn-secondary:hover { border-color: var(--primary); background: var(--primary-light); }
+        .btn-row { display: flex; gap: 8px; }
+        .btn-row .btn { flex: 1; }
+        
+        /* 底部 */
+        .footer-info { background: var(--gray-50); color: var(--gray-500); padding: 8px 24px; text-align: center; border-top: 1px solid var(--gray-200); font-size: 0.8rem; }
+        
+        /* 步骤导航按钮 */
+        .step-footer-buttons { display: flex; gap: 8px; }
+        .step-footer-btn { 
+            padding: 6px 18px; 
+            border-radius: 40px; 
+            font-weight: 600; 
+            border: 1px solid var(--gray-300); 
+            background: white; 
+            color: var(--gray-700); 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 4px; 
+            font-size: 0.85rem;
+        }
+        .step-footer-btn:hover:not(:disabled) { background: var(--primary); color: white; border-color: var(--primary); }
+        .step-footer-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-save-draft { background: var(--gray-100); border: 1px dashed var(--gray-400); }
+        .btn-save-draft:hover { background: var(--gray-200); }
+        
+        /* 流程面板特有样式 */
+        .start-box { background: #f0f4f8; border: 2px solid var(--primary); border-radius: 12px; padding: clamp(16px,3vw,24px); text-align: center; cursor: pointer; transition: all 0.2s; }
         .start-box.completed { background: #d4edda; border-color: #28a745; }
-        .qr-code { max-width: 120px; margin: 0 auto; display: block; }
-        .arrow-down { text-align: center; font-size: 24px; color: var(--accent); margin: -15px 0 20px; animation: bounce 2s infinite; }
-        @keyframes bounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(10px);} }
-        .flow-container { position: relative; padding-left: 40px; }
-        .flow-line { position: absolute; left: 15px; top: 0; bottom: 0; width: 4px; background: linear-gradient(to bottom, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #00d2d3); }
-        .flow-step { position: relative; margin-bottom: 25px; cursor: pointer; }
-        .step-marker { position: absolute; left: -33px; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; transition: background 0.2s, transform 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        .flow-step:hover .step-marker { transform: translateY(-50%) scale(1.1); }
-        .step-content { background: #f8f9fa; border-radius: 12px; padding: 20px; border-left: 4px solid transparent; box-shadow: var(--shadow-sm); }
+        .qr-code { max-width: 100px; margin: 0 auto; display: block; }
+        .arrow-down { text-align: center; font-size: 20px; color: var(--primary); margin: -10px 0 16px; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(8px);} }
+        .flow-container { position: relative; padding-left: 36px; }
+        .flow-line { position: absolute; left: 14px; top: 0; bottom: 0; width: 4px; background: linear-gradient(to bottom, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #00d2d3); }
+        .flow-step { position: relative; margin-bottom: 20px; cursor: pointer; }
+        .step-marker { position: absolute; left: -30px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.8rem; transition: background 0.2s; }
+        .step-content { background: #f8f9fa; border-radius: 10px; padding: 16px; border-left: 4px solid transparent; font-size: 0.85rem; }
         .flow-step-1 .step-marker { background: #ff6b6b; }
         .flow-step-2 .step-marker { background: #feca57; }
         .flow-step-3 .step-marker { background: #48dbfb; }
@@ -491,202 +509,31 @@
         .flow-step.completed .step-marker { background: #28a745 !important; }
         .check-icon::before { content: "✔ "; color: #28a745; font-weight: bold; margin-right: 4px; }
         .start-box.completed .start-text::before { content: "✔ "; color: #28a745; font-weight: bold; }
-        .note { margin-left: 20px; margin-top: 8px; padding: 12px; background: #fff3cd; border-radius: 8px; border-left: 3px solid #ffc107; }
-        .footer-notice { margin-top: 30px; background: #1e8449; color: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: var(--shadow); }
+        .note { margin-left: 16px; margin-top: 6px; padding: 8px; background: #fff3cd; border-radius: 6px; border-left: 3px solid #ffc107; font-size: 0.8rem; }
+        .footer-notice { margin-top: 24px; background: #1e8449; color: white; padding: 16px; border-radius: 10px; text-align: center; font-size: 0.85rem; }
         
-        /* 响应式 */
         @media (max-width: 768px) {
             body { padding: 0; }
             .app-container { border-radius: 0; }
-            .header { padding: 0.6rem 1.2rem; }
+            .header { padding: 0.6rem 1rem; }
             .header h1 { font-size: 1.5rem; }
-            .tab { padding: 8px 10px; font-size: 0.9rem; }
-            .tab-bar { padding: 0 8px; }
+            .tab { padding: 6px 12px; font-size: 0.85rem; }
+            .tab-bar { padding: 0 5px; }
             .step-panel-container,
             .preview-panel-container,
             .flow-panel-container {
-                padding: 16px;
+                padding: 12px 16px;
             }
         }
+        /* 针对更小屏幕及触摸优化 */
         @media (max-width: 480px) {
-            .tab { padding: 6px 8px; font-size: 0.85rem; }
-            .tab-bar { padding: 0 5px; }
-        }
-
-        /* ========== 卡片不留间距，大小由字体决定 (原有强制规则保留，仅修改颜色/阴影) ========== */
-        .step-panel-container,
-        .preview-panel-container,
-        .flow-panel-container,
-        .panel-header,
-        .panel-body,
-        .search-section,
-        .search-box,
-        .tree-container,
-        .selected-section,
-        .selected-list,
-        .form-section,
-        .form-row,
-        .upload-section,
-        .upload-area,
-        .preview-box,
-        .scheme-panel,
-        .scheme-option,
-        .invoice-section,
-        .legal-notice,
-        .fee-section,
-        .button-group,
-        .btn-row,
-        .step-footer-nav,
-        .step-footer-buttons,
-        .footer-info,
-        .tab-bar,
-        .tab,
-        .header,
-        .header-content,
-        .flow-container,
-        .flow-step,
-        .step-content,
-        .start-box,
-        .qr-container,
-        .note,
-        .footer-notice,
-        .selected-tag,
-        .subclass-item,
-        .folder-label,
-        .cat-major,
-        .cat-group,
-        .btn,
-        .step-footer-btn,
-        .preview-actions,
-        .interactive-hint,
-        .arrow-down,
-        .search-stats,
-        .search-icon,
-        .scheme-header,
-        .scheme-content,
-        .scheme-features,
-        .feature-tag,
-        .fee-details,
-        .fee-row,
-        .fee-header,
-        .invoice-check,
-        .invoice-hint,
-        .form-hint,
-        .empty-state,
-        .step-indicator-light,
-        .step-indicator {
-            margin: 0 !important;
-            padding: 0.15rem 0.25rem !important;
-            gap: 0 !important;
-        }
-
-        /* 按钮保留稍多水平内边距 */
-        .btn,
-        .step-footer-btn,
-        .tab {
-            padding: 0.15rem 0.5rem !important;
-        }
-
-        .selected-tag,
-        .feature-tag,
-        .tab-badge,
-        .header-contact {
-            padding: 0.1rem 0.3rem !important;
-        }
-
-        .tree-ul ul {
-            margin-left: 0.5rem !important;
-            padding-left: 0.5rem !important;
-            border-left: 1px solid var(--gray-200);
-        }
-
-        .flow-container {
-            padding-left: 2.2rem !important;
-        }
-        .flow-step .step-marker {
-            left: -2rem;
-        }
-
-        .preview-box {
-            min-height: auto !important;
-            padding: 0 !important;
-        }
-        #previewImg {
-            width: auto;
-            max-width: 100px;
-            height: auto;
-            max-height: 100px;
-        }
-
-        .step-footer-nav,
-        .upload-section,
-        .selected-section,
-        .form-section,
-        .fee-section,
-        .legal-notice,
-        .invoice-section {
-            margin-top: 0 !important;
-            margin-bottom: 0 !important;
-        }
-
-        .subclass-item {
-            gap: 0.3rem !important;
-            padding-left: 1.5rem !important;
-        }
-
-        .folder-icon {
-            width: auto;
-            margin-right: 0.2rem;
-        }
-
-        .button-group,
-        .btn-row {
-            flex-direction: column;
-            gap: 0 !important;
-        }
-
-        .note {
-            margin-left: 0 !important;
-            padding: 0.2rem !important;
-        }
-
-        .qr-container {
-            display: flex;
-            justify-content: center;
-            padding: 0 !important;
-        }
-
-        .scheme-price {
-            padding: 0.1rem 0.3rem !important;
-        }
-
-        .footer-info {
-            padding: 0.3rem !important;
-        }
-
-        .header {
-            padding: 0.3rem 1rem !important;
-        }
-        .header h1 {
-            gap: 0.3rem;
-        }
-
-        /* 额外微调：让强调色更突出 */
-        .header-contact {
-            background: var(--accent) !important;
-        }
-        .scheme-price {
-            background: var(--accent) !important;
-        }
-        .feature-tag {
-            background: var(--accent-light) !important;
-        }
-        .tag-remove:hover {
-            color: var(--accent) !important;
-        }
-        .upload-area:hover {
-            border-color: var(--accent) !important;
-            background: var(--accent-light) !important;
+            .tab { padding: 10px 8px; }
+            .btn, .step-footer-btn { min-height: 44px; }
+            .folder-label { padding: 10px; }
+            .subclass-item { padding: 8px 8px 8px 24px; }
+            .header h1 { font-size: 1.3rem; flex-wrap: wrap; }
+            .header-contact { font-size: 0.75rem; padding: 2px 8px; }
+            .search-stats { font-size: 0.7rem; }
         }
     </style>
 </head>
@@ -720,25 +567,25 @@
     <div id="step1Panel" class="step-panel-container" style="display: block;" role="tabpanel" aria-labelledby="tabStep1">
         <div class="panel-header">
             <div class="panel-title"><span class="step-indicator">1</span>选择商标分类</div>
-            <div class="panel-subtitle">搜索或浏览选择您需要注册的商品/服务类别</div>
+            <div class="panel-subtitle">搜索或浏览勾选您需要注册的商品/服务类别</div>
         </div>
         <div class="panel-body">
             <div class="search-section">
                 <div class="search-box">
-                    <div class="search-input-wrapper"><span class="search-icon">🔍</span><input type="text" id="searchInput" placeholder="输入如“服装”、“科技”..." autocomplete="off" aria-label="搜索商标分类"></div>
+                    <div class="search-input-wrapper"><span class="search-icon">🔍</span><input type="text" id="searchInput" placeholder="输入如“服装”、“研发”..." autocomplete="off" aria-label="搜索商标分类"></div>
                     <span class="search-stats" id="searchCount">加载中...</span>
                 </div>
             </div>
             <div class="tree-container" id="treeContainer" role="tree" aria-label="商标分类树">
                 <ul class="tree-ul" id="categoryTree"><li class="empty-state">正在加载分类数据...</li></ul>
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--gray-200);">
-                <button type="button" class="btn btn-secondary" id="clearSelectedBtn" style="padding: 10px 20px;"><span>🗑️</span><span>清空已选</span></button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--gray-200);">
+                <button type="button" class="btn btn-secondary" id="clearSelectedBtn" style="padding: 6px 16px;"><span>🗑️</span><span>清空已选</span></button>
                 <span class="search-stats" id="selectedCountBadge">已选 0 个小类</span>
             </div>
         </div>
         <div class="step-footer-nav">
-            <span class="step-indicator-light">当前：选分类</span>
+            <span class="step-indicator-light" style="font-size:0.85rem;">当前：选分类</span>
             <div class="step-footer-buttons">
                 <button class="step-footer-btn btn-save-draft save-draft-btn" data-step="1">💾 保存草稿</button>
                 <button class="step-footer-btn step-next-btn" data-next="2">下一步 ▶</button>
@@ -790,7 +637,7 @@
             </div>
         </div>
         <div class="step-footer-nav">
-            <span class="step-indicator-light">当前：填信息</span>
+            <span class="step-indicator-light" style="font-size:0.85rem;">当前：填信息</span>
             <div class="step-footer-buttons">
                 <button class="step-footer-btn step-prev-btn" data-prev="1">◀ 上一步</button>
                 <button class="step-footer-btn btn-save-draft save-draft-btn" data-step="2">💾 保存草稿</button>
@@ -806,14 +653,18 @@
             <div class="panel-subtitle">选择适合的服务方案，查看费用明细</div>
         </div>
         <div class="panel-body">
-            <!-- 方案选择部分不变 -->
+            <!-- 方案选择部分 -->
             <div class="scheme-panel" role="radiogroup" aria-label="服务方案选择">
                 <div class="scheme-option selected" id="schemeA" data-scheme="A" role="radio" aria-checked="true" tabindex="0">
                     <input type="radio" name="scheme" value="A" id="radioA" class="scheme-radio" checked>
                     <div class="scheme-content">
                         <div class="scheme-header"><span class="scheme-name">A方案 · 流程跟进</span><span class="scheme-price">¥380<span style="font-size:0.7rem;">/大类</span></span></div>
                         <div class="scheme-desc">适合有明确注册需求的客户，含10个小类，超出38元/个</div>
-                        <div class="scheme-features"><span class="feature-tag">✓ 材料审核</span><span class="feature-tag">✓ 进度提醒</span><span class="feature-tag">✓ 官文代收</span></div>
+                        <div class="scheme-features">
+                            <span class="feature-tag"><span class="check-mark">✓</span> 材料审核</span>
+                            <span class="feature-tag"><span class="check-mark">✓</span> 进度提醒</span>
+                            <span class="feature-tag"><span class="check-mark">✓</span> 官文代收</span>
+                        </div>
                     </div>
                 </div>
                 <div class="scheme-option" id="schemeB" data-scheme="B" role="radio" aria-checked="false" tabindex="-1">
@@ -821,7 +672,12 @@
                     <div class="scheme-content">
                         <div class="scheme-header"><span class="scheme-name">B方案 · 专业辅导</span><span class="scheme-price">¥580<span style="font-size:0.7rem;">/大类</span></span></div>
                         <div class="scheme-desc">含风险评估与类别规划，6个大类以上享85折优惠</div>
-                        <div class="scheme-features"><span class="feature-tag">✓ 风险评估</span><span class="feature-tag">✓ 类别规划</span><span class="feature-tag">✓ 专业解读</span><span class="feature-tag">✓ 材料优化</span></div>
+                        <div class="scheme-features">
+                            <span class="feature-tag"><span class="check-mark">✓</span> 风险评估</span>
+                            <span class="feature-tag"><span class="check-mark">✓</span> 类别规划</span>
+                            <span class="feature-tag"><span class="check-mark">✓</span> 专业解读</span>
+                            <span class="feature-tag"><span class="check-mark">✓</span> 材料优化</span>
+                        </div>
                     </div>
                 </div>
                 <div class="scheme-option" id="schemeC" data-scheme="C" role="radio" aria-checked="false" tabindex="-1">
@@ -829,13 +685,16 @@
                     <div class="scheme-content">
                         <div class="scheme-header"><span class="scheme-name">C方案 · 分期付费</span><span class="scheme-price">¥1100<span style="font-size:0.7rem;">/大类</span></span></div>
                         <div class="scheme-desc">首付300元首期款，下证后付尾款800元。</div>
-                        <div class="scheme-features"><span class="feature-tag">✓ 前期启动成本低</span><span class="feature-tag">✓ 下证后付服务费</span></div>
+                        <div class="scheme-features">
+                            <span class="feature-tag"><span class="check-mark">✓</span> 前期启动成本低</span>
+                            <span class="feature-tag"><span class="check-mark">✓</span> 下证后付服务费</span>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="invoice-section">
                 <label class="invoice-check"><input type="checkbox" id="invoiceCheckbox"><span class="invoice-label">开具增值税专用发票（加收5%）</span></label>
-                <div class="invoice-hint">如需专票，总费用增加5%税点；否则默认开具增值税普通发票</div>
+                <div class="invoice-hint">如需专票总费用加5%税点；否则默认普票</div>
             </div>
             <div class="legal-notice" role="alert">
                 <strong>⚠️ 重要声明：</strong>商标审查权归属国家知识产权局，审查结果存在主观因素，<strong>任何代理机构均不得承诺"包过"</strong>！若被驳回或异议，已收费用不可退。担心风险请选择C方案。
@@ -844,20 +703,20 @@
                 <div class="fee-header"><span class="fee-title"><span>💰</span><span>费用明细</span></span><span class="fee-amount" id="totalAmount">¥0</span></div>
                 <div class="fee-details" id="feeDisplay"><div class="empty-state">请先选择商标小类</div></div>
             </div>
-            <!-- 按钮组：重新布局为两行，每行两个按钮，符合要求顺序 -->
+            <!-- 按钮组：两行 -->
             <div class="button-group">
                 <div class="btn-row">
                     <button type="button" class="btn btn-secondary" id="previewOrderBtn"><span>👁️</span><span>预览订单</span></button>
-                    <button type="button" class="btn btn-primary" id="exportWordBtn"><span>📝</span><span>下单生成订单</span></button>
+                    <button type="button" class="btn btn-primary" id="exportWordBtn"><span>📝</span><span>下单下载订单</span></button>
                 </div>
                 <div class="btn-row">
                     <button type="button" class="btn btn-secondary" id="previewContractBtn"><span>👁️</span><span>预览合同</span></button>
-                    <button type="button" class="btn btn-primary" id="generateContractBtn"><span>📄</span><span>下单生成合同</span></button>
+                    <button type="button" class="btn btn-primary" id="generateContractBtn"><span>📄</span><span>下单下载合同</span></button>
                 </div>
             </div>
         </div>
         <div class="step-footer-nav">
-            <span class="step-indicator-light">当前：选方案</span>
+            <span class="step-indicator-light" style="font-size:0.85rem;">当前：选方案</span>
             <div class="step-footer-buttons">
                 <button class="step-footer-btn step-prev-btn" data-prev="2">◀ 上一步</button>
                 <button class="step-footer-btn btn-save-draft save-draft-btn" data-step="3">💾 保存草稿</button>
@@ -866,7 +725,7 @@
         </div>
     </div>
 
-    <!-- 预览面板（四、预览页面） -->
+    <!-- 预览面板 -->
     <div id="previewPanel" class="preview-panel-container" style="display: none;" role="tabpanel" aria-labelledby="tabPreview">
         <div class="panel-header">
             <div class="panel-title"><span class="step-indicator">📄</span>预览页面</div>
@@ -877,14 +736,14 @@
             <div class="preview-actions">
                 <div class="button-group">
                     <div class="btn-row">
-                        <button type="button" class="btn btn-primary preview-export-word">📝 下单生成订单</button>
-                        <button type="button" class="btn btn-primary preview-generate-contract">📄 下单生成合同</button>
+                        <button type="button" class="btn btn-primary preview-export-word">📝 下单下载订单</button>
+                        <button type="button" class="btn btn-primary preview-generate-contract">📄 下单下载合同</button>
                     </div>
                 </div>
             </div>
         </div>
         <div class="step-footer-nav">
-            <span class="step-indicator-light">当前：预览页面</span>
+            <span class="step-indicator-light" style="font-size:0.85rem;">当前：预览页面</span>
             <div class="step-footer-buttons">
                 <button class="step-footer-btn step-prev-btn" data-prev="3">◀ 上一步</button>
                 <button class="step-footer-btn step-next-btn" data-next="flow">下一步 ▶</button>
@@ -892,7 +751,7 @@
         </div>
     </div>
 
-    <!-- 流程面板 (付款后流程) -->
+    <!-- 流程面板 -->
     <div id="flowPanel" class="flow-panel-container" style="display: none;" role="tabpanel" aria-labelledby="tabFlow">
         <div class="panel-header">
             <div class="panel-title"><span class="step-indicator">⚙️</span>付款后流程</div>
@@ -901,65 +760,51 @@
         <div class="panel-body">
             <div class="start-box" id="flowStartBox" onclick="toggleFlowStart()" role="button" tabindex="0" aria-pressed="false">
                 <div class="qr-container">
-                    <img src="联系陈工-微信二维码.png" alt="联系陈工微信二维码" class="qr-code" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" onload="this.style.display='block'; this.nextElementSibling.style.display='none';" width="120" height="120">
+                    <img src="联系陈工-微信二维码.png" alt="联系陈工微信二维码" class="qr-code" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" onload="this.style.display='block'; this.nextElementSibling.style.display='none';" width="100" height="100">
                     <div class="qr-fallback" style="display: none;">二维码加载失败<br>请检查文件路径</div>
                 </div>
                 <div class="start-text">签订合同、付款后，开始服务流程↓↓↓</div>
             </div>
             <div class="arrow-down" aria-hidden="true">↓</div>
-            <div class="interactive-hint">点击步骤标记完成状态</div>
+            <div class="interactive-hint" style="font-size:0.75rem; text-align:center; margin-bottom:8px;">点击步骤标记完成状态</div>
             <div class="flow-container">
                 <div class="flow-line"></div>
                 <div class="flow-step flow-step-1" onclick="toggleFlowStep(this)" role="button" tabindex="0" aria-pressed="false">
                     <div class="step-marker">1</div>
-                    <div class="step-content">
-                        <div class="step-text"><span class="step-number">1</span>根据您所选方案进行对应服务流程</div>
-                    </div>
+                    <div class="step-content"><div class="step-text">1. 根据您所选方案进行对应服务流程</div></div>
                 </div>
                 <div class="flow-step flow-step-2" onclick="toggleFlowStep(this)" role="button" tabindex="0" aria-pressed="false">
                     <div class="step-marker">2</div>
-                    <div class="step-content">
-                        <div class="step-text"><span class="step-number">2</span>跟您再次确认商标申请信息表后，提交商标局</div>
-                    </div>
+                    <div class="step-content"><div class="step-text">2. 跟您再次确认商标申请信息表后，提交商标局</div></div>
                 </div>
                 <div class="flow-step flow-step-3" onclick="toggleFlowStep(this)" role="button" tabindex="0" aria-pressed="false">
                     <div class="step-marker">3</div>
-                    <div class="step-content">
-                        <div class="step-text"><span class="step-number">3</span>提交商标局后，最快当天有回执书给您</div>
-                    </div>
+                    <div class="step-content"><div class="step-text">3. 提交商标局后，最快当天有回执书给您</div></div>
                 </div>
                 <div class="flow-step flow-step-4" onclick="toggleFlowStep(this)" role="button" tabindex="0" aria-pressed="false">
                     <div class="step-marker">4</div>
-                    <div class="step-content">
-                        <div class="step-text"><span class="step-number">4</span>受理通知书（约1个月）：商标局形式审查通过，下发受理通知书</div>
-                    </div>
+                    <div class="step-content"><div class="step-text">4. 受理通知书（约1个月）：商标局形式审查通过，下发受理通知书</div></div>
                     <div class="note">⭕如遇补正，免费协助处理。</div>
                 </div>
                 <div class="flow-step flow-step-5" onclick="toggleFlowStep(this)" role="button" tabindex="0" aria-pressed="false">
                     <div class="step-marker">5</div>
-                    <div class="step-content">
-                        <div class="step-text"><span class="step-number">5</span>实质审查（约2-3个月）：审查员进行实质审查，结果可能是初步审定公告或者驳回</div>
-                    </div>
+                    <div class="step-content"><div class="step-text">5. 实质审查（约2-3个月）：审查员进行实质审查，结果可能是初步审定公告或者驳回</div></div>
                     <div class="note warning">⭕如遇驳回：您可选择是否进行驳回复审（需另付费，周期约1年）</div>
                 </div>
                 <div class="flow-step flow-step-6" onclick="toggleFlowStep(this)" role="button" tabindex="0" aria-pressed="false">
                     <div class="step-marker">6</div>
-                    <div class="step-content">
-                        <div class="step-text"><span class="step-number">6</span>公告期（3个月）：初步审定后进入公告期，接受公众监督，结果可能是无异议或者被提出异议</div>
-                    </div>
+                    <div class="step-content"><div class="step-text">6. 公告期（3个月）：初步审定后进入公告期，接受公众监督，结果可能是无异议或者被提出异议</div></div>
                     <div class="note warning">⭕如遇异议：您可选择是否进行异议答辩（需另付费，周期约1年）</div>
                 </div>
                 <div class="flow-step flow-step-7" onclick="toggleFlowStep(this)" role="button" tabindex="0" aria-pressed="false">
                     <div class="step-marker">7</div>
-                    <div class="step-content">
-                        <div class="step-text"><span class="step-number">7</span>获得注册证（约1个月）：公告期满无异议或异议不成立，颁发商标注册证书（C方案需此时结清尾款）</div>
-                    </div>
+                    <div class="step-content"><div class="step-text">7. 获得注册证（约1个月）：公告期满无异议或异议不成立，颁发商标注册证书（C方案需此时结清尾款）</div></div>
                 </div>
             </div>
             <div class="footer-notice">以上时间为目前政策下的估算周期，具体以商标局实际审查进度为准。</div>
         </div>
         <div class="step-footer-nav">
-            <span class="step-indicator-light">当前：付款后流程</span>
+            <span class="step-indicator-light" style="font-size:0.85rem;">当前：付款后流程</span>
             <div class="step-footer-buttons">
                 <button class="step-footer-btn step-prev-btn" data-prev="preview">◀ 上一步</button>
                 <button class="step-footer-btn" disabled>下一步 ▶</button>
@@ -971,7 +816,7 @@
 </div>
 
 <script>
-    // ==================== 完整JavaScript代码（原有全部功能 + 新增预览合同功能）====================
+    // ==================== 完整JavaScript（图片固定缩略图尺寸，预览数据实时联通）====================
     'use strict';
     (function() {
         // ----- 内置默认分类数据 -----
@@ -1049,7 +894,7 @@
         // 数据存储
         let rawData = [];
         const selectedSubclasses = {};
-        let trademarkImageData = null;
+        let trademarkImageData = null;  // 存储base64图片数据
         
         // 方案参数
         const schemeParams = {
@@ -1174,7 +1019,7 @@
             };
         }
 
-        // 生成费用文本
+        // 生成费用文本 
         function computeFeeText() {
             const d = computeFeeDetails();
             if (Object.keys(d.majorDetails).length === 0) {
@@ -1190,14 +1035,14 @@
                 html += `<div class="fee-row" style="color: var(--success);"><span>🎁 优惠活动</span><span>${escapeHtml(d.discountNote)}</span></div>`;
             }
             
-            html += '<div style="margin: 12px 0; border-top: 1px solid var(--gray-200);"></div>';
+            html += '<div style="margin: 8px 0; border-top: 1px solid var(--gray-200);"></div>';
             
             for (const major in d.majorDetails) {
                 const item = d.majorDetails[major];
                 html += `<div class="fee-row"><span>【${escapeHtml(major)}】${item.count}个小类</span><span>¥${item.originalCost.toFixed(2)}</span></div>`;
             }
             
-            html += '<div style="margin: 12px 0; border-top: 1px solid var(--gray-200);"></div>';
+            html += '<div style="margin: 8px 0; border-top: 1px solid var(--gray-200);"></div>';
             
             html += `<div class="fee-row"><span>小计（原价）</span><span>¥${d.totalOriginal.toFixed(2)}</span></div>`;
             
@@ -1213,11 +1058,11 @@
                 html += `<div class="fee-row"><span>增值税专票（加收5%）</span><span>¥${d.invoiceAmount.toFixed(2)}</span></div>`;
             }
             
-            html += `<div class="fee-row" style="font-size: 1.2rem; color: var(--primary); margin-top: 8px;"><span>应付总额</span><span>¥${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}</span></div>`;
+            html += `<div class="fee-row" style="font-size: 1.2rem; color: var(--primary); margin-top: 6px;"><span>应付总额</span><span>¥${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}</span></div>`;
             
-            html += `<div style="margin-top: 8px; font-size:0.9rem;"><span>📄 发票类型：${d.withInvoice ? '增值税专用发票（已加收5%）' : '增值税普通发票'}</span></div>`;
+            html += `<div style="margin-top: 6px; font-size:0.8rem;"><span>📄 发票类型：${d.withInvoice ? '增值税专用发票（已加收5%）' : '增值税普通发票'}</span></div>`;
             
-            html += '<div style="margin-top: 16px; padding-top: 16px; border-top: 2px solid var(--gray-200); font-size: 0.85rem; color: var(--gray-600);">';
+            html += '<div style="margin-top: 12px; padding-top: 12px; border-top: 2px solid var(--gray-200); font-size: 0.8rem; color: var(--gray-600);">';
             
             if (d.scheme === 'C') {
                 let firstTotal = 0, tailTotal = 0;
@@ -1229,7 +1074,8 @@
                     firstTotal = firstTotal * 1.05;
                     tailTotal = tailTotal * 1.05;
                 }
-                html += `<div style="margin-bottom: 8px;"><strong>付款计划：</strong></div>`;
+                html += `<div style="font-size:0.85rem; color:var(--gray-700);">`;
+                html += `<div style="margin-bottom: 6px;"><strong>付款计划：</strong></div>`;
                 html += `<div>① 首期款总额：¥${firstTotal.toFixed(2)}（合同签订后支付，${d.withInvoice?'含专票':'普票'}）</div>`;
                 html += `<div>② 服务尾款：每个大类下发注册证后支付，具体金额如下：</div>`;
                 let subIdx = 1;
@@ -1240,6 +1086,7 @@
                     html += `<div>${circle} 第${escapeHtml(major)}大类<strong>尾款</strong>：¥${tail.toFixed(2)}</div>`;
                     subIdx++;
                 }
+                html += `</div>`;
             } else {
                 html += `<div><strong>付款方式：</strong>合同签订后一次性支付（${d.withInvoice?'含专票':'普票'}）</div>`;
             }
@@ -1580,7 +1427,7 @@
             }
             const reader = new FileReader();
             reader.onload = (ev) => {
-                trademarkImageData = ev.target.result;
+                trademarkImageData = ev.target.result;  // 保存base64
                 previewImg.src = ev.target.result;
                 previewBox.style.display = 'flex';
                 uploadArea.classList.add('has-file');
@@ -1621,7 +1468,7 @@
 
         document.getElementById('invoiceCheckbox').addEventListener('change', refreshUI);
 
-        // 生成订单预览 HTML 的函数（原函数，保持不变）
+        // 生成订单预览 HTML 的函数（图片固定缩略图尺寸）
         function generateOrderPreviewHtml(applicant, tmName, phone, contact, stats, d, trademarkImageData) {
             const today = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
             const now = new Date();
@@ -1647,20 +1494,13 @@
                     .word-table th { background: #f0f0f0; border: 1px solid #999; padding: 8px; text-align: center; font-weight: bold; }
                     .word-table td { border: 1px solid #999; padding: 6px; vertical-align: top; }
                     .word-img { width: 40px; height: 40px; object-fit: contain; display: block; margin: 0 auto; }
-                    .word-img-preview { max-width: 60px; max-height: 60px; object-fit: contain; }
-                    .word-contract-table { border-collapse: collapse; width: 100%; margin: 10px 0; }
-                    .word-contract-table td, .word-contract-table th { border: 1px solid #333; padding: 8px; }
-                    .word-contract-table th { background: #e8e8e8; }
-                    .word-signature-table { width: 100%; border-collapse: collapse; margin-top: 30px; }
-                    .word-signature-table td { border: none; padding: 10px 20px; vertical-align: bottom; }
-                    .word-signature-line { border-bottom: 1px solid #000; height: 40px; width: 100%; }
                     .info-table { border-collapse: collapse; width: 100%; margin: 4px 0; }
                     .info-table td { border: 1px solid #999; padding: 4px; }
                     .info-table td:first-child { font-weight: bold; background: #f5f5f5; width: 30%; }
                 </style>
-                <h1 style="color: #003d7c; text-align: center; border-bottom: 2px solid #003d7c; padding-bottom: 3px; font-size: 14pt; margin: 0 0 4px;">📄 商标申请订单</h1>
+                <h1 style="color: #2563EB; text-align: center; border-bottom: 2px solid #2563EB; padding-bottom: 3px; font-size: 14pt; margin: 0 0 4px;">📄 商标申请订单</h1>
                 
-                <h2 style="color: #1f3a5f; margin: 6px 0 3px; font-size: 11pt; border-left: 3px solid #003d7c; padding-left: 4px;">一、基本信息</h2>
+                <h2 style="color: #1E40AF; margin: 6px 0 3px; font-size: 11pt; border-left: 3px solid #2563EB; padding-left: 4px;">一、基本信息</h2>
                 <table class="info-table">
                     <tr><td>申请人全称：</td><td>${escapeHtml(applicant)}</td></tr>
                     <tr><td>联系人姓名：</td><td>${escapeHtml(contact || '未填写')}</td></tr>
@@ -1671,7 +1511,7 @@
                     <tr><td>方案描述：</td><td>${d.scheme === 'A' ? '适合需求：您懂商标但事务繁忙？流程跟进帮您省心省力。服务内容：材料形式审核、官方文件代收代发、关键节点人工提醒、全流程进度同步。' : d.scheme === 'B' ? '适合需求：希望提升商标注册规范性？专业辅导为您保驾护航。服务内容：注册前风险评估、类别规划建议、申请材料优化、专业解读与指导。' : '适合需求：担心注册不下来，服务费白给？分期付费让您更从容。服务内容：启动成本更低，仅付首期款；下发商标注册证后再付服务费！'}</td></tr>
                 </table>
 
-                <h2 style="color: #1f3a5f; margin: 6px 0 3px; font-size: 11pt; border-left: 3px solid #003d7c; padding-left: 4px;">二、已选类别明细</h2>
+                <h2 style="color: #1E40AF; margin: 6px 0 3px; font-size: 11pt; border-left: 3px solid #2563EB; padding-left: 4px;">二、已选类别明细</h2>
                 <table class="word-table" style="table-layout: fixed;">
                     <colgroup>
                         <col style="width: 8%;">
@@ -1695,11 +1535,11 @@
                 html += `<tr>
                     <td style="text-align: center;">${idx}</td>
                     <td style="text-align: center;">${escapeHtml(tmName)}</td>
-                    <td style="width:60px; height:40px; padding:0; text-align:center; vertical-align:middle; font-size:0; line-height:0;">`;
+                    <td style="width:60px; height:40px; padding:0; text-align:center; vertical-align:middle;">`;
                 if (trademarkImageData) {
-                    html += `<img src="${trademarkImageData}" class="word-img" alt="商标图样" style="width:40px; height:40px; object-fit: contain; display: block; margin: 0 auto;">`;
+                    html += `<img src="${trademarkImageData}" class="word-img" alt="商标图样" width="40" height="40" style="width:40px; height:40px; object-fit: contain; display: block; margin: 0 auto;">`;
                 } else {
-                    html += `<span style="font-size:8pt; display: block; line-height: 1.2;">无图样</span>`;
+                    html += `<span style="font-size:8pt;">无图样</span>`;
                 }
                 html += `</td>
                     <td style="text-align: center;">${escapeHtml(major)}</td>
@@ -1709,7 +1549,7 @@
             }
             html += `</table>`;
 
-            html += `<h2 style="color: #1f3a5f; margin: 6px 0 3px; font-size: 11pt; border-left: 3px solid #003d7c; padding-left: 4px;">三、费用明细</h2>`;
+            html += `<h2 style="color: #1E40AF; margin: 6px 0 3px; font-size: 11pt; border-left: 3px solid #2563EB; padding-left: 4px;">三、费用明细</h2>`;
             html += `<div class="word-bg-scheme">（一）服务方案: ${escapeHtml(d.scheme)}方案 · ${escapeHtml(d.params.name)} </div>`;
             html += `<div>💰 基础价格：每大类${d.params.base}元（含10个小类），超出部分${d.params.extra}元/小类。</div>`;
             if (d.scheme === 'A') html += `<div>A方案暂无大客户优惠。</div>`;
@@ -1777,7 +1617,7 @@
             return html;
         }
 
-        // 生成合同预览 HTML 的函数（基于原合同生成逻辑，用于预览面板）
+        // 生成合同预览 HTML 的函数（图片固定缩略图尺寸）
         function generateContractPreviewHtml(applicant, tmName, phone, contact, stats, d, trademarkImageData) {
             const today = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
             const contractNo = `QYZ-TM-${new Date().getFullYear()}${String(new Date().getMonth()+1).padStart(2,'0')}${String(new Date().getDate()).padStart(2,'0')}${String(Math.floor(Math.random()*1000)).padStart(3,'0')}`;
@@ -1786,11 +1626,11 @@
                 <style>
                     body { font-family: '宋体', SimSun, serif; }
                     .contract-preview { font-size: 10.5pt; line-height: 1.2; }
-                    .contract-preview h1 { text-align: center; color: #003d7c; font-size: 16pt; margin: 0 0 4px; }
+                    .contract-preview h1 { text-align: center; color: #2563EB; font-size: 16pt; margin: 0 0 4px; }
                     .contract-preview .contract-no { text-align: center; color: #666; margin: 0 0 4px; font-size: 9pt; }
-                    .contract-preview h2 { color: #1f3a5f; font-size: 11pt; margin: 6px 0 3px; border-bottom: 1px solid #003d7c; padding-bottom: 2px; }
+                    .contract-preview h2 { color: #1E40AF; font-size: 11pt; margin: 6px 0 3px; border-bottom: 1px solid #2563EB; padding-bottom: 2px; }
                     .contract-preview .party { margin: 2px 0; }
-                    .contract-preview .party-title { font-weight: bold; color: #003d7c; }
+                    .contract-preview .party-title { font-weight: bold; color: #2563EB; }
                     .contract-preview table { border-collapse: collapse; width: 100%; margin: 4px 0; font-size: 10pt; }
                     .contract-preview th, .contract-preview td { border: 1px solid #333; padding: 4px; vertical-align: top; }
                     .contract-preview th { background: #e8e8e8; text-align: center; }
@@ -1841,9 +1681,9 @@
                 html += `<tr>
                     <td style="text-align: center;">${idx}</td>
                     <td style="text-align: center;">${escapeHtml(tmName)}</td>
-                    <td style="width:60px; height:40px; padding:0; text-align:center;">`;
+                    <td style="width:60px; height:40px; padding:0; text-align:center; vertical-align:middle;">`;
                 if (trademarkImageData) {
-                    html += `<img src="${trademarkImageData}" class="word-img" alt="商标图样">`;
+                    html += `<img src="${trademarkImageData}" class="word-img" alt="商标图样" width="40" height="40" style="width:40px; height:40px; object-fit: contain; display: block; margin: 0 auto;">`;
                 } else {
                     html += `<span style="font-size:8pt;">无图样</span>`;
                 }
@@ -2019,11 +1859,6 @@
             activateTab(tabPreview);
         });
 
-        // 移除原预览订单按钮的旧监听（如果有），但原代码中可能没有直接绑定，安全起见重新绑定即可。
-        // 原代码中可能有一行：document.getElementById('previewOrderBtn').addEventListener('click', function() { activateTab(tabPreview); });
-        // 我们已经在上面覆盖了，并且设置了previewMode，原监听如果存在可能会重复，但因为我们重新绑定，会执行两次，但都会激活同一标签，previewMode被设置，所以最终预览内容正确。
-        // 为了彻底，可以移除原监听，但为了简单，保留原样也不会出错。
-
         // 绑定选项卡点击
         tabStep1.addEventListener('click', () => activateTab(tabStep1));
         tabStep2.addEventListener('click', () => activateTab(tabStep2));
@@ -2044,7 +1879,7 @@
             }
         });
 
-        // ========== 导出PDF订单（原函数，保留，按钮文字已改） ==========
+        // ========== 导出Word订单（直接下载.doc，图片固定缩略图尺寸） ==========
         function exportWord() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
@@ -2083,13 +1918,14 @@
             const safeTmName = tmName.replace(/[\\/*?:"<>|]/g, '_');
             const fileName = `${safeApplicant}_${safeTmName}_${majorStr}_订单_${dateStr}`;
 
+            // 构建完整HTML（图片固定尺寸）
             let htmlContent = `
             <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/1999/xhtml'>
             <head><meta charset='UTF-8'><title>${fileName}</title>
             <style>
                 body { font-family: '宋体', SimSun, serif; margin: 0.6cm; font-size: 10.5pt; line-height: 1.2; color: #333; }
-                h1 { color: #003d7c; text-align: center; border-bottom: 2px solid #003d7c; padding-bottom: 3px; font-size: 14pt; margin: 0 0 4px; }
-                h2 { color: #1f3a5f; margin: 6px 0 3px; font-size: 11pt; border-left: 3px solid #003d7c; padding-left: 4px; }
+                h1 { color: #2563EB; text-align: center; border-bottom: 2px solid #2563EB; padding-bottom: 3px; font-size: 14pt; margin: 0 0 4px; }
+                h2 { color: #1E40AF; margin: 6px 0 3px; font-size: 11pt; border-left: 3px solid #2563EB; padding-left: 4px; }
                 p { margin: 0 0 2px; }
                 div { margin: 0 0 2px; }
                 .info-table { border-collapse: collapse; width: 100%; margin: 4px 0; }
@@ -2107,7 +1943,6 @@
                     table { page-break-inside: avoid; }
                     tr { page-break-inside: avoid; }
                     thead { display: table-header-group; }
-                    .footer { position: fixed; bottom: 0; width: 100%; }
                 }
             </style>
             </head>
@@ -2149,11 +1984,11 @@
                 htmlContent += `<tr>
                     <td style="text-align: center;">${idx}</td>
                     <td style="text-align: center;">${escapeHtml(tmName)}</td>
-                    <td style="width:60px; height:40px; padding:0; text-align:center; vertical-align:middle; font-size:0; line-height:0;">`;
+                    <td style="width:60px; height:40px; padding:0; text-align:center; vertical-align:middle;">`;
                 if (trademarkImageData) {
-                    htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样" style="width:40px; height:40px; object-fit: contain; display: block; margin: 0 auto;">`;
+                    htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样" width="40" height="40" style="width:40px; height:40px; object-fit: contain; display: block; margin: 0 auto;">`;
                 } else {
-                    htmlContent += `<span style="font-size:8pt; display: block; line-height: 1.2;">无图样</span>`;
+                    htmlContent += `<span style="font-size:8pt;">无图样</span>`;
                 }
                 htmlContent += `</td>
                     <td style="text-align: center;">${escapeHtml(major)}</td>
@@ -2232,22 +2067,19 @@
             </div>
             </body></html>`;
 
-            const printWindow = window.open('', '_blank');
-            if (!printWindow) {
-                alert('无法打开打印窗口，请检查浏览器是否阻止了弹窗。');
-                return;
-            }
-            printWindow.document.write(htmlContent);
-            printWindow.document.close();
-            printWindow.document.title = fileName;
-            printWindow.focus();
-            printWindow.print();
-            printWindow.onafterprint = function() {
-                printWindow.close();
-            };
+            // 下载为.doc文件
+            const blob = new Blob([htmlContent], { type: 'application/msword' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName + '.doc';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
         }
 
-        // ========== 生成PDF合同（原函数，保留，按钮文字已改） ==========
+        // ========== 生成Word合同（直接下载.doc，图片固定缩略图尺寸） ==========
         function generateContract() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
@@ -2280,16 +2112,17 @@
             const safeTmName = tmName.replace(/[\\/*?:"<>|]/g, '_');
             const fileName = `${safeApplicant}_${safeTmName}_${majorStr}_服务合同_${dateStr}`;
 
+            // 构建完整HTML（图片固定尺寸）
             let htmlContent = `
             <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/1999/xhtml'>
             <head><meta charset='UTF-8'><title>${fileName}</title>
             <style>
                 body { font-family: '宋体', SimSun, serif; margin: 0.6cm; font-size: 10.5pt; line-height: 1.2; color: #333; }
-                h1 { text-align: center; color: #003d7c; font-size: 16pt; margin: 0 0 4px; }
+                h1 { text-align: center; color: #2563EB; font-size: 16pt; margin: 0 0 4px; }
                 .contract-no { text-align: center; color: #666; margin: 0 0 4px; font-size: 9pt; }
-                h2 { color: #1f3a5f; font-size: 11pt; margin: 6px 0 3px; border-bottom: 1px solid #003d7c; padding-bottom: 2px; }
+                h2 { color: #1E40AF; font-size: 11pt; margin: 6px 0 3px; border-bottom: 1px solid #2563EB; padding-bottom: 2px; }
                 .party { margin: 2px 0; }
-                .party-title { font-weight: bold; color: #003d7c; }
+                .party-title { font-weight: bold; color: #2563EB; }
                 p { margin: 0 0 2px; }
                 div { margin: 0 0 2px; }
                 table { border-collapse: collapse; width: 100%; margin: 4px 0; font-size: 10pt; }
@@ -2378,11 +2211,11 @@
                 htmlContent += `<tr>
                     <td style="text-align: center;">${idx}</td>
                     <td style="text-align: center;">${escapeHtml(tmName)}</td>
-                    <td style="width:60px; height:40px; padding:0; text-align:center; vertical-align:middle; font-size:0; line-height:0;">`;
+                    <td style="width:60px; height:40px; padding:0; text-align:center; vertical-align:middle;">`;
                 if (trademarkImageData) {
-                    htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样" style="width:40px; height:40px; object-fit: contain; display: block; margin: 0 auto;">`;
+                    htmlContent += `<img src="${trademarkImageData}" class="word-img" alt="商标图样" width="40" height="40" style="width:40px; height:40px; object-fit: contain; display: block; margin: 0 auto;">`;
                 } else {
-                    htmlContent += `<span style="font-size:8pt; display: block; line-height: 1.2;">无图样</span>`;
+                    htmlContent += `<span style="font-size:8pt;">无图样</span>`;
                 }
                 htmlContent += `</td>
                     <td style="text-align: center;">${escapeHtml(major)}</td>
@@ -2523,19 +2356,16 @@
 
             </body></html>`;
 
-            const printWindow = window.open('', '_blank');
-            if (!printWindow) {
-                alert('无法打开打印窗口，请检查浏览器是否阻止了弹窗。');
-                return;
-            }
-            printWindow.document.write(htmlContent);
-            printWindow.document.close();
-            printWindow.document.title = fileName;
-            printWindow.focus();
-            printWindow.print();
-            printWindow.onafterprint = function() {
-                printWindow.close();
-            };
+            // 下载为.doc文件
+            const blob = new Blob([htmlContent], { type: 'application/msword' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = fileName + '.doc';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
         }
 
         // 绑定生成订单和合同按钮
@@ -2545,7 +2375,7 @@
         document.querySelector('.preview-export-word')?.addEventListener('click', exportWord);
         document.querySelector('.preview-generate-contract')?.addEventListener('click', generateContract);
 
-        // 流程相关 (原样保留)
+        // 流程相关（保持不变）
         window.toggleFlowStep = function(el) {
             el.classList.toggle('completed');
             const isCompleted = el.classList.contains('completed');
