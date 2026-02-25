@@ -7,6 +7,8 @@
     <meta name="keywords" content="商标申请,商标注册,企优咨,商标代理">
     <link rel="icon" type="image/x-icon" href="企优咨图标.ico">
     <title>企优咨 ·商标申请下单系统</title>
+    <!-- 引入 html-docx-js 用于生成真正的 DOCX 文件 (支持全平台) -->
+    <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
     <style>
         /* ===== 基础样式 ===== */
         * {
@@ -512,6 +514,14 @@
         .note { margin-left: 16px; margin-top: 6px; padding: 8px; background: #fff3cd; border-radius: 6px; border-left: 3px solid #ffc107; font-size: 0.8rem; }
         .footer-notice { margin-top: 24px; background: #1e8449; color: white; padding: 16px; border-radius: 10px; text-align: center; font-size: 0.85rem; }
         
+        /* ===== 修改点：订单基本信息表标签列宽度调整为35%，且禁止换行 ===== */
+        .info-table td:first-child {
+            font-weight: bold;
+            background: #f5f5f5;
+            width: 35%;
+            white-space: nowrap;
+        }
+        
         @media (max-width: 768px) {
             body { padding: 0; }
             .app-container { border-radius: 0; }
@@ -523,6 +533,10 @@
             .preview-panel-container,
             .flow-panel-container {
                 padding: 12px 16px;
+            }
+            /* 移动端可适当调整，但保持不换行 */
+            .info-table td:first-child {
+                width: 40%; /* 稍微再宽一点保证不换行 */
             }
         }
         /* 针对更小屏幕及触摸优化 */
@@ -816,7 +830,7 @@
 </div>
 
 <script>
-    // ==================== 完整JavaScript（优化移动端显示）====================
+    // ==================== 完整JavaScript（优化移动端显示，且订单/合同导出为真正的DOCX）====================
     'use strict';
     (function() {
         // ----- 内置默认分类数据 -----
@@ -1468,7 +1482,7 @@
 
         document.getElementById('invoiceCheckbox').addEventListener('change', refreshUI);
 
-        // 生成订单预览 HTML 的函数（图片固定缩略图尺寸，基本信息列宽28%）
+        // 生成订单预览 HTML 的函数（图片固定缩略图尺寸，基本信息列宽已调整）
         function generateOrderPreviewHtml(applicant, tmName, phone, contact, stats, d, trademarkImageData) {
             const today = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
             const now = new Date();
@@ -1496,7 +1510,7 @@
                     .word-img { width: 40px; height: 40px; object-fit: contain; display: block; margin: 0 auto; }
                     .info-table { border-collapse: collapse; width: 100%; margin: 4px 0; }
                     .info-table td { border: 1px solid #999; padding: 4px; }
-                    .info-table td:first-child { font-weight: bold; background: #f5f5f5; width: 28%; }
+                    .info-table td:first-child { font-weight: bold; background: #f5f5f5; width: 35%; white-space: nowrap; } /* 修改点：宽度35%，禁止换行 */
                 </style>
                 <h1 style="color: #2563EB; text-align: center; border-bottom: 2px solid #2563EB; padding-bottom: 3px; font-size: 14pt; margin: 0 0 4px;">📄 商标申请订单</h1>
                 
@@ -1879,8 +1893,8 @@
             }
         });
 
-        // ========== 导出Word订单（直接下载.docx，优化移动端显示） ==========
-        function exportWord() {
+        // ========== 导出Word订单（异步生成真正docx，支持全平台） ==========
+        async function exportWord() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
             const phone = cleanInput(document.getElementById('contactPhone').value);
@@ -1910,7 +1924,6 @@
             const seconds = String(now.getSeconds()).padStart(2, '0');
             const orderNo = `ZCXD-${year}${month}${day}${hours}${minutes}${seconds}`;
 
-            // 生成文件名
             const majorKeys = Object.keys(selectedSubclasses).filter(m => selectedSubclasses[m].length > 0);
             const majorStr = majorKeys.join('_');
             const dateStr = `${year}${month}${day}`;
@@ -1918,7 +1931,7 @@
             const safeTmName = tmName.replace(/[\\/*?:"<>|]/g, '_');
             const fileName = `${safeApplicant}_${safeTmName}_${majorStr}_订单_${dateStr}`;
 
-            // 构建完整HTML（添加移动端适配，基本信息表格第一列固定28%）
+            // 构建完整的订单HTML (同原exportWord中的htmlContent)
             let htmlContent = `
             <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/1999/xhtml'>
             <head><meta charset='UTF-8'><title>${fileName}</title>
@@ -1931,7 +1944,7 @@
                 div { margin: 0 0 2px; }
                 .info-table { border-collapse: collapse; width: 100%; margin: 4px 0; }
                 .info-table td { border: 1px solid #999; padding: 4px; }
-                .info-table td:first-child { font-weight: bold; background: #f5f5f5; width: 28%; }
+                .info-table td:first-child { font-weight: bold; background: #f5f5f5; width: 35%; white-space: nowrap; } /* 修改点：宽度35%，禁止换行 */
                 .word-table { border-collapse: collapse; width: 100%; margin: 4px 0; font-size: 10pt; }
                 .word-table th { background: #e8e8e8; border: 1px solid #999; padding: 4px; text-align: center; font-weight: bold; }
                 .word-table td { border: 1px solid #999; padding: 6px; vertical-align: top; }
@@ -1939,14 +1952,12 @@
                 .bg-scheme, .bg-fee, .bg-payment-plan, .bg-payment-info, .bg-important { padding: 2px 4px; margin: 2px 0; }
                 .total-red { color: #C00000; font-weight: bold; }
                 .footer { margin-top: 8px; text-align: center; color: #999; font-size: 8pt; border-top: 1px solid #eee; padding-top: 3px; }
-                /* 移动端适配 */
                 @media (max-width: 600px) {
                     body { margin: 0.3cm; font-size: 9pt; }
                     .word-table { font-size: 8pt; }
-                    .info-table td:first-child { width: 28%; } /* 保持与桌面一致 */
+                    .info-table td:first-child { width: 40%; }
                     .word-img { width: 30px; height: 30px; }
                 }
-                /* 表格容器，允许横向滚动 */
                 .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 8px 0; }
                 .table-responsive table { min-width: 100%; }
             </style>
@@ -1983,8 +1994,7 @@
                         <th style="width: 60px;">商标图样</th>
                         <th style="width: 10%;">已选大类</th>
                         <th>小类</th>
-                    </tr>
-            `;
+                    </tr>`;
             let idx = 1;
             for (const major in selectedSubclasses) {
                 if (selectedSubclasses[major].length === 0) continue;
@@ -2076,20 +2086,38 @@
             </div>
             </body></html>`;
 
-            // 下载为.docx文件（原为.doc，现按要求改为.docx）
-            const blob = new Blob([htmlContent], { type: 'application/msword' });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = fileName + '.docx';   // 修改为.docx
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
+            // 使用 html-docx-js 转换为真正的 DOCX Blob
+            try {
+                if (typeof htmlDocx === 'undefined' || !htmlDocx.asBlob) {
+                    throw new Error('DOCX生成库未加载，请刷新重试');
+                }
+                // 设置页面边距 (1440 twip = 1英寸)
+                const options = {
+                    orientation: 'portrait',
+                    margins: {
+                        top: 1440,
+                        right: 1440,
+                        bottom: 1440,
+                        left: 1440
+                    }
+                };
+                const blob = await htmlDocx.asBlob(htmlContent, options);
+                // 下载
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = fileName + '.docx';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+            } catch (e) {
+                console.error('DOCX生成失败', e);
+                alert('生成DOCX失败: ' + e.message + '，请尝试使用现代浏览器或联系管理员。');
+            }
         }
 
-        // ========== 生成Word合同（直接下载.docx，优化移动端显示） ==========
-        function generateContract() {
+        // ========== 生成Word合同（异步生成真正docx，支持全平台） ==========
+        async function generateContract() {
             const applicant = cleanInput(document.getElementById('applicantName').value);
             const tmName = cleanInput(document.getElementById('trademarkName').value);
             const phone = cleanInput(document.getElementById('contactPhone').value);
@@ -2121,7 +2149,7 @@
             const safeTmName = tmName.replace(/[\\/*?:"<>|]/g, '_');
             const fileName = `${safeApplicant}_${safeTmName}_${majorStr}_服务合同_${dateStr}`;
 
-            // 构建完整HTML（添加移动端适配）
+            // 构建合同HTML (同原generateContractHtml)
             let htmlContent = `
             <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/1999/xhtml'>
             <head><meta charset='UTF-8'><title>${fileName}</title>
@@ -2147,7 +2175,6 @@
                 .bg-payment-plan { background-color: #FFF2CC; padding: 2px 4px; }
                 .bg-payment-info { background-color: #E6E6FA; padding: 2px 4px; }
                 .word-img { width: 40px; height: 40px; object-fit: contain; display: block; margin: 0 auto; }
-                /* 移动端适配 */
                 @media (max-width: 600px) {
                     body { margin: 0.3cm; font-size: 9pt; }
                     table { font-size: 8pt; }
@@ -2215,8 +2242,7 @@
                         <th style="width: 60px;">商标图样</th>
                         <th style="width: 10%;">已选大类</th>
                         <th>小类</th>
-                    </tr>
-            `;
+                    </tr>`;
             let idx = 1;
             for (const major in selectedSubclasses) {
                 if (selectedSubclasses[major].length === 0) continue;
@@ -2247,8 +2273,7 @@
 
             <div class="table-responsive">
                 <table>
-                    <tr><th>序号</th><th>已选大类</th><th>小类数量</th><th>费用（元）</th></tr>
-            `;
+                    <tr><th>序号</th><th>已选大类</th><th>小类数量</th><th>费用（元）</th></tr>`;
             let rowIdx = 1;
             for (const major in d.majorDetails) {
                 const item = d.majorDetails[major];
@@ -2372,24 +2397,67 @@
 
             </body></html>`;
 
-            // 下载为.docx文件（原为.doc，现按要求改为.docx）
-            const blob = new Blob([htmlContent], { type: 'application/msword' });
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = fileName + '.docx';   // 修改为.docx
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
+            try {
+                if (typeof htmlDocx === 'undefined' || !htmlDocx.asBlob) {
+                    throw new Error('DOCX生成库未加载，请刷新重试');
+                }
+                const options = {
+                    orientation: 'portrait',
+                    margins: {
+                        top: 1440,
+                        right: 1440,
+                        bottom: 1440,
+                        left: 1440
+                    }
+                };
+                const blob = await htmlDocx.asBlob(htmlContent, options);
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = fileName + '.docx';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+            } catch (e) {
+                console.error('合同DOCX生成失败', e);
+                alert('生成DOCX失败: ' + e.message);
+            }
         }
 
-        // 绑定生成订单和合同按钮
-        document.getElementById('exportWordBtn').addEventListener('click', exportWord);
-        document.getElementById('generateContractBtn').addEventListener('click', generateContract);
-        // 预览面板中的按钮
-        document.querySelector('.preview-export-word')?.addEventListener('click', exportWord);
-        document.querySelector('.preview-generate-contract')?.addEventListener('click', generateContract);
+        // 覆盖原有的函数绑定
+        // 重新绑定下载按钮，确保使用新函数
+        document.addEventListener('DOMContentLoaded', function() {
+            // 重新绑定下载按钮
+            const exportBtn = document.getElementById('exportWordBtn');
+            const contractBtn = document.getElementById('generateContractBtn');
+            const previewExport = document.querySelector('.preview-export-word');
+            const previewContract = document.querySelector('.preview-generate-contract');
+            
+            if (exportBtn) {
+                exportBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    await exportWord();
+                });
+            }
+            if (contractBtn) {
+                contractBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    await generateContract();
+                });
+            }
+            if (previewExport) {
+                previewExport.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    await exportWord();
+                });
+            }
+            if (previewContract) {
+                previewContract.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    await generateContract();
+                });
+            }
+        });
 
         // 流程相关（保持不变）
         window.toggleFlowStep = function(el) {
