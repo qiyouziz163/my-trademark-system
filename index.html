@@ -7,12 +7,12 @@
     <meta name="keywords" content="商标申请,商标注册,企优咨,商标代理">
     <link rel="icon" type="image/x-icon" href="企优咨图标.ico">
     <title>企优咨 ·商标申请下单系统</title>
-    <!--  html-docx-js  生成DOCX 文件 -->
+    <!-- 引入 html-docx-js 用于生成真正的 DOCX 文件 -->
     <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
-    <!-- browser-image-compression 压缩图片 -->
+    <!-- 引入 browser-image-compression 用于图片压缩 -->
     <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
     <style>
-        /* ===== 基础样式 ===== */
+        /* ===== 基础样式 (保持不变) ===== */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -807,7 +807,7 @@
 </div>
 
 <script>
-    // ==================== 完整JavaScript（集成钉钉宜搭自动提交 + 图片压缩 + 钉钉机器人通知 + 完整预览恢复）====================
+    // ==================== 完整JavaScript（集成钉钉宜搭自动提交 + 图片压缩 + 钉钉机器人通知 + 完整预览恢复 + CORS代理支持）====================
     'use strict';
     (function() {
         // ----- 内置默认分类数据 -----
@@ -903,6 +903,16 @@
                 orderTimestamp: 'cascadeDateField_mm3ld7hr'
             }
         };
+        // ====================================================
+
+        // ==================== CORS代理配置 ====================
+        // 如果您部署了代理服务（如Cloudflare Worker），请将代理地址填写在此处
+        // 例如：const PROXY_URL = 'https://your-worker.workers.dev/proxy?target=';
+        // 留空表示不使用代理，直接请求（可能因CORS失败）
+        const PROXY_URL = 'https://qiweiqun.qiyouzizx.workers.dev/?target='; // 请根据实际情况修改
+
+        // 钉钉机器人Webhook地址
+        const DINGTALK_WEBHOOK = 'https://oapi.dingtalk.com/robot/send?access_token=52cf8252ac3d9facd45d89b1bd879c35c8efa3e7b56f604985e512f18445a1d3';
         // ====================================================
 
         // 数据存储
@@ -1679,8 +1689,14 @@
                 }
             };
 
+            // 确定请求URL（支持代理）
+            let url = 'https://api.aliwork.com/v1/yida/forms/instances';
+            if (PROXY_URL) {
+                url = PROXY_URL + encodeURIComponent(url);
+            }
+
             try {
-                const response = await fetch('https://api.aliwork.com/v1/yida/forms/instances', {
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -1696,8 +1712,14 @@
             }
         }
 
-        // ========== 钉钉机器人通知函数 ==========
+        // ========== 钉钉机器人通知函数（带CORS友好处理） ==========
         async function sendDingTalkNotification() {
+            // 如果是 file:// 协议，直接模拟成功并提示部署
+            if (window.location.protocol === 'file:') {
+                alert('下单成功，请联系陈工13128311370\n（提示：当前为本地文件运行，钉钉通知未实际发送。请将文件部署到HTTP服务器上以启用完整功能。）');
+                return;
+            }
+
             const applicant = document.getElementById('applicantName')?.value.trim() || '';
             const contact = document.getElementById('contactPerson')?.value.trim() || '';
             const phone = document.getElementById('contactPhone')?.value.trim() || '';
@@ -1717,7 +1739,12 @@
 
             const message = `商标申请人：${applicant}\n联系人：${contact}\n联系电话：${phone}\n商标名称：${tmName}\n所选方案：${scheme}方案·${schemeName}\n总费用：¥${total.toFixed(2)}\n所选商标类别：${selectedMajors}`;
 
-            const webhook = 'https://oapi.dingtalk.com/robot/send?access_token=52cf8252ac3d9facd45d89b1bd879c35c8efa3e7b56f604985e512f18445a1d3';
+            // 确定请求URL（支持代理）
+            let webhook = DINGTALK_WEBHOOK;
+            if (PROXY_URL) {
+                webhook = PROXY_URL + encodeURIComponent(webhook);
+            }
+
             try {
                 const response = await fetch(webhook, {
                     method: 'POST',
@@ -1735,62 +1762,140 @@
                 }
             } catch (error) {
                 console.error('钉钉消息发送失败', error);
-                alert('下单失败，请联系陈工13128311370');
+                alert('下单失败，请联系陈工13128311370\n错误详情：' + error.message);
             }
         }
 
-        // ========== 完整预览函数 ==========
+        // ========== 完整预览函数（与导出版本一致） ==========
         function generateOrderPreviewHtml(applicant, tmName, phone, contact, stats, d, trademarkImageData) {
-            // 这里直接从原订单HTML中提取核心预览部分，保持简洁但完整
-            let html = `<div style="font-family: '宋体', SimSun, serif; padding: 10px; max-height: 400px; overflow-y: auto;">
-                <h3 style="text-align:center; color:#2563EB;">📄 订单预览</h3>
-                <table style="width:100%; border-collapse:collapse; margin:10px 0; font-size:9pt;">
-                    <tr><td style="background:#f5f5f5; padding:4px;">申请人全称：</td><td style="padding:4px;">${escapeHtml(applicant)}</td></tr>
-                    <tr><td style="background:#f5f5f5; padding:4px;">商标名称：</td><td style="padding:4px;">${escapeHtml(tmName)}</td></tr>
-                    <tr><td style="background:#f5f5f5; padding:4px;">联系人：</td><td style="padding:4px;">${escapeHtml(contact)}</td></tr>
-                    <tr><td style="background:#f5f5f5; padding:4px;">联系电话：</td><td style="padding:4px;">${escapeHtml(phone)}</td></tr>
-                    <tr><td style="background:#f5f5f5; padding:4px;">服务方案：</td><td style="padding:4px;">${d.scheme}方案 · ${d.params.name}</td></tr>
+            // 构建详细的订单预览HTML，与导出的订单内容核心部分一致
+            let html = `
+            <div style="font-family: '宋体', SimSun, serif; padding: 10px; max-height: 400px; overflow-y: auto;">
+                <h1 style="color: #2563EB; text-align: center; border-bottom: 2px solid #2563EB; padding-bottom: 3px; font-size: 14pt; margin: 0 0 4px;">📄 商标申请订单</h1>
+                
+                <h2 style="color: #1E40AF; margin: 6px 0 3px; font-size: 11pt; border-left: 3px solid #2563EB; padding-left: 4px;">一、基本信息</h2>
+                <table style="border-collapse: collapse; width: 100%; margin: 4px 0; font-size: 9pt;">
+                    <tr><td style="border: 1px solid #999; padding: 4px; background: #f5f5f5; width: 35%;">申请人全称：</td><td style="border: 1px solid #999; padding: 4px;">${escapeHtml(applicant)}</td></tr>
+                    <tr><td style="border: 1px solid #999; padding: 4px; background: #f5f5f5;">联系人姓名：</td><td style="border: 1px solid #999; padding: 4px;">${escapeHtml(contact || '未填写')}</td></tr>
+                    <tr><td style="border: 1px solid #999; padding: 4px; background: #f5f5f5;">联系电话：</td><td style="border: 1px solid #999; padding: 4px;">${escapeHtml(phone || '未填写')}</td></tr>
+                    <tr><td style="border: 1px solid #999; padding: 4px; background: #f5f5f5;">服务方案：</td><td style="border: 1px solid #999; padding: 4px;">${escapeHtml(d.scheme)}方案 · ${escapeHtml(d.params.name)}</td></tr>
                 </table>
-                <h4>已选类别</h4>
-                <table style="width:100%; border-collapse:collapse; font-size:9pt;">
-                    <tr><th>大类</th><th>小类</th></tr>`;
+
+                <h2 style="color: #1E40AF; margin: 6px 0 3px; font-size: 11pt; border-left: 3px solid #2563EB; padding-left: 4px;">二、已选类别明细</h2>
+                <table style="border-collapse: collapse; width: 100%; margin: 4px 0; font-size: 9pt;">
+                    <tr><th style="border: 1px solid #999; padding: 4px; background: #e8e8e8;">大类</th><th style="border: 1px solid #999; padding: 4px; background: #e8e8e8;">小类</th></tr>`;
             for (const major in selectedSubclasses) {
                 if (selectedSubclasses[major].length === 0) continue;
-                html += `<tr><td>${escapeHtml(major)}</td><td>${escapeHtml(selectedSubclasses[major].join('、'))}</td></tr>`;
+                html += `<tr><td style="border: 1px solid #999; padding: 4px;">${escapeHtml(major)}</td><td style="border: 1px solid #999; padding: 4px;">${escapeHtml(selectedSubclasses[major].join('、'))}</td></tr>`;
             }
             html += `</table>
-                <h4>费用明细</h4>
-                <div>原价：¥${d.totalOriginal.toFixed(2)}</div>`;
-            if (d.discountNote) html += `<div>优惠：${d.discountNote}</div>`;
-            html += `<div style="font-weight:bold; color:#C00000;">应付总额：¥${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}</div>
-                <p style="text-align:center; margin-top:10px;">--- 详细内容请下载订单查看 ---</p>
-            </div>`;
+
+                <h2 style="color: #1E40AF; margin: 6px 0 3px; font-size: 11pt; border-left: 3px solid #2563EB; padding-left: 4px;">三、费用明细</h2>
+                <div style="margin: 4px 0;">基础价格：每大类${d.params.base}元（含10个小类），超出部分${d.params.extra}元/小类。</div>`;
+            for (const major in d.majorDetails) {
+                const item = d.majorDetails[major];
+                html += `<div>📌 第${escapeHtml(major)}大类（有${item.count}个小类） = ${item.originalCost.toFixed(2)}元</div>`;
+            }
+            html += `<div>小计（原价）: ¥${d.totalOriginal.toFixed(2)}</div>`;
+            if (d.discountNote) {
+                html += `<div style="color: green;">🎉 【${d.discountNote}】</div>`;
+                html += `<div>优惠后合计: ¥${d.finalTotal.toFixed(2)}</div>`;
+            }
+            if (d.withInvoice) {
+                html += `<div>专票加收5%: ¥${d.invoiceAmount.toFixed(2)}</div>`;
+                html += `<div style="font-weight:bold; color:#C00000;">总合计（含专票）: ¥${d.totalWithInvoice.toFixed(2)}</div>`;
+            } else {
+                html += `<div style="font-weight:bold; color:#C00000;">总合计: ¥${d.finalTotal.toFixed(2)}</div>`;
+            }
+
+            // 付款计划（与导出一致）
+            if (d.scheme === 'C') {
+                let firstTotal = 0, tailTotal = 0;
+                for (const major in d.majorDetails) {
+                    firstTotal += d.majorDetails[major].firstPay;
+                    tailTotal += d.majorDetails[major].tail;
+                }
+                if (d.withInvoice) {
+                    firstTotal = firstTotal * 1.05;
+                    tailTotal = tailTotal * 1.05;
+                }
+                html += `<h2 style="color: #1E40AF; margin: 6px 0 3px; font-size: 11pt;">付款计划</h2>`;
+                html += `<div>首期款：${firstTotal.toFixed(2)}元（签合同后支付）</div>`;
+                html += `<div>尾款：</div>`;
+                let subIdx = 1;
+                for (const major in d.majorDetails) {
+                    let tail = d.majorDetails[major].tail;
+                    if (d.withInvoice) tail = tail * 1.05;
+                    html += `<div>${getCircledNumber(subIdx)} 第${escapeHtml(major)}大类尾款：${tail.toFixed(2)}元</div>`;
+                    subIdx++;
+                }
+            } else {
+                html += `<h2 style="color: #1E40AF; margin: 6px 0 3px; font-size: 11pt;">付款方式</h2>`;
+                html += `<div>一次性付清：¥${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}元</div>`;
+            }
+
+            // 重要提示
+            html += `<div style="margin-top:8px; border-top:1px solid #ccc; padding-top:4px; color:#666;">【重要提示】下单后请联系陈工，启动服务后不支持退款。</div>`;
+            html += `</div>`;
             return html;
         }
 
         function generateContractPreviewHtml(applicant, tmName, phone, contact, stats, d, trademarkImageData) {
-            let html = `<div style="font-family: '宋体', SimSun, serif; padding: 10px; max-height: 400px; overflow-y: auto;">
-                <h3 style="text-align:center; color:#2563EB;">📄 合同预览</h3>
-                <table style="width:100%; border-collapse:collapse; margin:10px 0; font-size:9pt;">
-                    <tr><td style="background:#f5f5f5; padding:4px;">甲方（申请人）：</td><td style="padding:4px;">${escapeHtml(applicant)}</td></tr>
-                    <tr><td style="background:#f5f5f5; padding:4px;">商标名称：</td><td style="padding:4px;">${escapeHtml(tmName)}</td></tr>
-                    <tr><td style="background:#f5f5f5; padding:4px;">联系人：</td><td style="padding:4px;">${escapeHtml(contact)}</td></tr>
-                    <tr><td style="background:#f5f5f5; padding:4px;">联系电话：</td><td style="padding:4px;">${escapeHtml(phone)}</td></tr>
-                    <tr><td style="background:#f5f5f5; padding:4px;">服务方案：</td><td style="padding:4px;">${d.scheme}方案 · ${d.params.name}</td></tr>
+            // 构建详细的合同预览HTML，与导出的合同内容核心部分一致
+            let html = `
+            <div style="font-family: '宋体', SimSun, serif; padding: 10px; max-height: 400px; overflow-y: auto;">
+                <h1 style="text-align: center; color: #2563EB; font-size: 14pt; margin: 0 0 4px;">📝 商标申请代理服务合同</h1>
+                <div style="text-align: center; color: #666; font-size: 9pt;">签订日期：${new Date().toLocaleDateString('zh-CN')}</div>
+
+                <h2 style="color: #1E40AF; margin: 6px 0 3px; font-size: 11pt;">第一条 甲方（委托人信息）</h2>
+                <table style="border-collapse: collapse; width: 100%; margin: 4px 0; font-size: 9pt;">
+                    <tr><td style="border: 1px solid #999; padding: 4px; background: #f5f5f5; width: 35%;">公司名称/个人姓名：</td><td style="border: 1px solid #999; padding: 4px;">${escapeHtml(applicant)}</td></tr>
+                    <tr><td style="border: 1px solid #999; padding: 4px; background: #f5f5f5;">联系人：</td><td style="border: 1px solid #999; padding: 4px;">${escapeHtml(contact || '未填写')}</td></tr>
+                    <tr><td style="border: 1px solid #999; padding: 4px; background: #f5f5f5;">联系电话：</td><td style="border: 1px solid #999; padding: 4px;">${escapeHtml(phone || '未填写')}</td></tr>
                 </table>
-                <h4>委托事项</h4>
-                <table style="width:100%; border-collapse:collapse; font-size:9pt;">
-                    <tr><th>大类</th><th>小类</th></tr>`;
+
+                <h2 style="color: #1E40AF; margin: 6px 0 3px; font-size: 11pt;">第二条 委托事项</h2>
+                <table style="border-collapse: collapse; width: 100%; margin: 4px 0; font-size: 9pt;">
+                    <tr><th style="border: 1px solid #999; padding: 4px; background: #e8e8e8;">大类</th><th style="border: 1px solid #999; padding: 4px; background: #e8e8e8;">小类</th></tr>`;
             for (const major in selectedSubclasses) {
                 if (selectedSubclasses[major].length === 0) continue;
-                html += `<tr><td>${escapeHtml(major)}</td><td>${escapeHtml(selectedSubclasses[major].join('、'))}</td></tr>`;
+                html += `<tr><td style="border: 1px solid #999; padding: 4px;">${escapeHtml(major)}</td><td style="border: 1px solid #999; padding: 4px;">${escapeHtml(selectedSubclasses[major].join('、'))}</td></tr>`;
             }
             html += `</table>
-                <h4>合同金额</h4>
-                <div>合同总金额：¥${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}</div>
-                <div>发票类型：${d.withInvoice ? '增值税专用发票' : '增值税普通发票'}</div>
-                <p style="text-align:center; margin-top:10px;">--- 详细条款请下载合同查看 ---</p>
-            </div>`;
+
+                <h2 style="color: #1E40AF; margin: 6px 0 3px; font-size: 11pt;">第三条 费用及支付</h2>
+                <div>服务方案：${d.scheme}方案 · ${d.params.name}</div>`;
+            for (const major in d.majorDetails) {
+                const item = d.majorDetails[major];
+                html += `<div>第${escapeHtml(major)}大类（${item.count}小类）：${item.originalCost.toFixed(2)}元</div>`;
+            }
+            html += `<div>小计（原价）：¥${d.totalOriginal.toFixed(2)}</div>`;
+            if (d.discountNote) html += `<div>优惠：${d.discountNote}</div>`;
+            if (d.withInvoice) html += `<div>专票加收5%：¥${d.invoiceAmount.toFixed(2)}</div>`;
+            html += `<div style="font-weight:bold; color:#C00000;">合同总金额：¥${(d.withInvoice ? d.totalWithInvoice : d.finalTotal).toFixed(2)}</div>`;
+
+            // 付款计划摘要
+            if (d.scheme === 'C') {
+                let firstTotal = 0, tailTotal = 0;
+                for (const major in d.majorDetails) {
+                    firstTotal += d.majorDetails[major].firstPay;
+                    tailTotal += d.majorDetails[major].tail;
+                }
+                if (d.withInvoice) {
+                    firstTotal = firstTotal * 1.05;
+                    tailTotal = tailTotal * 1.05;
+                }
+                html += `<div style="margin-top:4px;">付款计划：首期款¥${firstTotal.toFixed(2)}，尾款合计¥${tailTotal.toFixed(2)}（按大类下发后支付）</div>`;
+            }
+
+            // 乙方信息摘要
+            html += `<h2 style="color: #1E40AF; margin: 6px 0 3px; font-size: 11pt;">乙方（受托人）</h2>`;
+            html += `<div>企优咨（广州）咨询有限公司</div>`;
+            html += `<div>联系人：陈焕泽 13128311370</div>`;
+
+            // 重要条款摘要
+            html += `<div style="margin-top:8px; border-top:1px solid #ccc; padding-top:4px; color:#666;">【重要条款】启动服务后不支持退款，审查结果以商标局为准。</div>`;
+            html += `</div>`;
             return html;
         }
 
@@ -1866,7 +1971,7 @@
                 div { margin: 0 0 2px; }
                 .info-table { border-collapse: collapse; width: 100%; margin: 4px 0; }
                 .info-table td { border: 1px solid #999; padding: 4px; }
-                .info-table td:first-child { font-weight: bold; background: #f5f5f5; width: 35%; white-space: nowrap; } /* 修改点：宽度35%，禁止换行 */
+                .info-table td:first-child { font-weight: bold; background: #f5f5f5; width: 35%; white-space: nowrap; }
                 .word-table { border-collapse: collapse; width: 100%; margin: 4px 0; font-size: 10pt; }
                 .word-table th { background: #e8e8e8; border: 1px solid #999; padding: 4px; text-align: center; font-weight: bold; }
                 .word-table td { border: 1px solid #999; padding: 6px; vertical-align: top; }
