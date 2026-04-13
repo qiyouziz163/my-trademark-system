@@ -3,91 +3,516 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
-    <title>企优咨 · 商标申请系统（纯语义相似度引擎）</title>
+    <title>企优咨 · 商标申请下单系统（语义相似度引擎）</title>
+    <!-- html-docx-js 用于生成真正的 DOCX -->
     <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: '宋体', SimSun, 'Times New Roman', serif; }
-        :root { --primary: #2563EB; --primary-dark: #1E40AF; --primary-light: #DBEAFE; --accent: #F97316; --success: #10b981; --warning: #f59e0b; --gray-50: #f8fafc; --gray-200: #e2e8f0; --gray-300: #cbd5e1; --gray-500: #64748b; --gray-700: #1e293b; --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
-        body { background: linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%); min-height: 100vh; padding: 20px; color: var(--gray-700); line-height: 1.5; }
-        .app-container { max-width: 1400px; margin: 0 auto; background: white; border-radius: 24px; box-shadow: var(--shadow-xl); overflow: hidden; }
-        .header { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, #3b82f6 100%); color: white; padding: 0.8rem 1.5rem; }
-        .header h1 { font-size: 1.8rem; display: flex; align-items: center; gap: 8px; }
-        .header-icon { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
-        .header-subtitle { margin-top: 0.3rem; font-size: 0.9rem; display: flex; gap: 16px; flex-wrap: wrap; }
-        .header-contact { background: var(--accent); color: white; padding: 4px 12px; border-radius: 40px; font-size: 0.85rem; }
-        .tab-bar { display: flex; background: white; padding: 0 10px; border-bottom: 2px solid var(--gray-200); overflow-x: auto; }
-        .tab { padding: 8px 16px; cursor: pointer; color: var(--gray-500); font-weight: 600; border-bottom: 3px solid transparent; background: none; border: none; white-space: nowrap; }
-        .tab.active { color: var(--primary); border-bottom-color: var(--accent); }
-        .step-panel-container, .preview-panel-container, .flow-panel-container { max-width: 900px; margin: 0 auto; padding: 16px 24px; }
-        .panel-header { margin-bottom: 12px; border-bottom: 1px solid var(--gray-200); padding-bottom: 8px; }
-        .panel-title { font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-        .panel-subtitle { font-size: 0.8rem; color: var(--gray-500); margin-left: 34px; }
-        .smart-match-section { background: linear-gradient(135deg, #FEF9E6 0%, #FFF4DC 100%); border-radius: 12px; padding: 12px; margin: 12px 0; border: 1px solid #FFE4B5; }
-        .smart-match-title { font-weight: 700; color: var(--accent); margin-bottom: 8px; }
-        .smart-match-input-group { display: flex; gap: 8px; flex-wrap: wrap; }
-        .smart-match-input-group input { flex: 2; min-width: 200px; padding: 8px 12px; border: 2px solid var(--gray-200); border-radius: 10px; font-size: 0.9rem; }
-        .smart-match-btn { background: var(--accent); color: white; border: none; padding: 6px 16px; border-radius: 40px; font-weight: 600; cursor: pointer; }
-        .smart-match-result { font-size: 0.75rem; margin-top: 8px; background: white; padding: 6px; border-radius: 8px; border-left: 3px solid var(--accent); max-height: 120px; overflow-y: auto; }
-        .tree-container { max-height: 400px; overflow-y: auto; border: 1px solid var(--gray-200); border-radius: 12px; padding: 8px; background: white; }
-        .tree-ul { list-style: none; padding-left: 0; }
-        .tree-ul ul { display: none; margin-left: 16px; padding-left: 10px; border-left: 2px solid var(--gray-200); }
-        .tree-ul li.expanded > ul { display: block; }
-        .folder-label { cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 6px 10px; font-weight: 600; border-radius: 8px; background: none; border: none; width: 100%; text-align: left; }
-        .folder-label:hover { background: var(--primary-light); }
-        .folder-icon { transition: transform 0.2s; }
-        li.expanded > .folder-label .folder-icon { transform: rotate(90deg); }
-        .cat-major { background: linear-gradient(135deg, var(--primary-light) 0%, #dbeafe 100%); border-radius: 10px; }
-        .subclass-item { display: flex; align-items: center; gap: 8px; padding: 4px 8px 4px 24px; border-radius: 6px; cursor: pointer; }
-        .subclass-item:hover { background: var(--primary-light); }
-        .selected-section { margin-bottom: 16px; }
-        .selected-list { min-height: 100px; max-height: 200px; overflow-y: auto; background: var(--gray-50); border-radius: 12px; padding: 12px; border: 2px dashed var(--gray-300); }
-        .selected-list.has-items { border-style: solid; border-color: var(--primary-light); background: white; }
-        .selected-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-        .selected-tag { background: white; border: 1px solid var(--primary-light); border-radius: 40px; padding: 4px 10px; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 6px; }
-        .tag-major { font-weight: 700; color: var(--primary); }
-        .tag-remove { cursor: pointer; color: var(--gray-500); background: none; border: none; font-size: 1.1rem; }
-        .empty-state { text-align: center; color: var(--gray-500); padding: 16px; font-style: italic; }
-        .form-row { margin-bottom: 12px; }
-        .form-row label { font-weight: 600; display: block; margin-bottom: 4px; }
-        .form-row input { width: 100%; padding: 8px 12px; border: 2px solid var(--gray-200); border-radius: 10px; }
-        .form-row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .upload-area { border: 2px dashed var(--gray-300); border-radius: 12px; padding: 16px; text-align: center; background: var(--gray-50); cursor: pointer; }
-        .upload-area:hover { border-color: var(--primary); background: var(--primary-light); }
-        .preview-box { margin-top: 12px; background: var(--gray-100); padding: 12px; display: flex; justify-content: center; border-radius: 12px; }
-        #previewImg { max-width: 120px; max-height: 120px; object-fit: contain; }
-        .scheme-panel { display: flex; flex-direction: column; gap: 8px; }
-        .scheme-option { display: flex; gap: 12px; padding: 16px; background: white; border-radius: 12px; border: 2px solid var(--gray-200); cursor: pointer; }
-        .scheme-option.selected { border-color: var(--primary); background: var(--primary-light); }
-        .scheme-price { background: var(--accent); color: white; padding: 2px 10px; border-radius: 40px; font-size: 1rem; margin-left: 8px; }
-        .invoice-section { margin: 16px 0; padding: 12px; background: var(--gray-50); border-radius: 10px; }
-        .legal-notice { background: #fffbeb; border-left: 4px solid var(--warning); border-radius: 10px; padding: 12px; font-size: 0.85rem; margin: 16px 0; }
-        .fee-section { background: #f0f9ff; border-radius: 12px; padding: 16px; margin: 16px 0; }
-        .fee-amount { font-size: 1.6rem; font-weight: 700; color: var(--primary); }
-        .fee-details { font-size: 0.85rem; max-height: 260px; overflow-y: auto; }
-        .fee-row { display: flex; justify-content: space-between; margin: 4px 0; }
-        .btn { padding: 8px 16px; border-radius: 10px; font-weight: 600; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 6px; }
-        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; }
-        .btn-secondary { background: white; border: 2px solid var(--gray-300); color: var(--gray-700); }
-        .step-footer-nav { padding: 12px 0 0; border-top: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; }
-        .step-footer-btn { padding: 6px 18px; border-radius: 40px; border: 1px solid var(--gray-300); background: white; cursor: pointer; font-size: 0.85rem; }
-        .footer-info { background: var(--gray-50); padding: 8px 24px; text-align: center; border-top: 1px solid var(--gray-200); font-size: 0.8rem; }
-        .flow-container { position: relative; padding-left: 36px; }
-        .flow-line { position: absolute; left: 14px; top: 0; bottom: 0; width: 4px; background: linear-gradient(to bottom, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #00d2d3); }
-        .flow-step { position: relative; margin-bottom: 20px; cursor: pointer; }
-        .step-marker { position: absolute; left: -30px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; background: #ccc; }
-        .flow-step-1 .step-marker { background: #ff6b6b; } .flow-step-2 .step-marker { background: #feca57; } .flow-step-3 .step-marker { background: #48dbfb; } .flow-step-4 .step-marker { background: #ff9ff3; } .flow-step-5 .step-marker { background: #54a0ff; } .flow-step-6 .step-marker { background: #5f27cd; } .flow-step-7 .step-marker { background: #00d2d3; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: '宋体', SimSun, 'Times New Roman', serif;
+        }
+        :root {
+            --primary: #2563EB;
+            --primary-dark: #1E40AF;
+            --primary-light: #DBEAFE;
+            --accent: #F97316;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --gray-50: #f8fafc;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-500: #64748b;
+            --gray-700: #1e293b;
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+        body {
+            background: linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--gray-700);
+            line-height: 1.5;
+        }
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, #3b82f6 100%);
+            color: white;
+            padding: 0.8rem 1.5rem;
+        }
+        .header h1 {
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+        .header-subtitle {
+            margin-top: 0.3rem;
+            font-size: 0.9rem;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .header-contact {
+            background: var(--accent);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+        }
+        .tab-bar {
+            display: flex;
+            background: white;
+            padding: 0 10px;
+            border-bottom: 2px solid var(--gray-200);
+            overflow-x: auto;
+        }
+        .tab {
+            padding: 8px 16px;
+            cursor: pointer;
+            color: var(--gray-500);
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border: none;
+            white-space: nowrap;
+        }
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--accent);
+        }
+        .step-panel-container,
+        .preview-panel-container,
+        .flow-panel-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 16px 24px;
+        }
+        .panel-header {
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--gray-200);
+            padding-bottom: 8px;
+        }
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .panel-subtitle {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            margin-left: 34px;
+        }
+        .smart-match-section {
+            background: linear-gradient(135deg, #FEF9E6 0%, #FFF4DC 100%);
+            border-radius: 12px;
+            padding: 12px;
+            margin: 12px 0;
+            border: 1px solid #FFE4B5;
+        }
+        .smart-match-title {
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+        .smart-match-input-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .smart-match-input-group input {
+            flex: 2;
+            min-width: 200px;
+            padding: 8px 12px;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        .smart-match-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .smart-match-result {
+            font-size: 0.75rem;
+            margin-top: 8px;
+            background: white;
+            padding: 6px;
+            border-radius: 8px;
+            border-left: 3px solid var(--accent);
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        .tree-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 8px;
+            background: white;
+        }
+        .tree-ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .tree-ul ul {
+            display: none;
+            margin-left: 16px;
+            padding-left: 10px;
+            border-left: 2px solid var(--gray-200);
+        }
+        .tree-ul li.expanded > ul {
+            display: block;
+        }
+        .folder-label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            font-weight: 600;
+            border-radius: 8px;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+        }
+        .folder-label:hover {
+            background: var(--primary-light);
+        }
+        .folder-icon {
+            transition: transform 0.2s;
+        }
+        li.expanded > .folder-label .folder-icon {
+            transform: rotate(90deg);
+        }
+        .cat-major {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #dbeafe 100%);
+            border-radius: 10px;
+        }
+        .subclass-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 8px 4px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .subclass-item:hover {
+            background: var(--primary-light);
+        }
+        .selected-section {
+            margin-bottom: 16px;
+        }
+        .section-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .selected-list {
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: var(--gray-50);
+            border-radius: 12px;
+            padding: 12px;
+            border: 2px dashed var(--gray-300);
+        }
+        .selected-list.has-items {
+            border-style: solid;
+            border-color: var(--primary-light);
+            background: white;
+        }
+        .selected-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .selected-tag {
+            background: white;
+            border: 1px solid var(--primary-light);
+            border-radius: 40px;
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tag-major {
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .tag-remove {
+            cursor: pointer;
+            color: var(--gray-500);
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+        }
+        .empty-state {
+            text-align: center;
+            color: var(--gray-500);
+            padding: 16px;
+            font-style: italic;
+        }
+        .form-row {
+            margin-bottom: 12px;
+        }
+        .form-row label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .form-row input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+        }
+        .form-row-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .upload-area {
+            border: 2px dashed var(--gray-300);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            background: var(--gray-50);
+            cursor: pointer;
+        }
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+        .preview-box {
+            margin-top: 12px;
+            background: var(--gray-100);
+            padding: 12px;
+            display: flex;
+            justify-content: center;
+            border-radius: 12px;
+        }
+        #previewImg {
+            max-width: 120px;
+            max-height: 120px;
+            object-fit: contain;
+        }
+        .scheme-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .scheme-option {
+            display: flex;
+            gap: 12px;
+            padding: 16px;
+            background: white;
+            border-radius: 12px;
+            border: 2px solid var(--gray-200);
+            cursor: pointer;
+        }
+        .scheme-option.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+        .scheme-price {
+            background: var(--accent);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 40px;
+            font-size: 1rem;
+            margin-left: 8px;
+        }
+        .invoice-section {
+            margin: 16px 0;
+            padding: 12px;
+            background: var(--gray-50);
+            border-radius: 10px;
+        }
+        .legal-notice {
+            background: #fffbeb;
+            border-left: 4px solid var(--warning);
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 0.85rem;
+            margin: 16px 0;
+        }
+        .fee-section {
+            background: #f0f9ff;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+        .fee-amount {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .fee-details {
+            font-size: 0.85rem;
+            max-height: 260px;
+            overflow-y: auto;
+        }
+        .fee-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 4px 0;
+        }
+        .btn {
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+        .btn-secondary {
+            background: white;
+            border: 2px solid var(--gray-300);
+            color: var(--gray-700);
+        }
+        .step-footer-nav {
+            padding: 12px 0 0;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .step-footer-btn {
+            padding: 6px 18px;
+            border-radius: 40px;
+            border: 1px solid var(--gray-300);
+            background: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .footer-info {
+            background: var(--gray-50);
+            padding: 8px 24px;
+            text-align: center;
+            border-top: 1px solid var(--gray-200);
+            font-size: 0.8rem;
+        }
+        .flow-container {
+            position: relative;
+            padding-left: 36px;
+        }
+        .flow-line {
+            position: absolute;
+            left: 14px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, #ff6b6b, #feca57, #48dbfb, #ff9ff3, #54a0ff, #5f27cd, #00d2d3);
+        }
+        .flow-step {
+            position: relative;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+        .step-marker {
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            background: #ccc;
+        }
+        .flow-step-1 .step-marker { background: #ff6b6b; }
+        .flow-step-2 .step-marker { background: #feca57; }
+        .flow-step-3 .step-marker { background: #48dbfb; }
+        .flow-step-4 .step-marker { background: #ff9ff3; }
+        .flow-step-5 .step-marker { background: #54a0ff; }
+        .flow-step-6 .step-marker { background: #5f27cd; }
+        .flow-step-7 .step-marker { background: #00d2d3; }
         .flow-step.completed .step-marker { background: #28a745 !important; }
-        .step-content { background: #f8f9fa; border-radius: 10px; padding: 12px; font-size: 0.85rem; }
-        .start-box { background: #f0f4f8; border: 2px solid var(--primary); border-radius: 12px; padding: 16px; text-align: center; cursor: pointer; }
-        .qr-code { max-width: 80px; margin: 0 auto; }
-        .arrow-down { text-align: center; font-size: 20px; color: var(--primary); margin: -10px 0 16px; animation: bounce 2s infinite; }
-        @keyframes bounce { 0%,100%{transform:translateY(0);} 50%{transform:translateY(8px);} }
-        @media (max-width: 768px) { body { padding: 0; } .step-panel-container { padding: 12px 16px; } }
+        .step-content {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 0.85rem;
+        }
+        .start-box {
+            background: #f0f4f8;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .qr-code {
+            max-width: 80px;
+            margin: 0 auto;
+        }
+        .arrow-down {
+            text-align: center;
+            font-size: 20px;
+            color: var(--primary);
+            margin: -10px 0 16px;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%,100%{transform:translateY(0);}
+            50%{transform:translateY(8px);}
+        }
+        @media (max-width: 768px) {
+            body { padding: 0; }
+            .step-panel-container { padding: 12px 16px; }
+        }
     </style>
 </head>
 <body>
 <div class="app-container">
-    <header class="header"><div><h1><div class="header-icon">™</div>企优咨 · 商标申请系统（纯语义相似度引擎）</h1><div class="header-subtitle"><span>任意行业描述 → 自动匹配尼斯分类 → 智能勾选</span><span class="header-contact">📞 定制需求 13128311370</span></div></div></header>
+    <header class="header">
+        <div>
+            <h1><div class="header-icon">™</div>企优咨 · 商标申请下单系统（语义相似度引擎）</h1>
+            <div class="header-subtitle">
+                <span>任意行业描述 → 自动匹配尼斯分类 → 智能勾选</span>
+                <span class="header-contact">📞 定制需求 13128311370</span>
+            </div>
+        </div>
+    </header>
+
     <nav class="tab-bar">
         <button class="tab active" id="tabStep1">一、选分类（语义相似度）</button>
         <button class="tab" id="tabStep2">二、填信息</button>
@@ -96,60 +521,174 @@
         <button class="tab" id="tabFlow">五、付款后流程</button>
     </nav>
 
-    <!-- 步骤1：纯语义相似度匹配 -->
+    <!-- 步骤1：语义相似度匹配 -->
     <div id="step1Panel" class="step-panel-container" style="display: block;">
-        <div class="panel-header"><div class="panel-title">1 语义相似度 · 智能分类</div><div class="panel-subtitle">输入任意行业/商品/服务描述（例如“新能源电池”、“口腔诊所”、“宠物寄养”），系统基于文本相似度从尼斯分类中自动匹配最相关小类</div></div>
+        <div class="panel-header">
+            <div class="panel-title">1 语义相似度 · 智能分类</div>
+            <div class="panel-subtitle">输入任意行业/商品/服务描述，系统基于文本相似度从尼斯分类中自动匹配最相关小类（每个大类最多10个）</div>
+        </div>
         <div class="panel-body">
             <div class="smart-match-section">
                 <div class="smart-match-title">🧠 自然语言描述（无预设词库，纯相似度计算）</div>
-                <div class="smart-match-input-group"><input type="text" id="smartMatchKeyword" placeholder="例如：新能源汽车、人工智能、口腔诊所、宠物美容、区块链游戏..."><button class="smart-match-btn" id="smartMatchBtn">✨ 语义相似度匹配并勾选</button></div>
-                <div id="smartMatchResultMsg" class="smart-match-result">💡 系统将分析您输入的文字与每个小类名称、群组名称的相似度（分词+TF-IDF加权），自动推荐最贴切的小类（每个大类最多10个）。</div>
+                <div class="smart-match-input-group">
+                    <input type="text" id="smartMatchKeyword" placeholder="例如：新能源汽车、口腔诊所、宠物美容、区块链游戏...">
+                    <button class="smart-match-btn" id="smartMatchBtn">✨ 语义相似度匹配并勾选</button>
+                </div>
+                <div id="smartMatchResultMsg" class="smart-match-result">💡 系统将分析您输入的文字与每个小类名称、群组名称的相似度（TF‑IDF+余弦），自动推荐最贴切的小类。</div>
             </div>
-            <div class="search-box" style="display: flex; gap: 8px; margin-bottom: 12px;"><input type="text" id="searchInput" placeholder="或手动搜索小类..."><span class="search-stats" id="searchCount">加载中...</span></div>
-            <div class="tree-container" id="treeContainer"><ul class="tree-ul" id="categoryTree"><li class="empty-state">正在加载分类数据...</li></ul></div>
-            <div style="display: flex; justify-content: space-between; margin-top: 12px;"><button class="btn btn-secondary" id="clearSelectedBtn">🗑️ 清空已选</button><span class="search-stats" id="selectedCountBadge">已选 0 个小类</span></div>
+            <div class="search-box" style="display: flex; gap: 8px; margin-bottom: 12px;">
+                <input type="text" id="searchInput" placeholder="或手动搜索小类...">
+                <span class="search-stats" id="searchCount">加载中...</span>
+            </div>
+            <div class="tree-container" id="treeContainer">
+                <ul class="tree-ul" id="categoryTree"><li class="empty-state">正在加载分类数据...</li></ul>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 12px;">
+                <button class="btn btn-secondary" id="clearSelectedBtn">🗑️ 清空已选</button>
+                <span class="search-stats" id="selectedCountBadge">已选 0 个小类</span>
+            </div>
         </div>
-        <div class="step-footer-nav"><span>当前：选分类</span><div><button class="step-footer-btn save-draft-btn" data-step="1">💾 保存草稿</button><button class="step-footer-btn step-next-btn" data-next="2">下一步 ▶</button></div></div>
+        <div class="step-footer-nav">
+            <span>当前：选分类</span>
+            <div>
+                <button class="step-footer-btn save-draft-btn" data-step="1">💾 保存草稿</button>
+                <button class="step-footer-btn step-next-btn" data-next="2">下一步 ▶</button>
+            </div>
+        </div>
     </div>
 
-    <!-- 步骤2-5 完整保留（略缩显示但功能全） -->
-    <div id="step2Panel" class="step-panel-container" style="display: none;"><div class="panel-header"><div class="panel-title">2 填写申请信息</div></div><div class="panel-body"><div class="selected-section"><div class="section-label">📋 已选小类（点击标签可删除）</div><div class="selected-list" id="selectedListContainer"><div class="empty-state" id="selectedEmpty">暂无选择</div><div class="selected-tags" id="selectedTags" style="display: none;"></div></div></div><div class="form-row"><label>申请人全称 <span style="color:red">*</span></label><input id="applicantName"></div><div class="form-row"><label>商标名称 <span style="color:red">*</span></label><input id="trademarkName"></div><div class="form-row-grid"><div><label>联系电话</label><input id="contactPhone"></div><div><label>联系人</label><input id="contactPerson"></div></div><div class="upload-area" id="uploadArea"><div>📎 点击上传商标图样</div><input type="file" id="fileInput" accept="image/*" style="display:none"></div><div class="preview-box" id="imagePreview" style="display:none"><img id="previewImg"></div></div><div class="step-footer-nav"><div><button class="step-footer-btn step-prev-btn" data-prev="1">◀ 上一步</button><button class="step-footer-btn save-draft-btn" data-step="2">💾 保存草稿</button><button class="step-footer-btn step-next-btn" data-next="3">下一步 ▶</button></div></div></div>
+    <!-- 步骤2：填信息 -->
+    <div id="step2Panel" class="step-panel-container" style="display: none;">
+        <div class="panel-header"><div class="panel-title">2 填写申请信息</div></div>
+        <div class="panel-body">
+            <div class="selected-section">
+                <div class="section-label">📋 已选小类（点击标签可删除）</div>
+                <div class="selected-list" id="selectedListContainer">
+                    <div class="empty-state" id="selectedEmpty">暂无选择，请从左侧添加</div>
+                    <div class="selected-tags" id="selectedTags" style="display: none;"></div>
+                </div>
+            </div>
+            <div class="form-section">
+                <div class="form-row"><label>申请人全称 <span style="color:red">*</span></label><input id="applicantName" placeholder="营业执照上的完整名称"></div>
+                <div class="form-row"><label>商标名称 <span style="color:red">*</span></label><input id="trademarkName" placeholder="请输入商标名称"></div>
+                <div class="form-row-grid">
+                    <div class="form-row"><label>联系电话</label><input id="contactPhone" placeholder="手机号码"></div>
+                    <div class="form-row"><label>联系人姓名</label><input id="contactPerson" placeholder="真实姓名"></div>
+                </div>
+            </div>
+            <div class="upload-section">
+                <div class="section-label">🖼️ 商标图样（建议上传）</div>
+                <div class="upload-area" id="uploadArea">
+                    <div>📎 点击或拖拽上传图片</div>
+                    <div class="upload-hint">支持 PNG、JPG 格式</div>
+                    <input type="file" id="fileInput" accept="image/png,image/jpeg" style="display: none;">
+                </div>
+                <div class="preview-box" id="imagePreview" style="display: none;"><img id="previewImg" src=""></div>
+            </div>
+        </div>
+        <div class="step-footer-nav">
+            <div>
+                <button class="step-footer-btn step-prev-btn" data-prev="1">◀ 上一步</button>
+                <button class="step-footer-btn save-draft-btn" data-step="2">💾 保存草稿</button>
+                <button class="step-footer-btn step-next-btn" data-next="3">下一步 ▶</button>
+            </div>
+        </div>
+    </div>
 
-    <div id="step3Panel" class="step-panel-container" style="display: none;"><div class="panel-header"><div class="panel-title">3 选择服务方案</div></div><div class="panel-body"><div class="scheme-panel"><div class="scheme-option selected" data-scheme="A"><input type="radio" name="scheme" value="A" checked><div>A方案 · 流程跟进 <span class="scheme-price">¥380/大类</span></div></div><div class="scheme-option" data-scheme="B"><input type="radio" name="scheme" value="B"><div>B方案 · 专业辅导 <span class="scheme-price">¥580/大类</span></div></div><div class="scheme-option" data-scheme="C"><input type="radio" name="scheme" value="C"><div>C方案 · 分期付费 <span class="scheme-price">¥1100/大类</span></div></div></div><div class="invoice-section"><label><input type="checkbox" id="invoiceCheckbox"> 专票加收5%</label></div><div class="legal-notice"><strong>⚠️ 重要声明：</strong>商标审查权归属国家知识产权局，任何代理机构均不得承诺"包过"！</div><div class="fee-section"><div><span>💰 费用明细</span><span class="fee-amount" id="totalAmount">¥0</span></div><div id="feeDisplay" class="fee-details"></div></div><div><button class="btn btn-secondary" id="previewOrderBtn">👁️ 预览订单</button><button class="btn btn-primary" id="exportWordBtn">📝 下载订单</button><button class="btn btn-secondary" id="previewContractBtn">👁️ 预览合同</button><button class="btn btn-primary" id="generateContractBtn">📄 下载合同</button></div></div><div class="step-footer-nav"><div><button class="step-footer-btn step-prev-btn" data-prev="2">◀ 上一步</button><button class="step-footer-btn save-draft-btn" data-step="3">💾 保存草稿</button><button class="step-footer-btn step-next-btn" data-next="preview">下一步 ▶</button></div></div></div>
+    <!-- 步骤3：选方案 -->
+    <div id="step3Panel" class="step-panel-container" style="display: none;">
+        <div class="panel-header"><div class="panel-title">3 选择服务方案</div></div>
+        <div class="panel-body">
+            <div class="scheme-panel">
+                <div class="scheme-option selected" data-scheme="A"><input type="radio" name="scheme" value="A" checked><div><div class="scheme-name">A方案 · 流程跟进<span class="scheme-price">¥380/大类</span></div><div class="scheme-desc">含10个小类，超出38元/个</div></div></div>
+                <div class="scheme-option" data-scheme="B"><input type="radio" name="scheme" value="B"><div><div class="scheme-name">B方案 · 专业辅导<span class="scheme-price">¥580/大类</span></div><div class="scheme-desc">含风险评估，6大类以上85折</div></div></div>
+                <div class="scheme-option" data-scheme="C"><input type="radio" name="scheme" value="C"><div><div class="scheme-name">C方案 · 分期付费<span class="scheme-price">¥1100/大类</span></div><div class="scheme-desc">首付300元/大类，下证后付尾款</div></div></div>
+            </div>
+            <div class="invoice-section"><label><input type="checkbox" id="invoiceCheckbox"> 开具增值税专用发票（加收5%）</label></div>
+            <div class="legal-notice"><strong>⚠️ 重要声明：</strong>商标审查权归属国家知识产权局，任何代理机构均不得承诺"包过"！若被驳回，已收费用不可退。</div>
+            <div class="fee-section"><div><span>💰 费用明细</span><span class="fee-amount" id="totalAmount">¥0</span></div><div id="feeDisplay" class="fee-details"></div></div>
+            <div class="button-group">
+                <div class="btn-row"><button class="btn btn-secondary" id="previewOrderBtn">👁️ 预览订单</button><button class="btn btn-primary" id="exportWordBtn">📝 下单下载订单</button></div>
+                <div class="btn-row"><button class="btn btn-secondary" id="previewContractBtn">👁️ 预览合同</button><button class="btn btn-primary" id="generateContractBtn">📄 下单下载合同</button></div>
+            </div>
+        </div>
+        <div class="step-footer-nav">
+            <div>
+                <button class="step-footer-btn step-prev-btn" data-prev="2">◀ 上一步</button>
+                <button class="step-footer-btn save-draft-btn" data-step="3">💾 保存草稿</button>
+                <button class="step-footer-btn step-next-btn" data-next="preview">下一步 ▶</button>
+            </div>
+        </div>
+    </div>
 
-    <div id="previewPanel" class="preview-panel-container" style="display: none;"><div class="panel-header"><div class="panel-title">📄 预览页面</div></div><div class="panel-body"><div id="previewContent"><div class="empty-state">请填写信息并选择小类后预览</div></div><div class="preview-actions"><button class="btn btn-primary preview-export-word">📝 下单下载订单</button><button class="btn btn-primary preview-generate-contract">📄 下单下载合同</button></div></div><div class="step-footer-nav"><button class="step-footer-btn step-prev-btn" data-prev="3">◀ 上一步</button><button class="step-footer-btn step-next-btn" data-next="flow">下一步 ▶</button></div></div>
+    <!-- 步骤4：预览页面 -->
+    <div id="previewPanel" class="preview-panel-container" style="display: none;">
+        <div class="panel-header"><div class="panel-title">📄 预览页面</div></div>
+        <div class="panel-body">
+            <div id="previewContent" class="preview-content"><div class="empty-state">请填写必要信息并选择小类后查看预览</div></div>
+            <div class="preview-actions">
+                <div class="button-group">
+                    <div class="btn-row"><button class="btn btn-primary preview-export-word">📝 下单下载订单</button><button class="btn btn-primary preview-generate-contract">📄 下单下载合同</button></div>
+                </div>
+            </div>
+        </div>
+        <div class="step-footer-nav"><button class="step-footer-btn step-prev-btn" data-prev="3">◀ 上一步</button><button class="step-footer-btn step-next-btn" data-next="flow">下一步 ▶</button></div>
+    </div>
 
-    <div id="flowPanel" class="flow-panel-container" style="display: none;"><div class="panel-header"><div class="panel-title">⚙️ 付款后流程</div></div><div class="panel-body"><div class="start-box" id="flowStartBox"><div><img src="联系陈工-微信二维码.png" alt="二维码" class="qr-code" onerror="this.style.display='none';"><div>签订合同、付款后，开启服务流程↓↓↓</div></div></div><div class="arrow-down">↓</div><div class="flow-container"><div class="flow-line"></div><div class="flow-step flow-step-1" onclick="toggleFlowStep(this)"><div class="step-marker">1</div><div class="step-content">根据所选方案进行对应服务流程</div></div><div class="flow-step flow-step-2" onclick="toggleFlowStep(this)"><div class="step-marker">2</div><div class="step-content">确认信息提交商标局</div></div><div class="flow-step flow-step-3" onclick="toggleFlowStep(this)"><div class="step-marker">3</div><div class="step-content">回执书（当天）</div></div><div class="flow-step flow-step-4" onclick="toggleFlowStep(this)"><div class="step-marker">4</div><div class="step-content">受理通知书（约1个月）</div></div><div class="flow-step flow-step-5" onclick="toggleFlowStep(this)"><div class="step-marker">5</div><div class="step-content">实质审查（2-3个月）</div></div><div class="flow-step flow-step-6" onclick="toggleFlowStep(this)"><div class="step-marker">6</div><div class="step-content">公告期（3个月）</div></div><div class="flow-step flow-step-7" onclick="toggleFlowStep(this)"><div class="step-marker">7</div><div class="step-content">获得注册证</div></div></div><div class="footer-notice">周期以商标局实际为准。</div></div><div class="step-footer-nav"><button class="step-footer-btn step-prev-btn" data-prev="preview">◀ 上一步</button><button class="step-footer-btn" disabled>下一步 ▶</button></div></div>
+    <!-- 步骤5：付款后流程 -->
+    <div id="flowPanel" class="flow-panel-container" style="display: none;">
+        <div class="panel-header"><div class="panel-title">⚙️ 付款后流程</div></div>
+        <div class="panel-body">
+            <div class="start-box" id="flowStartBox">
+                <div class="qr-container"><img src="联系陈工-微信二维码.png" alt="联系陈工微信二维码" class="qr-code" onerror="this.style.display='none';"><div>签订合同、付款后，开始服务流程↓↓↓</div></div>
+            </div>
+            <div class="arrow-down">↓</div>
+            <div class="flow-container">
+                <div class="flow-line"></div>
+                <div class="flow-step flow-step-1" onclick="toggleFlowStep(this)"><div class="step-marker">1</div><div class="step-content">根据所选方案进行对应服务流程</div></div>
+                <div class="flow-step flow-step-2" onclick="toggleFlowStep(this)"><div class="step-marker">2</div><div class="step-content">跟您再次确认商标申请信息表后，提交商标局</div></div>
+                <div class="flow-step flow-step-3" onclick="toggleFlowStep(this)"><div class="step-marker">3</div><div class="step-content">提交商标局后，最快当天有回执书给您</div></div>
+                <div class="flow-step flow-step-4" onclick="toggleFlowStep(this)"><div class="step-marker">4</div><div class="step-content">受理通知书（约1个月）<div class="note">⭕如遇补正，免费协助处理。</div></div></div>
+                <div class="flow-step flow-step-5" onclick="toggleFlowStep(this)"><div class="step-marker">5</div><div class="step-content">实质审查（约2-3个月）<div class="note">⭕如遇驳回：您可选择是否进行驳回复审（需另付费）</div></div></div>
+                <div class="flow-step flow-step-6" onclick="toggleFlowStep(this)"><div class="step-marker">6</div><div class="step-content">公告期（3个月）<div class="note">⭕如遇异议：您可选择是否进行异议答辩（需另付费）</div></div></div>
+                <div class="flow-step flow-step-7" onclick="toggleFlowStep(this)"><div class="step-marker">7</div><div class="step-content">获得注册证（约1个月）</div></div>
+            </div>
+            <div class="footer-notice">以上时间为目前政策下的估算周期，具体以商标局实际审查进度为准。</div>
+        </div>
+        <div class="step-footer-nav"><button class="step-footer-btn step-prev-btn" data-prev="preview">◀ 上一步</button><button class="step-footer-btn" disabled>下一步 ▶</button></div>
+    </div>
+
     <footer class="footer-info">企优咨（广州）咨询有限公司 · 商标 · 版权专业代理：13128311370</footer>
 </div>
 
 <script>
     (function(){
         // ---------- 全局数据 ----------
-        let rawData = [];
-        const selectedSubclasses = {};
-        let trademarkImageData = null;
+        let rawData = [];                 // 从 JSON 加载的尼斯分类数据
+        const selectedSubclasses = {};   // { "大类号": ["小类1","小类2"...] }
+        let trademarkImageData = null;   // 商标图样 base64
         const schemeParams = { A:{base:380,extra:38,name:'流程跟进'}, B:{base:580,extra:58,name:'专业辅导'}, C:{base:1100,extra:110,name:'分期付费'} };
-        
-        // 内置默认分类（仅作为加载失败时的后备，确保演示可用）
+
+        // ---------- 内置默认分类（仅在加载外部JSON失败时使用，保证演示）----------
         const DEFAULT_CATEGORIES = [
             { "大类":"3", "children":[{"类似群组":"0301","name":"化妆品","children":["化妆品","美容面膜","精油","香水","洗面奶","沐浴露","洗发水","护发素","染发剂","防晒霜","口红","粉底液","眼影","腮红","卸妆水"].map(n=>({小类:n}))}]},
-            { "大类":"44", "children":[{"类似群组":"4401","name":"美容服务","children":["美容院服务","理发店","按摩","修指甲","化妆师服务","皮肤护理服务","卫生美容咨询","桑拿服务","医疗按摩","康复中心"].map(n=>({小类:n}))}]},
-            { "大类":"35", "children":[{"类似群组":"3501","name":"广告","children":["广告宣传","特许经营的商业管理","为商品和服务提供在线市场","进出口代理","市场营销","替他人推销","人事管理咨询"].map(n=>({小类:n}))}]},
-            { "大类":"10", "children":[{"类似群组":"1001","name":"医疗器械","children":["美容用激光仪器","电动美容仪","微针滚轮","医疗器械","整形用仪器","按摩器械","理疗设备","医用冷敷贴"].map(n=>({小类:n}))}]},
-            { "大类":"21", "children":[{"类似群组":"2110","name":"化妆用具","children":["化妆刷","粉扑","化妆棉","美甲用泡沫材料","梳妆用海绵","专用化妆包","眉刷","唇刷","粉底刷"].map(n=>({小类:n}))}]},
-            { "大类":"5", "children":[{"类似群组":"0501","name":"医药","children":["医用敷料","消毒剂","减肥用药","医用胶原蛋白","卫生棉条","隐形眼镜护理液","营养补充剂","医用营养品"].map(n=>({小类:n}))}]},
-            { "大类":"41", "children":[{"类似群组":"4101","name":"教育","children":["美容培训","组织美容教育考核","提供在线电子出版物","健身指导培训","教育信息","安排和组织培训班"].map(n=>({小类:n}))}]},
-            { "大类":"9", "children":[{"类似群组":"0901","name":"软件","children":["可下载的软件程序","美容用电子仪器","太阳镜","磁性编码的信用卡","智能手表","手机应用软件"].map(n=>({小类:n}))}]},
-            { "大类":"25", "children":[{"类似群组":"2501","name":"服装","children":["服装","鞋","帽","围巾","理发用披肩","工作服","睡衣","内衣","运动衫"].map(n=>({小类:n}))}]},
-            { "大类":"16", "children":[{"类似群组":"1601","name":"纸品","children":["宣传画册","杂志","纸质包装袋","包装纸","教学材料","名片","海报"].map(n=>({小类:n}))}]},
-            { "大类":"1", "children":[{"类似群组":"0104","name":"化学原料","children":["化妆品制造用化学原料","工业用防腐剂","抗氧化剂","表面活性剂","香料用原料"].map(n=>({小类:n}))}]}
+            { "大类":"44","children":[{"类似群组":"4401","name":"美容服务","children":["美容院服务","理发店","按摩","修指甲","化妆师服务","皮肤护理服务","卫生美容咨询","桑拿服务","医疗按摩","康复中心"].map(n=>({小类:n}))}]},
+            { "大类":"35","children":[{"类似群组":"3501","name":"广告","children":["广告宣传","特许经营的商业管理","为商品和服务提供在线市场","进出口代理","市场营销","替他人推销","人事管理咨询"].map(n=>({小类:n}))}]},
+            { "大类":"10","children":[{"类似群组":"1001","name":"医疗器械","children":["美容用激光仪器","电动美容仪","微针滚轮","医疗器械","整形用仪器","按摩器械","理疗设备","医用冷敷贴"].map(n=>({小类:n}))}]},
+            { "大类":"21","children":[{"类似群组":"2110","name":"化妆用具","children":["化妆刷","粉扑","化妆棉","美甲用泡沫材料","梳妆用海绵","专用化妆包","眉刷","唇刷","粉底刷"].map(n=>({小类:n}))}]},
+            { "大类":"5","children":[{"类似群组":"0501","name":"医药","children":["医用敷料","消毒剂","减肥用药","医用胶原蛋白","卫生棉条","隐形眼镜护理液","营养补充剂","医用营养品"].map(n=>({小类:n}))}]},
+            { "大类":"41","children":[{"类似群组":"4101","name":"教育","children":["美容培训","组织美容教育考核","提供在线电子出版物","健身指导培训","教育信息","安排和组织培训班"].map(n=>({小类:n}))}]},
+            { "大类":"9","children":[{"类似群组":"0901","name":"软件","children":["可下载的软件程序","美容用电子仪器","太阳镜","磁性编码的信用卡","智能手表","手机应用软件"].map(n=>({小类:n}))}]},
+            { "大类":"25","children":[{"类似群组":"2501","name":"服装","children":["服装","鞋","帽","围巾","理发用披肩","工作服","睡衣","内衣","运动衫"].map(n=>({小类:n}))}]},
+            { "大类":"16","children":[{"类似群组":"1601","name":"纸品","children":["宣传画册","杂志","纸质包装袋","包装纸","教学材料","名片","海报"].map(n=>({小类:n}))}]},
+            { "大类":"1","children":[{"类似群组":"0104","name":"化学原料","children":["化妆品制造用化学原料","工业用防腐剂","抗氧化剂","表面活性剂","香料用原料"].map(n=>({小类:n}))}]}
         ];
-        
+
+        // ---------- 辅助函数 ----------
         function escapeHtml(s){ if(!s) return ''; return String(s).replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
         function escapeAttr(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-        
-        // 获取所有小类扁平列表（含群组名称、大类号）
+
+        // 获取所有小类的扁平列表（包含大类号、小类名、群组名、用于相似度的完整文本）
         function getAllSubclassesFlat(){
             const list = [];
             rawData.forEach(majorNode => {
@@ -158,26 +697,35 @@
                     const groupName = group.name || group.类似群组 || '';
                     (group.children || []).forEach(sub => {
                         const subName = sub.小类 || sub.name || '';
-                        if(subName) list.push({ major, subclassName: subName, groupName: groupName, fullText: (subName + ' ' + groupName + ' 大类' + major).toLowerCase() });
+                        if(subName){
+                            list.push({
+                                major: major,
+                                subclassName: subName,
+                                groupName: groupName,
+                                fullText: (subName + ' ' + groupName + ' 大类' + major).toLowerCase()
+                            });
+                        }
                     });
                 });
             });
             return list;
         }
-        
-        // ================= 纯文本相似度引擎（无预设词库）=================
-        // 简单高效的分词（按中文字符和英文单词）
+
+        // ================= 纯文本相似度引擎（TF‑IDF + 余弦，无预设词库）=================
+        let corpusIdf = null;      // 全局 IDF 字典
+        let allDocTokens = null;   // 所有文档的分词结果（用于 IDF 计算）
+
+        // 分词（中英文混合）
         function tokenize(text){
             const words = [];
-            // 匹配中文词（连续汉字）和英文词（字母数字）
             const chineseMatches = text.match(/[\u4e00-\u9fa5]+/g) || [];
-            const englishMatches = text.match(/[a-zA-Z0-9]+/g) || [];
+            const englishMatches = text.match(/[a-zA-Z0-9]{2,}/g) || [];
             for(let w of chineseMatches) if(w.length>=1) words.push(w);
             for(let w of englishMatches) if(w.length>=2) words.push(w.toLowerCase());
             return words;
         }
-        
-        // 计算词频 (term frequency)
+
+        // 计算词频 TF
         function computeTF(tokens){
             const tf = {};
             for(let t of tokens) tf[t] = (tf[t]||0) + 1;
@@ -185,10 +733,8 @@
             for(let t in tf) tf[t] = tf[t] / total;
             return tf;
         }
-        
-        // 构建整个语料库（所有小类的fullText）的逆文档频率IDF（全局计算一次）
-        let corpusIdf = null;
-        let allDocTokens = null;
+
+        // 构建全局 IDF（基于所有小类的 fullText）
         function buildCorpusIdf(){
             const allSubs = getAllSubclassesFlat();
             if(allSubs.length === 0) return;
@@ -210,17 +756,15 @@
             corpusIdf = idf;
             allDocTokens = docTokensList;
         }
-        
-        // 计算两个文本的TF-IDF余弦相似度（查询文本 vs 文档文本）
+
+        // 计算两个文本的 TF‑IDF 余弦相似度
         function cosineSimilarity(queryText, docText){
             const queryTokens = tokenize(queryText);
             const docTokens = tokenize(docText);
             if(queryTokens.length === 0 || docTokens.length === 0) return 0;
             const queryTF = computeTF(queryTokens);
             const docTF = computeTF(docTokens);
-            // 使用全局IDF
             if(!corpusIdf) buildCorpusIdf();
-            // 构建向量（仅考虑query中的词，提升性能）
             let dot = 0, normQ = 0, normD = 0;
             for(let term in queryTF){
                 const idfVal = (corpusIdf && corpusIdf[term]) ? corpusIdf[term] : 1;
@@ -237,22 +781,21 @@
             if(normQ === 0 || normD === 0) return 0;
             return dot / (Math.sqrt(normQ) * Math.sqrt(normD));
         }
-        
-        // 智能匹配主函数：完全基于文本相似度
+
+        // 核心匹配函数：根据用户输入，返回 { "大类号": ["小类1","小类2"...] }，每个大类最多10个
         function semanticSimilarityMatch(query){
             if(!query.trim()) return {};
             const allSubs = getAllSubclassesFlat();
             if(allSubs.length === 0) return {};
-            // 确保IDF已构建
             if(!corpusIdf) buildCorpusIdf();
             const scored = [];
             for(let item of allSubs){
                 const sim = cosineSimilarity(query, item.fullText);
-                if(sim > 0.05){  // 阈值过滤，避免噪声
+                if(sim > 0.05){  // 阈值过滤
                     scored.push({ major: item.major, subclassName: item.subclassName, score: sim });
                 }
             }
-            // 按大类分组，每个大类取前10
+            // 按大类分组，每组取前10
             const groupMap = new Map();
             for(const s of scored){
                 if(!groupMap.has(s.major)) groupMap.set(s.major, []);
@@ -265,7 +808,7 @@
             }
             return result;
         }
-        
+
         function applyMatch(matchRes){
             if(!matchRes || Object.keys(matchRes).length===0) return false;
             for(let k in selectedSubclasses) delete selectedSubclasses[k];
@@ -274,8 +817,8 @@
             }
             return true;
         }
-        
-        // ---------- 费用计算与UI刷新（复用原有逻辑）----------
+
+        // ---------- 费用计算与UI刷新 ----------
         function computeFeeDetails(){
             const scheme = document.querySelector('input[name="scheme"]:checked')?.value||'A';
             const params = schemeParams[scheme];
@@ -290,7 +833,7 @@
             }
             let finalTotal=totalOriginal, discountNote='';
             const majorCnt=Object.keys(majorDetails).length;
-            if(scheme==='B' && majorCnt>6){ finalTotal*=0.85; discountNote='B方案大客户85折';}
+            if(scheme==='B' && majorCnt>6){ finalTotal*=0.85; discountNote='B方案大客户优惠立减15%';}
             if(scheme==='C'){
                 let totalActual=0;
                 for(const m in majorDetails){
@@ -301,11 +844,12 @@
                     totalActual+=first+finalTail;
                 }
                 finalTotal=totalActual;
-                if(majorCnt>6) discountNote='C方案尾款减免15%';
+                if(majorCnt>6) discountNote='C方案大客户优惠尾款减免15%';
             }
             const invoiceAmount = withInvoice ? finalTotal*0.05 : 0;
             return {scheme,params,withInvoice,majorDetails,totalOriginal,finalTotal,invoiceAmount,totalWithInvoice:finalTotal+invoiceAmount,discountNote};
         }
+
         function computeFeeText(d){
             let html='<div class="fee-rows">';
             html+=`<div class="fee-row"><span>服务方案</span><span>${d.scheme}方案·${d.params.name}</span></div>`;
@@ -316,8 +860,9 @@
             html+=`<div class="fee-row"><strong>应付总额</strong><strong>¥${(d.withInvoice?d.totalWithInvoice:d.finalTotal).toFixed(2)}</strong></div>`;
             return html;
         }
-        
+
         function refreshUI(){
+            // 更新已选标签
             const tags=document.getElementById('selectedTags'), empty=document.getElementById('selectedEmpty'), cont=document.getElementById('selectedListContainer');
             if(tags){
                 tags.innerHTML=''; let has=false;
@@ -351,40 +896,70 @@
             }
             syncCheckboxes();
         }
-        
-        function syncCheckboxes(){ document.querySelectorAll('.subclass-checkbox').forEach(cb=>{ const major=cb.dataset.major, sub=cb.dataset.sub; cb.checked=!!(selectedSubclasses[major]&&selectedSubclasses[major].includes(sub)); }); }
+
+        function syncCheckboxes(){
+            document.querySelectorAll('.subclass-checkbox').forEach(cb=>{
+                const major=cb.dataset.major, sub=cb.dataset.sub;
+                cb.checked = !!(selectedSubclasses[major] && selectedSubclasses[major].includes(sub));
+            });
+        }
+
         function handleCheckboxChange(e){
             const cb=e.target, major=cb.dataset.major, sub=cb.dataset.sub;
-            if(cb.checked){ if(!selectedSubclasses[major]) selectedSubclasses[major]=[]; if(!selectedSubclasses[major].includes(sub)) selectedSubclasses[major].push(sub); }
-            else{ if(selectedSubclasses[major]){ const idx=selectedSubclasses[major].indexOf(sub); if(idx!==-1) selectedSubclasses[major].splice(idx,1); if(!selectedSubclasses[major].length) delete selectedSubclasses[major]; } }
+            if(cb.checked){
+                if(!selectedSubclasses[major]) selectedSubclasses[major]=[];
+                if(!selectedSubclasses[major].includes(sub)) selectedSubclasses[major].push(sub);
+            } else {
+                if(selectedSubclasses[major]){
+                    const idx=selectedSubclasses[major].indexOf(sub);
+                    if(idx!==-1) selectedSubclasses[major].splice(idx,1);
+                    if(!selectedSubclasses[major].length) delete selectedSubclasses[major];
+                }
+            }
             refreshUI();
         }
-        
+
+        // 渲染树形分类（支持搜索过滤）
         function renderTree(filter=''){
             const tree=document.getElementById('categoryTree'); if(!tree) return;
             if(!rawData.length){ tree.innerHTML='<li class="empty-state">暂无分类数据</li>'; return; }
             let html='';
+            const lowerFilter = filter.toLowerCase();
             rawData.forEach(majorNode=>{
                 const major=majorNode.大类||majorNode.name;
-                html+=`<li class="tree-li major-li"><button class="folder-label cat-major"><span class="folder-icon">▶</span>大类 ${escapeHtml(major)}</button><ul class="major-groups">`;
+                let majorHasMatch = false;
+                let groupsHtml = '';
                 (majorNode.children||[]).forEach(group=>{
-                    const gl=`${group.类似群组||''} ${group.name||''}`;
-                    html+=`<li><button class="folder-label cat-group"><span class="folder-icon">▶</span>${escapeHtml(gl)}</button><ul>`;
+                    const groupLabel = `${group.类似群组||''} ${group.name||''}`;
+                    let groupHasMatch = false;
+                    let subsHtml = '';
                     (group.children||[]).forEach(sub=>{
                         const sn=sub.小类||sub.name;
-                        const checked=(selectedSubclasses[major]&&selectedSubclasses[major].includes(sn))?'checked':'';
-                        html+=`<li class="subclass-item"><input type="checkbox" class="subclass-checkbox" data-major="${escapeAttr(major)}" data-sub="${escapeAttr(sn)}" ${checked}><label>${escapeHtml(sn)}</label></li>`;
+                        const match = !filter || major.toLowerCase().includes(lowerFilter) || groupLabel.toLowerCase().includes(lowerFilter) || sn.toLowerCase().includes(lowerFilter);
+                        if(match) groupHasMatch = true;
+                        if(match || !filter){
+                            const checked=(selectedSubclasses[major]&&selectedSubclasses[major].includes(sn))?'checked':'';
+                            subsHtml += `<li class="subclass-item"><input type="checkbox" class="subclass-checkbox" data-major="${escapeAttr(major)}" data-sub="${escapeAttr(sn)}" ${checked}><label>${escapeHtml(sn)}</label></li>`;
+                        }
                     });
-                    html+=`</ul></li>`;
+                    if(groupHasMatch || !filter){
+                        groupsHtml += `<li><button class="folder-label cat-group"><span class="folder-icon">▶</span>${escapeHtml(groupLabel)}</button><ul>${subsHtml}</ul></li>`;
+                        majorHasMatch = true;
+                    }
                 });
-                html+=`</ul></li>`;
+                if(majorHasMatch || !filter){
+                    html += `<li class="tree-li major-li"><button class="folder-label cat-major"><span class="folder-icon">▶</span>大类 ${escapeHtml(major)}</button><ul class="major-groups">${groupsHtml}</ul></li>`;
+                }
             });
             tree.innerHTML=html;
             document.querySelectorAll('.subclass-checkbox').forEach(cb=>cb.addEventListener('change',handleCheckboxChange));
             document.querySelectorAll('.folder-label').forEach(btn=>btn.addEventListener('click',function(e){ e.stopPropagation(); this.closest('li')?.classList.toggle('expanded'); }));
             syncCheckboxes();
+            const totalSubCount = getAllSubclassesFlat().length;
+            document.getElementById('searchCount').innerText = filter ? `筛选结果` : `共 ${totalSubCount} 小类`;
         }
-        
+
+        // 加载 JSON 数据
         async function loadJSON(){
             try{
                 const res=await fetch('尼斯分类表_树状结构.json');
@@ -394,11 +969,12 @@
                 console.warn('加载外部JSON失败，使用内置分类数据');
                 rawData=DEFAULT_CATEGORIES;
             }
-            // 构建语料库IDF
-            buildCorpusIdf();
-            renderTree(); refreshUI();
+            buildCorpusIdf();   // 构建 IDF 语料库
+            renderTree(); 
+            refreshUI();
         }
-        
+
+        // 语义匹配按钮逻辑
         function initSemanticMatch(){
             const btn=document.getElementById('smartMatchBtn');
             const input=document.getElementById('smartMatchKeyword');
@@ -411,38 +987,123 @@
                 const total = Object.values(matchRes).reduce((a,b)=>a+b.length,0);
                 if(total===0){ msgDiv.innerHTML=`❌ 未从尼斯分类中匹配到与“${escapeHtml(desc)}”相关的小类，请尝试更详细的描述。`; return; }
                 applyMatch(matchRes);
-                refreshUI(); renderTree();
+                refreshUI(); renderTree(document.getElementById('searchInput').value);
                 let details = Object.entries(matchRes).map(([m,subs])=>`${m}类(${subs.length}个)`).join(', ');
                 msgDiv.innerHTML=`🧠 语义相似度匹配成功！针对“${escapeHtml(desc)}” 自动匹配并勾选了 ${total} 个小类，涉及 ${Object.keys(matchRes).length} 个大类：${details}。您可手动调整。`;
             });
         }
-        
-        // ---------- 选项卡与导航 ----------
-        const tabs=['tabStep1','tabStep2','tabStep3','tabPreview','tabFlow'], panels=['step1Panel','step2Panel','step3Panel','previewPanel','flowPanel'];
-        function activateTab(idx){ tabs.forEach((id,i)=>{ document.getElementById(id).classList.toggle('active',i===idx); document.getElementById(panels[i]).style.display=i===idx?'block':'none'; }); if(idx===3) document.getElementById('previewContent').innerHTML='<div class="empty-state">请使用“预览订单”或“预览合同”按钮查看详细内容</div>'; }
+
+        // ---------- 选项卡与步骤导航 ----------
+        const tabs=['tabStep1','tabStep2','tabStep3','tabPreview','tabFlow'];
+        const panels=['step1Panel','step2Panel','step3Panel','previewPanel','flowPanel'];
+        function activateTab(idx){
+            tabs.forEach((id,i)=>{
+                document.getElementById(id).classList.toggle('active',i===idx);
+                document.getElementById(panels[i]).style.display = i===idx ? 'block' : 'none';
+            });
+            if(idx===3) renderPreviewPanel();
+        }
+        function renderPreviewPanel(){
+            const previewDiv=document.getElementById('previewContent');
+            const applicant=document.getElementById('applicantName')?.value.trim()||'';
+            const tmName=document.getElementById('trademarkName')?.value.trim()||'';
+            const totalSub=Object.values(selectedSubclasses).reduce((a,b)=>a+b.length,0);
+            if(!applicant || !tmName || totalSub===0){
+                previewDiv.innerHTML='<div class="empty-state">请填写申请人全称、商标名称并选择小类后预览</div>';
+                return;
+            }
+            previewDiv.innerHTML='<div class="empty-state">预览功能请使用“预览订单”或“预览合同”按钮查看详细内容</div>';
+        }
+
         tabs.forEach((id,i)=>document.getElementById(id).addEventListener('click',()=>activateTab(i)));
-        document.querySelectorAll('.step-prev-btn').forEach(btn=>btn.addEventListener('click',function(){ const p=this.dataset.prev; if(p==='1')activateTab(0); else if(p==='2')activateTab(1); else if(p==='3')activateTab(2); else if(p==='preview')activateTab(3); }));
-        document.querySelectorAll('.step-next-btn').forEach(btn=>btn.addEventListener('click',function(){ const n=this.dataset.next; if(n==='2')activateTab(1); else if(n==='3')activateTab(2); else if(n==='preview')activateTab(3); else if(n==='flow')activateTab(4); }));
-        
-        // 占位导出功能
-        document.getElementById('previewOrderBtn')?.addEventListener('click',()=>alert('订单预览（正式版展示完整订单内容）'));
-        document.getElementById('previewContractBtn')?.addEventListener('click',()=>alert('合同预览（正式版展示完整合同内容）'));
-        document.getElementById('exportWordBtn')?.addEventListener('click',()=>alert('下载订单.docx（正式版生成DOCX文件）'));
-        document.getElementById('generateContractBtn')?.addEventListener('click',()=>alert('下载合同.docx（正式版生成DOCX文件）'));
-        
+        document.querySelectorAll('.step-prev-btn').forEach(btn=>btn.addEventListener('click',function(){
+            const p=this.dataset.prev;
+            if(p==='1')activateTab(0); else if(p==='2')activateTab(1); else if(p==='3')activateTab(2); else if(p==='preview')activateTab(3);
+        }));
+        document.querySelectorAll('.step-next-btn').forEach(btn=>btn.addEventListener('click',function(){
+            const n=this.dataset.next;
+            if(n==='2')activateTab(1); else if(n==='3')activateTab(2); else if(n==='preview')activateTab(3); else if(n==='flow')activateTab(4);
+        }));
+
+        // 导出订单/合同（DOCX 生成，完整版）
+        function generateDocx(htmlContent, filename){
+            if(typeof htmlDocx === 'undefined' || !htmlDocx.asBlob){
+                alert('DOCX生成库未加载，请刷新重试');
+                return;
+            }
+            const options = { orientation:'portrait', margins:{ top:1440, right:1440, bottom:1440, left:1440 } };
+            htmlDocx.asBlob(htmlContent, options).then(blob=>{
+                const link=document.createElement('a');
+                link.href=URL.createObjectURL(blob);
+                link.download=filename+'.docx';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+            }).catch(e=>alert('生成失败：'+e.message));
+        }
+        function getOrderHtml(){
+            const applicant=document.getElementById('applicantName')?.value.trim()||'未填写';
+            const tmName=document.getElementById('trademarkName')?.value.trim()||'未填写';
+            const phone=document.getElementById('contactPhone')?.value.trim()||'';
+            const contact=document.getElementById('contactPerson')?.value.trim()||'';
+            const d=computeFeeDetails();
+            const today=new Date().toLocaleDateString('zh-CN');
+            const orderNo='ZCXD-'+new Date().toISOString().slice(0,19).replace(/[-:T]/g,'');
+            let subRows='';
+            let idx=1;
+            for(const major in selectedSubclasses){
+                if(selectedSubclasses[major].length){
+                    subRows+=`<tr><td>${idx}</td><td>${escapeHtml(tmName)}</td><td>${escapeHtml(major)}</td><td>${selectedSubclasses[major].map(escapeHtml).join('；')}</td></tr>`;
+                    idx++;
+                }
+            }
+            return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>商标申请订单</title><style>body{font-family:'宋体',SimSun;margin:0.6cm;}table{border-collapse:collapse;width:100%;margin:8px 0;}th,td{border:1px solid #999;padding:6px;text-align:left;}th{background:#f0f0f0;}</style></head><body><h1 style="text-align:center;">商标申请订单</h1><p><strong>订单号：</strong>${orderNo}</p><p><strong>申请人：</strong>${escapeHtml(applicant)}</p><p><strong>商标名称：</strong>${escapeHtml(tmName)}</p><p><strong>联系人：</strong>${escapeHtml(contact)} ${escapeHtml(phone)}</p><p><strong>下单日期：</strong>${today}</p><h2>已选类别</h2><table><tr><th>序号</th><th>商标名称</th><th>大类</th><th>小类</th></tr>${subRows}</table><h2>费用明细</h2><p>服务方案：${d.scheme}方案 · ${d.params.name}</p><p>合计金额：¥${(d.withInvoice?d.totalWithInvoice:d.finalTotal).toFixed(2)}元（${d.withInvoice?'含专票':'普票'}）</p><p>付款账户：企优咨（广州）咨询有限公司 建行广州花城支行 4405 0158 0107 0000 4275</p><p style="margin-top:20px;">本订单由企优咨商标系统生成，咨询热线13128311370</p></body></html>`;
+        }
+        function getContractHtml(){
+            const applicant=document.getElementById('applicantName')?.value.trim()||'';
+            const tmName=document.getElementById('trademarkName')?.value.trim()||'';
+            const phone=document.getElementById('contactPhone')?.value.trim()||'';
+            const contact=document.getElementById('contactPerson')?.value.trim()||'';
+            const d=computeFeeDetails();
+            const today=new Date().toLocaleDateString('zh-CN');
+            const contractNo='QYZ-TM-'+Date.now();
+            let subRows=''; let idx=1;
+            for(const major in selectedSubclasses){
+                if(selectedSubclasses[major].length){
+                    subRows+=`<tr><td>${idx}</td><td>${escapeHtml(tmName)}</td><td>${escapeHtml(major)}</td><td>${selectedSubclasses[major].map(escapeHtml).join('；')}</td></tr>`;
+                    idx++;
+                }
+            }
+            return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>商标代理合同</title><style>body{font-family:'宋体',SimSun;margin:0.6cm;}table{border-collapse:collapse;width:100%;margin:8px 0;}th,td{border:1px solid #333;padding:6px;}</style></head><body><h1 style="text-align:center;">商标申请代理服务合同</h1><p>合同编号：${contractNo} &nbsp;签订日期：${today}</p><h2>甲方（委托人）：${escapeHtml(applicant)}</h2><h2>乙方（受托人）：企优咨（广州）咨询有限公司</h2><p>委托事项：商标申请注册</p><h3>商标信息</h3><p>商标名称：${escapeHtml(tmName)}</p><h3>申请类别明细</h3><table><tr><th>序号</th><th>商标名称</th><th>大类</th><th>小类</th></tr>${subRows}</table><h3>服务方案及费用</h3><p>方案：${d.scheme}方案 · ${d.params.name}</p><p>合同总金额：¥${(d.withInvoice?d.totalWithInvoice:d.finalTotal).toFixed(2)}元（${d.withInvoice?'含增值税专用发票':'增值税普通发票'}）</p><p>付款方式：合同签订后一次性支付至乙方账户。</p><p>乙方账户：企优咨（广州）咨询有限公司 建行广州花城支行 4405 0158 0107 0000 4275</p><p>本合同一式两份，双方各执一份，具有同等法律效力。</p><p style="margin-top:30px;">甲方（签章）：__________ &nbsp;&nbsp;&nbsp;乙方（签章）：企优咨（广州）咨询有限公司</p></body></html>`;
+        }
+        document.getElementById('exportWordBtn')?.addEventListener('click',()=>generateDocx(getOrderHtml(),`商标订单_${Date.now()}`));
+        document.getElementById('generateContractBtn')?.addEventListener('click',()=>generateDocx(getContractHtml(),`商标合同_${Date.now()}`));
+        document.querySelectorAll('.preview-export-word').forEach(btn=>btn.addEventListener('click',()=>generateDocx(getOrderHtml(),`商标订单_${Date.now()}`)));
+        document.querySelectorAll('.preview-generate-contract').forEach(btn=>btn.addEventListener('click',()=>generateDocx(getContractHtml(),`商标合同_${Date.now()}`)));
+        document.getElementById('previewOrderBtn')?.addEventListener('click',()=>alert('订单预览（完整版可生成DOCX）'));
+        document.getElementById('previewContractBtn')?.addEventListener('click',()=>alert('合同预览（完整版可生成DOCX）'));
+
         // 图片上传
         const upArea=document.getElementById('uploadArea'), fileInp=document.getElementById('fileInput'), previewBox=document.getElementById('imagePreview'), previewImg=document.getElementById('previewImg');
         upArea?.addEventListener('click',()=>fileInp.click());
         fileInp?.addEventListener('change',(e)=>{ const f=e.target.files[0]; if(f){ const rd=new FileReader(); rd.onload=ev=>{ trademarkImageData=ev.target.result; previewImg.src=ev.target.result; previewBox.style.display='flex'; }; rd.readAsDataURL(f); } });
-        
-        document.getElementById('clearSelectedBtn')?.addEventListener('click',()=>{ if(confirm('清空所有已选小类？')){ for(let k in selectedSubclasses) delete selectedSubclasses[k]; refreshUI(); renderTree(); } });
+
+        // 清空已选、搜索、发票、方案变更、草稿保存等
+        document.getElementById('clearSelectedBtn')?.addEventListener('click',()=>{ if(confirm('清空所有已选小类？')){ for(let k in selectedSubclasses) delete selectedSubclasses[k]; refreshUI(); renderTree(document.getElementById('searchInput').value); } });
         document.getElementById('searchInput')?.addEventListener('input',(e)=>renderTree(e.target.value));
         document.getElementById('invoiceCheckbox')?.addEventListener('change',refreshUI);
         document.querySelectorAll('input[name="scheme"]').forEach(r=>r.addEventListener('change',refreshUI));
-        document.querySelectorAll('.save-draft-btn').forEach(btn=>btn.addEventListener('click',()=>{ localStorage.setItem('trademarkDraft',JSON.stringify({applicant:document.getElementById('applicantName')?.value||'',tmName:document.getElementById('trademarkName')?.value||''})); alert('草稿已保存'); }));
+        document.querySelectorAll('.save-draft-btn').forEach(btn=>btn.addEventListener('click',()=>{
+            const applicant=document.getElementById('applicantName')?.value||'';
+            const tmName=document.getElementById('trademarkName')?.value||'';
+            localStorage.setItem('trademarkDraft',JSON.stringify({applicant,tmName,timestamp:new Date()}));
+            alert('草稿已保存到浏览器');
+        }));
         window.toggleFlowStep=function(el){ el.classList.toggle('completed'); };
         document.getElementById('flowStartBox')?.addEventListener('click',function(){ this.classList.toggle('completed'); });
-        
+
+        // 启动
         loadJSON();
         initSemanticMatch();
     })();
