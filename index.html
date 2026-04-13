@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
-    <meta name="description" content="企优咨商标申请下单系统 - 专业商标代理服务，支持行业智能匹配快速选类">
-    <title>企优咨 · 商标申请下单系统（全功能版）</title>
-    <!-- html-docx-js 用于生成真正的 .docx 文件 -->
+    <meta name="description" content="企优咨商标申请下单系统 - 支持尼斯分类表_树状结构.json 动态加载 + 行业智能匹配">
+    <title>企优咨 · 商标申请下单系统（完整版）</title>
     <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: '宋体', SimSun, 'Times New Roman', serif; }
@@ -99,6 +98,7 @@
         .start-box.completed { background: #d4edda; border-color: #28a745; }
         .qr-code { max-width: 100px; margin: 0 auto; display: block; }
         @media (max-width: 768px) { .step-panel-container { padding: 12px 16px; } .info-table td:first-child { width: 40%; } }
+        .loading-tip { background: #e6f7ff; border-left: 4px solid #1890ff; padding: 8px 12px; margin-bottom: 12px; font-size: 0.85rem; }
     </style>
 </head>
 <body>
@@ -121,13 +121,14 @@
     <div id="step1Panel" class="step-panel-container" style="display: block;">
         <div class="panel-header"><div class="panel-title"><span>1</span>选择商标分类</div><div class="panel-subtitle">搜索或浏览，勾选小类；也可通过「行业智能匹配」一键勾选</div></div>
         <div class="panel-body">
+            <div id="dataLoadStatus" class="loading-tip">⏳ 正在加载分类数据（优先读取 尼斯分类表_树状结构.json）...</div>
             <div class="industry-match-card">
                 <div class="industry-match-title">✨ 行业智能匹配（360行属性）</div>
                 <div class="industry-match-row"><input type="text" id="industryKeyword" placeholder="例如：餐饮、服装、电子产品、广告、医疗..." autocomplete="off"><button id="matchIndustryBtn">🔍 匹配行业</button></div>
                 <div id="matchResultArea" class="match-result-area" style="display: none;"><div class="match-result-header"><span>📋 推荐小类</span><span class="match-badge" id="matchCountBadge">0项</span></div><div id="matchedItemsList" class="industry-item-list"></div><div class="action-buttons"><button id="checkAllMatchedBtn" class="primary-btn">✓ 一键勾选全部</button><button id="clearMatchedBtn">🗑️ 清空</button></div></div>
             </div>
             <div class="search-section"><div class="search-box"><div class="search-input-wrapper"><span class="search-icon">🔍</span><input type="text" id="searchInput" placeholder="输入小类名称或大类号"></div><span class="search-stats" id="searchCount">加载中...</span></div></div>
-            <div class="tree-container" id="treeContainer"><ul class="tree-ul" id="categoryTree"><li>加载分类数据中...</li></ul></div>
+            <div class="tree-container" id="treeContainer"><ul class="tree-ul" id="categoryTree"><li>正在加载分类树...</li></ul></div>
             <div style="display: flex; justify-content: space-between; margin-top: 12px;"><button class="btn btn-secondary" id="clearSelectedBtn">🗑️ 清空已选</button><span class="search-stats" id="selectedCountBadge">已选 0 个小类</span></div>
         </div>
         <div class="step-footer-nav"><span>当前：选分类</span><div><button class="step-footer-btn save-draft-btn" data-step="1">💾 保存草稿</button><button class="step-footer-btn step-next-btn" data-next="2">下一步 ▶</button></div></div>
@@ -181,7 +182,29 @@
 
 <script>
     (function(){
-        // ---------- 内置尼斯分类数据（确保离线可用）----------
+        // ---------- 全局变量 ----------
+        let rawData = [];               // 存储尼斯分类原始数据（从json加载或内置）
+        let selectedSubclasses = {};   // { "25": ["服装","衬衫"] }
+        let trademarkImageData = null;
+        const schemeParams = { A:{base:380,extra:38,name:"流程跟进"}, B:{base:580,extra:58,name:"专业辅导"}, C:{base:1100,extra:110,name:"分期付费"} };
+        
+        // 行业智能映射相关
+        let industryMap = new Map();    // 行业名 -> [{major, subclass}]
+        const industryRules = [
+            { industry:"餐饮", keywords:["餐厅","饭店","咖啡馆","酒吧","餐饮","食物","饮料"], matchMajors:["43"] },
+            { industry:"服装/鞋帽", keywords:["服装","衬衫","T恤","外套","裤子","鞋","帽","袜"], matchMajors:["25"] },
+            { industry:"电子产品/科技", keywords:["计算机","软件","手机","平板","笔记本电脑","电子","芯片"], matchMajors:["9"] },
+            { industry:"广告/市场营销", keywords:["广告","广告宣传","市场营销","替他人推销"], matchMajors:["35"] },
+            { industry:"美妆/日化", keywords:["化妆品","香水","洗护","牙膏"], matchMajors:["3"] },
+            { industry:"珠宝/手表", keywords:["珠宝","首饰","手表","宝石"], matchMajors:["14"] },
+            { industry:"医疗/卫生", keywords:["医疗","医院","美容","卫生"], matchMajors:["44"] },
+            { industry:"教育/娱乐", keywords:["教育","培训","娱乐","出版"], matchMajors:["41"] },
+            { industry:"金融/保险", keywords:["金融","保险","银行"], matchMajors:["36"] },
+            { industry:"法律服务", keywords:["法律","知识产权","诉讼"], matchMajors:["45"] }
+        ];
+        const synonymMap = { "科技":"电子产品/科技","电脑":"电子产品/科技","服装":"服装/鞋帽","广告":"广告/市场营销","美妆":"美妆/日化","医疗":"医疗/卫生","教育":"教育/娱乐" };
+        
+        // ---------- 内置默认数据（当外部json加载失败时使用）----------
         const DEFAULT_CATEGORIES = [
             { "大类":"25", "children":[{"类似群组":"2501","name":"衣物","children":[{"小类":"服装"},{"小类":"衬衫"},{"小类":"T恤"},{"小类":"外套"},{"小类":"裤子"}]},{"类似群组":"2502","name":"婴儿纺织品","children":[{"小类":"婴儿服装"}]},{"类似群组":"2503","name":"特种运动服装","children":[{"小类":"游泳衣"}]}] },
             { "大类":"9", "children":[{"类似群组":"0901","name":"电子计算机","children":[{"小类":"计算机"},{"小类":"笔记本电脑"},{"小类":"计算机软件"}]},{"类似群组":"0907","name":"通信设备","children":[{"小类":"智能手机"},{"小类":"手机壳"}]}] },
@@ -190,63 +213,13 @@
             { "大类":"3", "children":[{"类似群组":"0306","name":"化妆品","children":[{"小类":"化妆品"},{"小类":"香水"}]}] },
             { "大类":"14", "children":[{"类似群组":"1403","name":"珠宝","children":[{"小类":"珠宝首饰"},{"小类":"手表"}]}] }
         ];
-        let rawData = [];
-        let selectedSubclasses = {};   // { "25": ["服装","衬衫"] }
-        let trademarkImageData = null;
-        const schemeParams = { A:{base:380,extra:38,name:"流程跟进"}, B:{base:580,extra:58,name:"专业辅导"}, C:{base:1100,extra:110,name:"分期付费"} };
         
-        // ---------- 行业智能映射库（基于内置数据动态构建）----------
-        let industryMap = new Map();  // 行业名 -> [{major, subclass}]
-        const industryRules = [
-            { industry:"餐饮", keywords:["餐厅","饭店","咖啡馆","酒吧","餐饮"], matchMajors:["43"] },
-            { industry:"服装/鞋帽", keywords:["服装","衬衫","T恤","外套","裤子"], matchMajors:["25"] },
-            { industry:"电子产品/科技", keywords:["计算机","软件","手机","平板","笔记本电脑"], matchMajors:["9"] },
-            { industry:"广告/市场营销", keywords:["广告","广告宣传","市场营销"], matchMajors:["35"] },
-            { industry:"美妆/日化", keywords:["化妆品","香水"], matchMajors:["3"] },
-            { industry:"珠宝/手表", keywords:["珠宝","首饰","手表"], matchMajors:["14"] }
-        ];
-        const synonymMap = { "科技":"电子产品/科技","电脑":"电子产品/科技","服装":"服装/鞋帽","广告":"广告/市场营销","美妆":"美妆/日化" };
-        
-        function buildIndustryMapping() {
-            industryMap.clear();
-            if(!rawData.length) return;
-            rawData.forEach(majorNode => {
-                const majorNum = majorNode.大类 || majorNode.name;
-                (majorNode.children || []).forEach(group => {
-                    const groupName = group.name || group.类似群组 || '';
-                    (group.children || []).forEach(sub => {
-                        const subclassName = sub.小类 || sub.name;
-                        if(!subclassName) return;
-                        industryRules.forEach(rule => {
-                            let matched = false;
-                            if(rule.matchMajors && rule.matchMajors.includes(majorNum)) matched = true;
-                            if(!matched && rule.keywords.some(kw => subclassName.includes(kw) || groupName.includes(kw))) matched = true;
-                            if(matched) {
-                                if(!industryMap.has(rule.industry)) industryMap.set(rule.industry, []);
-                                const list = industryMap.get(rule.industry);
-                                if(!list.some(item => item.major === majorNum && item.subclass === subclassName))
-                                    list.push({ major: majorNum, subclass: subclassName });
-                            }
-                        });
-                    });
-                });
-            });
-        }
-        function getMatchedIndustries(input) {
-            const kw = input.trim().toLowerCase();
-            if(!kw) return [];
-            let matched = new Set();
-            for(let industry of industryMap.keys()) if(industry.toLowerCase().includes(kw)) matched.add(industry);
-            for(let [syn, target] of Object.entries(synonymMap)) if(kw.includes(syn) || syn.includes(kw)) matched.add(target);
-            for(let rule of industryRules) if(rule.keywords.some(k => kw.includes(k))) matched.add(rule.industry);
-            return Array.from(matched);
-        }
-        
-        // 通用函数
+        // ---------- 通用工具函数 ----------
         function escapeHtml(str) { if(!str) return ''; return String(str).replace(/[&<>]/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[m]; }); }
         function escapeAttr(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
         function getSelectedStats() { let major=0,sub=0; for(let m in selectedSubclasses){ if(selectedSubclasses[m].length){ major++; sub+=selectedSubclasses[m].length; } } return {majorCount:major, totalSubCount:sub}; }
         
+        // 刷新已选标签 + 费用
         function refreshUI() {
             const tagsContainer = document.getElementById('selectedTags');
             const emptyState = document.getElementById('selectedEmpty');
@@ -269,8 +242,7 @@
             document.querySelectorAll('.tag-remove').forEach(btn => btn.addEventListener('click', (e) => {
                 let major = btn.dataset.major, sub = btn.dataset.sub;
                 if(selectedSubclasses[major]) { let idx = selectedSubclasses[major].indexOf(sub); if(idx>-1) selectedSubclasses[major].splice(idx,1); if(selectedSubclasses[major].length===0) delete selectedSubclasses[major]; }
-                refreshUI(); syncCheckboxes(); renderTree(document.getElementById('searchInput')?.value||'');
-                updateFeeAndTotal();
+                refreshUI(); syncCheckboxes(); renderTree(document.getElementById('searchInput')?.value||''); updateFeeAndTotal();
             }));
             document.getElementById('selectedCountBadge').innerText = `已选 ${getSelectedStats().totalSubCount} 个小类`;
             syncCheckboxes();
@@ -295,10 +267,48 @@
             document.getElementById('feeDisplay').innerHTML = `<div>已选 ${stats.totalSubCount} 个小类，${stats.majorCount}个大类<br>方案 ${scheme}，总费用 ¥${total.toFixed(2)}</div>`;
         }
         
-        // 渲染树形分类
+        // 构建行业映射（基于当前 rawData）
+        function buildIndustryMapping() {
+            industryMap.clear();
+            if(!rawData.length) return;
+            rawData.forEach(majorNode => {
+                const majorNum = majorNode.大类 || majorNode.name;
+                if(!majorNum) return;
+                (majorNode.children || []).forEach(group => {
+                    const groupName = group.name || group.类似群组 || '';
+                    (group.children || []).forEach(sub => {
+                        const subclassName = sub.小类 || sub.name;
+                        if(!subclassName) return;
+                        industryRules.forEach(rule => {
+                            let matched = false;
+                            if(rule.matchMajors && rule.matchMajors.includes(majorNum)) matched = true;
+                            if(!matched && rule.keywords.some(kw => subclassName.includes(kw) || groupName.includes(kw))) matched = true;
+                            if(matched) {
+                                if(!industryMap.has(rule.industry)) industryMap.set(rule.industry, []);
+                                const list = industryMap.get(rule.industry);
+                                if(!list.some(item => item.major === majorNum && item.subclass === subclassName))
+                                    list.push({ major: majorNum, subclass: subclassName });
+                            }
+                        });
+                    });
+                });
+            });
+        }
+        
+        function getMatchedIndustries(input) {
+            const kw = input.trim().toLowerCase();
+            if(!kw) return [];
+            let matched = new Set();
+            for(let industry of industryMap.keys()) if(industry.toLowerCase().includes(kw)) matched.add(industry);
+            for(let [syn, target] of Object.entries(synonymMap)) if(kw.includes(syn) || syn.includes(kw)) matched.add(target);
+            for(let rule of industryRules) if(rule.keywords.some(k => kw.includes(k))) matched.add(rule.industry);
+            return Array.from(matched);
+        }
+        
+        // 渲染树形分类（支持过滤）
         function renderTree(filter='') {
             const container = document.getElementById('categoryTree');
-            if(!container || !rawData.length) return;
+            if(!container || !rawData.length) { container.innerHTML = '<li>暂无分类数据，请检查 JSON 文件或刷新重试</li>'; return; }
             let html = '';
             rawData.forEach(major => {
                 const majorNum = major.大类 || major.name;
@@ -308,6 +318,8 @@
                     html += `<li><button class="folder-label cat-group"><span class="folder-icon">▶</span>${escapeHtml(groupName)}</button><ul>`;
                     (group.children || []).forEach(sub => {
                         const subName = sub.小类 || sub.name;
+                        // 简单过滤（可选）
+                        if(filter && !subName.toLowerCase().includes(filter.toLowerCase()) && !majorNum.includes(filter)) return;
                         const checked = (selectedSubclasses[majorNum] && selectedSubclasses[majorNum].includes(subName)) ? 'checked' : '';
                         html += `<li class="subclass-item"><input type="checkbox" class="subclass-checkbox" data-major="${escapeAttr(majorNum)}" data-sub="${escapeAttr(subName)}" ${checked}><label>${escapeHtml(subName)}</label></li>`;
                     });
@@ -316,14 +328,17 @@
                 html += `</ul></li>`;
             });
             container.innerHTML = html;
+            // 绑定复选框事件
             document.querySelectorAll('.subclass-checkbox').forEach(cb => cb.addEventListener('change', function(e) {
                 let m=this.dataset.major, s=this.dataset.sub;
                 if(this.checked) { if(!selectedSubclasses[m]) selectedSubclasses[m]=[]; if(!selectedSubclasses[m].includes(s)) selectedSubclasses[m].push(s); }
                 else { let idx=selectedSubclasses[m]?.indexOf(s); if(idx>-1) selectedSubclasses[m].splice(idx,1); if(selectedSubclasses[m]?.length===0) delete selectedSubclasses[m]; }
                 refreshUI(); renderTree(document.getElementById('searchInput')?.value||''); updateFeeAndTotal();
             }));
+            // 绑定文件夹展开
             document.querySelectorAll('.folder-label').forEach(btn => btn.addEventListener('click',(e)=>{ e.stopPropagation(); btn.parentElement.classList.toggle('expanded'); }));
-            document.getElementById('searchCount').innerHTML = `共 ${document.querySelectorAll('.subclass-checkbox').length} 小类`;
+            const totalSubCount = document.querySelectorAll('.subclass-checkbox').length;
+            document.getElementById('searchCount').innerHTML = totalSubCount ? `共 ${totalSubCount} 小类` : '无匹配项';
         }
         
         // 行业匹配交互
@@ -335,6 +350,7 @@
             document.getElementById('matchCountBadge').innerText = items.length+'项';
             const listDiv = document.getElementById('matchedItemsList');
             listDiv.innerHTML = '';
+            if(items.length === 0) { listDiv.innerHTML = '<div class="empty-match">暂无匹配小类</div>'; }
             items.forEach(item => {
                 const chip = document.createElement('div'); chip.className='industry-item';
                 chip.innerHTML = `<strong>${escapeHtml(item.major)}类</strong> ${escapeHtml(item.subclass)} <span class="select-single" data-major="${escapeAttr(item.major)}" data-sub="${escapeAttr(item.subclass)}">➕勾选</span>`;
@@ -388,7 +404,7 @@
             } catch(e) { alert('导出失败：'+e.message); }
         }
         
-        // 预览
+        // 预览渲染
         function renderPreview() {
             const applicant = document.getElementById('applicantName')?.value;
             const tmName = document.getElementById('trademarkName')?.value;
@@ -404,32 +420,55 @@
         document.querySelectorAll('.step-next-btn').forEach(btn=>btn.addEventListener('click',()=>{ let n=btn.dataset.next; if(n==='2') activateTab('step2'); else if(n==='3') activateTab('step3'); else if(n==='preview') activateTab('preview'); else if(n==='flow') activateTab('flow'); }));
         document.querySelectorAll('.step-prev-btn').forEach(btn=>btn.addEventListener('click',()=>{ let p=btn.dataset.prev; if(p==='1') activateTab('step1'); else if(p==='2') activateTab('step2'); else if(p==='3') activateTab('step3'); else if(p==='preview') activateTab('preview'); }));
         
-        // 绑定事件
-        document.getElementById('clearSelectedBtn')?.addEventListener('click',()=>{ if(confirm('清空所有已选小类？')){ selectedSubclasses={}; refreshUI(); renderTree(); updateFeeAndTotal(); } });
-        document.getElementById('searchInput')?.addEventListener('input',(e)=>renderTree(e.target.value));
-        document.getElementById('uploadArea')?.addEventListener('click',()=>document.getElementById('fileInput').click());
-        document.getElementById('fileInput')?.addEventListener('change',(e)=>{ let f=e.target.files[0]; if(f){ let r=new FileReader(); r.onload=ev=>{ trademarkImageData=ev.target.result; document.getElementById('previewImg').src=ev.target.result; document.getElementById('imagePreview').style.display='block'; }; r.readAsDataURL(f); } });
-        document.querySelectorAll('.save-draft-btn').forEach(btn=>btn.addEventListener('click',()=>{ let draft={ applicant:document.getElementById('applicantName')?.value, tmName:document.getElementById('trademarkName')?.value }; localStorage.setItem('trademarkDraft',JSON.stringify(draft)); alert('草稿已保存'); }));
-        document.querySelectorAll('input[name="scheme"]').forEach(r=>r.addEventListener('change',updateFeeAndTotal));
-        document.getElementById('invoiceCheckbox')?.addEventListener('change',updateFeeAndTotal);
-        document.getElementById('previewOrderBtn')?.addEventListener('click',()=>activateTab('preview'));
-        document.getElementById('previewContractBtn')?.addEventListener('click',()=>activateTab('preview'));
-        document.getElementById('exportWordBtn')?.addEventListener('click',()=>exportDocx(false));
-        document.getElementById('generateContractBtn')?.addEventListener('click',()=>exportDocx(true));
-        document.querySelector('.preview-export-word')?.addEventListener('click',()=>exportDocx(false));
-        document.querySelector('.preview-generate-contract')?.addEventListener('click',()=>exportDocx(true));
-        document.getElementById('matchIndustryBtn')?.addEventListener('click',()=>{ let kw=document.getElementById('industryKeyword').value; if(!kw.trim()){ alert('请输入行业关键词'); return; } let industries=getMatchedIndustries(kw); if(industries.length===0){ alert('未匹配到行业，请尝试其他关键词'); return; } renderMatchResult(industries[0]); });
-        document.getElementById('checkAllMatchedBtn')?.addEventListener('click',checkAllMatched);
-        document.getElementById('clearMatchedBtn')?.addEventListener('click',clearMatchArea);
-        document.querySelectorAll('.flow-step').forEach(step=>step.addEventListener('click',function(){ this.classList.toggle('completed'); }));
-        document.getElementById('flowStartBox')?.addEventListener('click',function(){ this.classList.toggle('completed'); });
+        // 加载外部 JSON 或回退内置数据
+        function loadExternalJSON() {
+            const statusDiv = document.getElementById('dataLoadStatus');
+            fetch('尼斯分类表_树状结构.json')
+                .then(res => { if(!res.ok) throw new Error('HTTP '+res.status); return res.json(); })
+                .then(data => {
+                    rawData = data;
+                    statusDiv.innerHTML = '✅ 已成功加载 <strong>尼斯分类表_树状结构.json</strong>，共 '+rawData.length+' 个大类。';
+                    statusDiv.style.background = '#e6ffe6';
+                    buildIndustryMapping();
+                    renderTree();
+                    refreshUI();
+                })
+                .catch(err => {
+                    console.warn('加载外部JSON失败，使用内置默认数据:', err);
+                    rawData = JSON.parse(JSON.stringify(DEFAULT_CATEGORIES));
+                    statusDiv.innerHTML = '⚠️ 未找到外部文件“尼斯分类表_树状结构.json”，已使用内置示例数据。请将有效的JSON文件放在相同目录下。';
+                    statusDiv.style.background = '#fff3cd';
+                    buildIndustryMapping();
+                    renderTree();
+                    refreshUI();
+                });
+        }
         
-        // 初始化数据
-        rawData = DEFAULT_CATEGORIES;
-        buildIndustryMapping();
-        renderTree();
-        refreshUI();
-        updateFeeAndTotal();
+        // 绑定UI事件
+        function bindEvents() {
+            document.getElementById('clearSelectedBtn')?.addEventListener('click',()=>{ if(confirm('清空所有已选小类？')){ selectedSubclasses={}; refreshUI(); renderTree(); updateFeeAndTotal(); } });
+            document.getElementById('searchInput')?.addEventListener('input',(e)=>renderTree(e.target.value));
+            document.getElementById('uploadArea')?.addEventListener('click',()=>document.getElementById('fileInput').click());
+            document.getElementById('fileInput')?.addEventListener('change',(e)=>{ let f=e.target.files[0]; if(f){ let r=new FileReader(); r.onload=ev=>{ trademarkImageData=ev.target.result; document.getElementById('previewImg').src=ev.target.result; document.getElementById('imagePreview').style.display='block'; }; r.readAsDataURL(f); } });
+            document.querySelectorAll('.save-draft-btn').forEach(btn=>btn.addEventListener('click',()=>{ let draft={ applicant:document.getElementById('applicantName')?.value, tmName:document.getElementById('trademarkName')?.value }; localStorage.setItem('trademarkDraft',JSON.stringify(draft)); alert('草稿已保存'); }));
+            document.querySelectorAll('input[name="scheme"]').forEach(r=>r.addEventListener('change',updateFeeAndTotal));
+            document.getElementById('invoiceCheckbox')?.addEventListener('change',updateFeeAndTotal);
+            document.getElementById('previewOrderBtn')?.addEventListener('click',()=>activateTab('preview'));
+            document.getElementById('previewContractBtn')?.addEventListener('click',()=>activateTab('preview'));
+            document.getElementById('exportWordBtn')?.addEventListener('click',()=>exportDocx(false));
+            document.getElementById('generateContractBtn')?.addEventListener('click',()=>exportDocx(true));
+            document.querySelector('.preview-export-word')?.addEventListener('click',()=>exportDocx(false));
+            document.querySelector('.preview-generate-contract')?.addEventListener('click',()=>exportDocx(true));
+            document.getElementById('matchIndustryBtn')?.addEventListener('click',()=>{ let kw=document.getElementById('industryKeyword').value; if(!kw.trim()){ alert('请输入行业关键词'); return; } let industries=getMatchedIndustries(kw); if(industries.length===0){ alert('未匹配到行业，请尝试其他关键词'); return; } renderMatchResult(industries[0]); });
+            document.getElementById('checkAllMatchedBtn')?.addEventListener('click',checkAllMatched);
+            document.getElementById('clearMatchedBtn')?.addEventListener('click',clearMatchArea);
+            document.querySelectorAll('.flow-step').forEach(step=>step.addEventListener('click',function(){ this.classList.toggle('completed'); }));
+            document.getElementById('flowStartBox')?.addEventListener('click',function(){ this.classList.toggle('completed'); });
+        }
+        
+        // 启动
+        bindEvents();
+        loadExternalJSON();
     })();
 </script>
 </body>
